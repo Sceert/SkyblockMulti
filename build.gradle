@@ -36,7 +36,7 @@ dependencies {
 
     implementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 
-    modCompileOnly "maven.modrinth:gF3BGWvG:tdvSCMV3"
+    compileOnly "maven.modrinth:gF3BGWvG:tdvSCMV3"
 }
 
 processResources {
