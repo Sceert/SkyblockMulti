@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:progress/end_entry",
+  "display": {
+    "icon": {
+      "id": "minecraft:dragon_head"
+    },
+    "title": {
+      "text": "El fin... por ahora"
+    },
+    "description": {
+      "text": "Derrota al dragón del End."
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

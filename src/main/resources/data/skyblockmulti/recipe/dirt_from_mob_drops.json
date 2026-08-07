@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "RBR",
+    "BGB",
+    "RBR"
+  ],
+  "key": {
+    "R": "minecraft:rotten_flesh",
+    "B": "minecraft:bone_meal",
+    "G": "minecraft:cobblestone"
+  },
+  "result": {
+    "id": "minecraft:dirt",
+    "count": 1
+  }
+}

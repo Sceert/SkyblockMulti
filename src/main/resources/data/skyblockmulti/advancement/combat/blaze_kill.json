@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:combat/advanced_loot",
+  "display": {
+    "icon": {
+      "id": "minecraft:blaze_rod"
+    },
+    "title": {
+      "text": "Fuego capturado"
+    },
+    "description": {
+      "text": "Derrota a un blaze."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

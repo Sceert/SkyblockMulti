@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:automation/piston",
+  "display": {
+    "icon": {
+      "id": "minecraft:observer"
+    },
+    "title": {
+      "text": "Todo bajo observación"
+    },
+    "description": {
+      "text": "Obtén un observador."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "event": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

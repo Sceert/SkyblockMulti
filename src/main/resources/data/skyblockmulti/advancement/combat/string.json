@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:combat/spider_kill",
+  "display": {
+    "icon": {
+      "id": "minecraft:string"
+    },
+    "title": {
+      "text": "Hilo de araña"
+    },
+    "description": {
+      "text": "Consigue hilo."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

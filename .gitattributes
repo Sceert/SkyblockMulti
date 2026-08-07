@@ -1,0 +1,7 @@
+* text=auto
+*.bat text eol=crlf
+*.gradle text eol=lf
+*.properties text eol=lf
+*.json text eol=lf
+*.mcfunction text eol=lf
+*.md text eol=lf

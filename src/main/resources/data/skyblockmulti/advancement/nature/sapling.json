@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:progress/first_log",
+  "display": {
+    "icon": {
+      "id": "minecraft:oak_sapling"
+    },
+    "title": {
+      "text": "El ciclo continúa"
+    },
+    "description": {
+      "text": "Obtén un retoño para volver a plantar."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "event": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

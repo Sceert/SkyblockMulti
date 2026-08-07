@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:combat/kill_hostile",
+  "display": {
+    "icon": {
+      "id": "minecraft:string"
+    },
+    "title": {
+      "text": "Tejedor nocturno"
+    },
+    "description": {
+      "text": "Derrota a una araña."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:combat/basic_farm",
+  "display": {
+    "icon": {
+      "id": "minecraft:slime_ball"
+    },
+    "title": {
+      "text": "Gel del vacío"
+    },
+    "description": {
+      "text": "Derrota a un slime."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

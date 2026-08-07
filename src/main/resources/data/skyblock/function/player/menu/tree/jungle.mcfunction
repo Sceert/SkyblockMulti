@@ -1,0 +1,1 @@
+tellraw @s {"translate":"skyblockmulti.menu.tree.jungle","color":"green","bold":true,"click_event":{"action":"run_command","command":"trigger sb_tree set 4"},"hover_event":{"action":"show_text","value":{"translate":"skyblockmulti.menu.tree.jungle.hover"}}}

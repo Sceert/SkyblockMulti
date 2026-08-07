@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:combat/ghast_kill",
+  "display": {
+    "icon": {
+      "id": "minecraft:ghast_tear"
+    },
+    "title": {
+      "text": "Botín fantasmal"
+    },
+    "description": {
+      "text": "Consigue una lágrima de ghast."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:combat/skeleton_kill",
+  "display": {
+    "icon": {
+      "id": "minecraft:arrow"
+    },
+    "title": {
+      "text": "Munición reciclada"
+    },
+    "description": {
+      "text": "Consigue flechas."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

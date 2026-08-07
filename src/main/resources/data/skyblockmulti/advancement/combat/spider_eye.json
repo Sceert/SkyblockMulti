@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:combat/spider_kill",
+  "display": {
+    "icon": {
+      "id": "minecraft:spider_eye"
+    },
+    "title": {
+      "text": "Ojo vigilante"
+    },
+    "description": {
+      "text": "Consigue un ojo de araña."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

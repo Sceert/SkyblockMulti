@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:combat/advanced_loot",
+  "display": {
+    "icon": {
+      "id": "minecraft:ghast_tear"
+    },
+    "title": {
+      "text": "Cazador del Nether"
+    },
+    "description": {
+      "text": "Reúne vara de blaze, polvo de blaze y lágrima de ghast."
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

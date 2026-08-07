@@ -1,0 +1,1 @@
+tellraw @s {"translate":"skyblockmulti.menu.tree.dark_oak","color":"dark_gray","bold":true,"click_event":{"action":"run_command","command":"trigger sb_tree set 8"},"hover_event":{"action":"show_text","value":{"translate":"skyblockmulti.menu.tree.dark_oak.hover"}}}

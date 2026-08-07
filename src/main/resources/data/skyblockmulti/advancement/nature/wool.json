@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:nature/breed_animal",
+  "display": {
+    "icon": {
+      "id": "minecraft:white_wool"
+    },
+    "title": {
+      "text": "Lana del cielo"
+    },
+    "description": {
+      "text": "Obtén lana."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "event": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

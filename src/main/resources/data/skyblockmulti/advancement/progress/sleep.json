@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:progress/first_island",
+  "display": {
+    "icon": {
+      "id": "minecraft:red_bed"
+    },
+    "title": {
+      "text": "Hogar, dulce hogar"
+    },
+    "description": {
+      "text": "Duerme en una cama."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "event": {
+      "trigger": "minecraft:slept_in_bed"
+    }
+  }
+}

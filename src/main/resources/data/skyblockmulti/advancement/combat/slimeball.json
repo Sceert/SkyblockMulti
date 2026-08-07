@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:combat/slime_kill",
+  "display": {
+    "icon": {
+      "id": "minecraft:slime_ball"
+    },
+    "title": {
+      "text": "Elasticidad renovable"
+    },
+    "description": {
+      "text": "Consigue una bola de slime."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

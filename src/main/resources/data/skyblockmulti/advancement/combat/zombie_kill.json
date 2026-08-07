@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:combat/kill_hostile",
+  "display": {
+    "icon": {
+      "id": "minecraft:rotten_flesh"
+    },
+    "title": {
+      "text": "Sin descanso"
+    },
+    "description": {
+      "text": "Derrota a un zombi."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:combat/witch_kill",
+  "display": {
+    "icon": {
+      "id": "minecraft:redstone"
+    },
+    "title": {
+      "text": "Polvo brillante"
+    },
+    "description": {
+      "text": "Consigue redstone de brujas o del mundo."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

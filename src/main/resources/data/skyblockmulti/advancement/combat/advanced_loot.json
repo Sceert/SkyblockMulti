@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:combat/basic_farm",
+  "display": {
+    "icon": {
+      "id": "minecraft:ender_pearl"
+    },
+    "title": {
+      "text": "Botines avanzados"
+    },
+    "description": {
+      "text": "Reúne ojo de araña, slime, redstone y una perla de Ender."
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

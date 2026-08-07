@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:combat/kill_hostile",
+  "display": {
+    "icon": {
+      "id": "minecraft:bow"
+    },
+    "title": {
+      "text": "Huesos en el aire"
+    },
+    "description": {
+      "text": "Derrota a un esqueleto."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

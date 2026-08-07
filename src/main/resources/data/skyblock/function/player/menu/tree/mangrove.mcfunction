@@ -1,0 +1,1 @@
+tellraw @s {"translate":"skyblockmulti.menu.tree.mangrove","color":"dark_red","bold":true,"click_event":{"action":"run_command","command":"trigger sb_tree set 7"},"hover_event":{"action":"show_text","value":{"translate":"skyblockmulti.menu.tree.mangrove.hover"}}}

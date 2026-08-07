@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:progress/first_island",
+  "display": {
+    "icon": {
+      "id": "minecraft:iron_sword"
+    },
+    "title": {
+      "text": "Primera amenaza"
+    },
+    "description": {
+      "text": "Derrota una criatura hostil."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:progress/end_entry",
+  "display": {
+    "icon": {
+      "id": "minecraft:shulker_shell"
+    },
+    "title": {
+      "text": "Caparazón extraño"
+    },
+    "description": {
+      "text": "Obtén un caparazón de shulker."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "event": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

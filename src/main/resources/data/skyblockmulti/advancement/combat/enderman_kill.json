@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:combat/basic_farm",
+  "display": {
+    "icon": {
+      "id": "minecraft:ender_pearl"
+    },
+    "title": {
+      "text": "Mirada prohibida"
+    },
+    "description": {
+      "text": "Derrota a un enderman."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

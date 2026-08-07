@@ -1,0 +1,26 @@
+{
+  "parent": "skyblockmulti:progress/nether_entry",
+  "display": {
+    "icon": {
+      "id": "minecraft:end_portal_frame"
+    },
+    "title": {
+      "text": "Al otro lado"
+    },
+    "description": {
+      "text": "Entra al End."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "event": {
+      "trigger": "minecraft:changed_dimension",
+      "conditions": {
+        "to": "minecraft:the_end"
+      }
+    }
+  }
+}

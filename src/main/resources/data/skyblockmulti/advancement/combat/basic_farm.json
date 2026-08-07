@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:combat/kill_hostile",
+  "display": {
+    "icon": {
+      "id": "minecraft:spawner"
+    },
+    "title": {
+      "text": "Granja hostil inicial"
+    },
+    "description": {
+      "text": "Reúne carne podrida, huesos, hilo y pólvora."
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

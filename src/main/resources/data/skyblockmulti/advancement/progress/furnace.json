@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:progress/crafting_table",
+  "display": {
+    "icon": {
+      "id": "minecraft:furnace"
+    },
+    "title": {
+      "text": "El primer horno"
+    },
+    "description": {
+      "text": "Obtén un horno."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "event": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

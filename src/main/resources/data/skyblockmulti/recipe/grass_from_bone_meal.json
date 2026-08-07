@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    [
+      "minecraft:dirt"
+    ],
+    [
+      "minecraft:dirt"
+    ],
+    [
+      "minecraft:dirt"
+    ],
+    [
+      "minecraft:bone_meal"
+    ]
+  ],
+  "result": {
+    "id": "minecraft:grass_block",
+    "count": 3
+  }
+}

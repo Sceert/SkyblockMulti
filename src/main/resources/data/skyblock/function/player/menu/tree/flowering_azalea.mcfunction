@@ -1,0 +1,1 @@
+tellraw @s {"translate":"skyblockmulti.menu.tree.flowering_azalea","color":"dark_purple","bold":true,"click_event":{"action":"run_command","command":"trigger sb_tree set 11"},"hover_event":{"action":"show_text","value":{"translate":"skyblockmulti.menu.tree.flowering_azalea.hover"}}}

@@ -1,0 +1,23 @@
+{
+  "parent": "skyblockmulti:combat/blaze_kill",
+  "display": {
+    "icon": {
+      "id": "minecraft:blaze_powder"
+    },
+    "title": {
+      "text": "Polvo infernal"
+    },
+    "description": {
+      "text": "Consigue polvo de blaze."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

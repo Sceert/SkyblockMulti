@@ -1,0 +1,26 @@
+# Respaldo predeterminado de 24 posiciones a 2048 bloques.
+data modify storage skyblock:config island_distance set value 2048
+data modify storage skyblock:slots s01 set value {x:-4096,z:-4096,slot:1,key:"01"}
+data modify storage skyblock:slots s02 set value {x:-2048,z:-4096,slot:2,key:"02"}
+data modify storage skyblock:slots s03 set value {x:0,z:-4096,slot:3,key:"03"}
+data modify storage skyblock:slots s04 set value {x:2048,z:-4096,slot:4,key:"04"}
+data modify storage skyblock:slots s05 set value {x:4096,z:-4096,slot:5,key:"05"}
+data modify storage skyblock:slots s06 set value {x:-4096,z:-2048,slot:6,key:"06"}
+data modify storage skyblock:slots s07 set value {x:-2048,z:-2048,slot:7,key:"07"}
+data modify storage skyblock:slots s08 set value {x:0,z:-2048,slot:8,key:"08"}
+data modify storage skyblock:slots s09 set value {x:2048,z:-2048,slot:9,key:"09"}
+data modify storage skyblock:slots s10 set value {x:4096,z:-2048,slot:10,key:"10"}
+data modify storage skyblock:slots s11 set value {x:-4096,z:0,slot:11,key:"11"}
+data modify storage skyblock:slots s12 set value {x:-2048,z:0,slot:12,key:"12"}
+data modify storage skyblock:slots s13 set value {x:2048,z:0,slot:13,key:"13"}
+data modify storage skyblock:slots s14 set value {x:4096,z:0,slot:14,key:"14"}
+data modify storage skyblock:slots s15 set value {x:-4096,z:2048,slot:15,key:"15"}
+data modify storage skyblock:slots s16 set value {x:-2048,z:2048,slot:16,key:"16"}
+data modify storage skyblock:slots s17 set value {x:0,z:2048,slot:17,key:"17"}
+data modify storage skyblock:slots s18 set value {x:2048,z:2048,slot:18,key:"18"}
+data modify storage skyblock:slots s19 set value {x:4096,z:2048,slot:19,key:"19"}
+data modify storage skyblock:slots s20 set value {x:-4096,z:4096,slot:20,key:"20"}
+data modify storage skyblock:slots s21 set value {x:-2048,z:4096,slot:21,key:"21"}
+data modify storage skyblock:slots s22 set value {x:0,z:4096,slot:22,key:"22"}
+data modify storage skyblock:slots s23 set value {x:2048,z:4096,slot:23,key:"23"}
+data modify storage skyblock:slots s24 set value {x:4096,z:4096,slot:24,key:"24"}
