@@ -166,30 +166,25 @@ ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
     var player = handler.player;
 
     // Mensaje informativo mostrado una sola vez por jugador.
-    if (!player.getTags().contains("skyblock_openpac_info_v1")) {
-
-        if (OpenPacCompat.isInstalled()) {
-            player.sendSystemMessage(
-                    Component.literal(
-                            "[SkyblockMulti] Open Parties and Claims detectado. " +
-                            "Para jugar en equipo puedes crear una party o aceptar una invitación " +
-                            "y compartir la isla del propietario. " +
-                            "Al abandonar una party, SkyblockMulti puede aplicar una dificultad mínima " +
-                            "más exigente según la configuración del mundo."
-                    )
-            );
-        } else {
-            player.sendSystemMessage(
-                    Component.literal(
-                            "[SkyblockMulti] Modo individual activo. " +
-                            "Para jugar en equipo puedes instalar Open Parties and Claims. " +
-                            "Este mod es opcional y SkyblockMulti funciona normalmente sin él."
-                    )
-            );
-        }
-
-        player.addTag("skyblock_openpac_info_v1");
-    }
+	if (OpenPacCompat.isInstalled()) {
+		player.sendSystemMessage(
+				Component.literal(
+						"[SkyblockMulti] Open Parties and Claims detectado. " +
+						"Para jugar en equipo puedes crear una party o aceptar una invitación " +
+						"y compartir la isla del propietario. " +
+						"Al abandonar una party, SkyblockMulti puede aplicar una dificultad mínima " +
+						"más exigente según la configuración del mundo."
+				)
+		);
+	} else {
+		player.sendSystemMessage(
+				Component.literal(
+						"[SkyblockMulti] Modo individual activo. " +
+						"Para jugar en equipo puedes instalar Open Parties and Claims. " +
+						"Este mod es opcional y SkyblockMulti funciona normalmente sin él."
+				)
+		);
+	}
 
     // Sin OpenPAC no debemos intentar consultar su API.
     if (!OpenPacCompat.isInstalled()) {
