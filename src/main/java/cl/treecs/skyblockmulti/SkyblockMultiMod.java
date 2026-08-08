@@ -428,47 +428,30 @@ ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             return;
         }
 
-        String ownerName = partyInfo.ownerName();
+		String ownerName = partyInfo.ownerName();
 
-        // Primero comprobamos que el owner realmente tenga una isla.
-        int ownerHasIsland = executor.run(
-                "execute if score " + ownerName +
-                        " sb3_state matches 2 run scoreboard players get " +
-                        ownerName + " sb3_state"
-        );
+		// Solo vinculamos la isla activa si el owner tiene una isla asignada.
+		executor.run(
+				"execute if score " + ownerName +
+						" sb3_state matches 2 run scoreboard players operation " +
+						playerName + " sb_active_x = " +
+						ownerName + " sb3_x"
+		);
 
-        if (ownerHasIsland <= 0) {
-            System.out.println(
-                    "[SkyblockMulti] OpenPAC: la party de "
-                            + playerName
-                            + " tiene owner "
-                            + ownerName
-                            + ", pero el owner todavía no tiene una isla asignada."
-            );
-            return;
-        }
+		executor.run(
+				"execute if score " + ownerName +
+						" sb3_state matches 2 run scoreboard players operation " +
+						playerName + " sb_active_z = " +
+						ownerName + " sb3_z"
+		);
 
-        // La isla personal del miembro NO se modifica.
-        // Solo cambiamos las coordenadas activas.
-        executor.run(
-                "scoreboard players operation " +
-                        playerName + " sb_active_x = " +
-                        ownerName + " sb3_x"
-        );
-
-        executor.run(
-                "scoreboard players operation " +
-                        playerName + " sb_active_z = " +
-                        ownerName + " sb3_z"
-        );
-
-        System.out.println(
-                "[SkyblockMulti] OpenPAC: isla activa de "
-                        + playerName
-                        + " vinculada a la isla de "
-                        + ownerName
-                        + "."
-        );
+		System.out.println(
+				"[SkyblockMulti] OpenPAC: sincronización de isla activa solicitada para "
+						+ playerName
+						+ " usando la isla de "
+						+ ownerName
+						+ "."
+		);
 
     } catch (Exception e) {
         System.err.println(
