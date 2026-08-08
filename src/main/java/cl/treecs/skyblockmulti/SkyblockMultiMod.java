@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import cl.treecs.skyblockmulti.compatibility.openpac.OpenPacCompat;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 
+
 public final class SkyblockMultiMod implements ModInitializer {
     public static final String MOD_ID = "skyblockmulti";
     public static final int DEFAULT_DISTANCE = 2048;
@@ -123,11 +124,6 @@ public final class SkyblockMultiMod implements ModInitializer {
 	OpenPacCompat.initialize();
 	ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 	    var player = handler.player;
-	
-	System.out.println(
-  	      "[SkyblockMulti] DEBUG JOIN detectado para "
-      	          + player.getGameProfile().name()
-	);
 	
     	OpenPacCompat.PartyInfo partyInfo =
 	            OpenPacCompat.getPartyInfo(player);
