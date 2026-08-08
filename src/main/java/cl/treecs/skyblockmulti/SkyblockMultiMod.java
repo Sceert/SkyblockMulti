@@ -27,6 +27,8 @@ import net.minecraft.server.level.ServerPlayer;
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
 
+import net.minecraft.network.chat.Component;
+
 public final class SkyblockMultiMod implements ModInitializer {
     public static final String MOD_ID = "skyblockmulti";
     public static final int DEFAULT_DISTANCE = 2048;
@@ -160,45 +162,73 @@ public final class SkyblockMultiMod implements ModInitializer {
     );
 });
 	
-	ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-	    var player = handler.player;
-	
-    	OpenPacCompat.PartyInfo partyInfo =
-	            OpenPacCompat.getPartyInfo(player);
-	
-	    if (!OpenPacCompat.isInstalled()) {
-	        return;
-    	}
+ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+    var player = handler.player;
 
-	    if (!partyInfo.inParty()) {
-	        System.out.println(
-	                "[SkyblockMulti] OpenPAC: "
- 	                       + player.getGameProfile().name()
- 	                       + " no pertenece a una party."
-  	      );
-   	     return;
-	    }
-	
-	    if (partyInfo.owner()) {
-	        System.out.println(
- 	               "[SkyblockMulti] OpenPAC: "
- 	                       + player.getGameProfile().name()
-	                        + " es owner de la party "
- 	                       + partyInfo.partyId()
- 	                       + "."
- 	       );
- 	   } else {
-	        System.out.println(
- 	               "[SkyblockMulti] OpenPAC: "
- 	                       + player.getGameProfile().name()
- 	                       + " pertenece a la party "
-  	                      + partyInfo.partyId()
-  	                      + ". Owner: "
-  	                      + partyInfo.ownerName()
-  	                      + "."
- 	       );
-	    }
-	});
+    // Mensaje informativo mostrado una sola vez por jugador.
+    if (!player.getTags().contains("skyblock_openpac_info_v1")) {
+
+        if (OpenPacCompat.isInstalled()) {
+            player.sendSystemMessage(
+                    Component.literal(
+                            "[SkyblockMulti] Open Parties and Claims detectado. " +
+                            "Para jugar en equipo puedes crear una party o aceptar una invitación " +
+                            "y compartir la isla del propietario. " +
+                            "Al abandonar una party, SkyblockMulti puede aplicar una dificultad mínima " +
+                            "más exigente según la configuración del mundo."
+                    )
+            );
+        } else {
+            player.sendSystemMessage(
+                    Component.literal(
+                            "[SkyblockMulti] Modo individual activo. " +
+                            "Para jugar en equipo puedes instalar Open Parties and Claims. " +
+                            "Este mod es opcional y SkyblockMulti funciona normalmente sin él."
+                    )
+            );
+        }
+
+        player.addTag("skyblock_openpac_info_v1");
+    }
+
+    // Sin OpenPAC no debemos intentar consultar su API.
+    if (!OpenPacCompat.isInstalled()) {
+        return;
+    }
+
+    OpenPacCompat.PartyInfo partyInfo =
+            OpenPacCompat.getPartyInfo(player);
+
+    if (!partyInfo.inParty()) {
+        System.out.println(
+                "[SkyblockMulti] OpenPAC: "
+                        + player.getGameProfile().name()
+                        + " no pertenece a una party."
+        );
+        return;
+    }
+
+    if (partyInfo.owner()) {
+        System.out.println(
+                "[SkyblockMulti] OpenPAC: "
+                        + player.getGameProfile().name()
+                        + " es owner de la party "
+                        + partyInfo.partyId()
+                        + "."
+        );
+    } else {
+        System.out.println(
+                "[SkyblockMulti] OpenPAC: "
+                        + player.getGameProfile().name()
+                        + " pertenece a la party "
+                        + partyInfo.partyId()
+                        + ". Owner: "
+                        + partyInfo.ownerName()
+                        + "."
+        );
+    }
+});
+
         registerServerStartedEvent();
         System.out.println("[SkyblockMulti] Mod 0.1.1-beta inicializado. Configuración: " + configPath);
     }
