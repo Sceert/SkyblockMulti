@@ -147,9 +147,9 @@ public final class SkyblockDebugOverlay implements ModInitializer {
                 + "{\"text\":\" Z: \",\"color\":\"gray\"},"
                 + score(playerName, "sb_active_z", "green") + ","
                 + "{\"text\":\" | Party: \",\"color\":\"gray\"},"
-                + literal(partyText, partyColor) + ","
+                + jsonLiteral(partyText, partyColor) + ","
                 + "{\"text\":\" | Leader: \",\"color\":\"gray\"},"
-                + literal(leaderText, leaderColor)
+                + jsonLiteral(leaderText, leaderColor)
                 + "]";
 
         try {
@@ -183,7 +183,7 @@ public final class SkyblockDebugOverlay implements ModInitializer {
                 + "\"},\"color\":\"" + color + "\"}";
     }
 
-    private static String literal(String text, String color) {
+    private static String jsonLiteral(String text, String color) {
         return "{\"text\":\"" + text + "\",\"color\":\"" + color + "\"}";
     }
 
