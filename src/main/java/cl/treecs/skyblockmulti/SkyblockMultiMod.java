@@ -17,6 +17,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import cl.treecs.skyblockmulti.compatibility.openpac.OpenPacCompat;
 
 public final class SkyblockMultiMod implements ModInitializer {
     public static final String MOD_ID = "skyblockmulti";
@@ -118,6 +119,7 @@ public final class SkyblockMultiMod implements ModInitializer {
     public void onInitialize() {
         configPath = FabricLoader.getInstance().getConfigDir().resolve("skyblockmulti.json");
         ensureConfigExists();
+	OpenPacCompat.initialize();
         registerServerStartedEvent();
         System.out.println("[SkyblockMulti] Mod 0.1.1-beta inicializado. Configuración: " + configPath);
     }

@@ -14,11 +14,10 @@ public final class OpenPacCompat {
     }
 
     public static void initialize() {
-        if (!isInstalled()) {
+        if (isInstalled()) {
+            System.out.println("[SkyblockMulti] OpenPAC detectado; integración opcional disponible.");
+        } else {
             System.out.println("[SkyblockMulti] OpenPAC no instalado; integración desactivada.");
-            return;
         }
-
-        System.out.println("[SkyblockMulti] OpenPAC detectado; compatibilidad disponible.");
     }
 }
