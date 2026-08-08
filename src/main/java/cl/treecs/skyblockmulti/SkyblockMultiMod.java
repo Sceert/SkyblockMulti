@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import cl.treecs.skyblockmulti.compatibility.openpac.OpenPacCompat;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 
 public final class SkyblockMultiMod implements ModInitializer {
     public static final String MOD_ID = "skyblockmulti";
@@ -120,6 +121,45 @@ public final class SkyblockMultiMod implements ModInitializer {
         configPath = FabricLoader.getInstance().getConfigDir().resolve("skyblockmulti.json");
         ensureConfigExists();
 	OpenPacCompat.initialize();
+	ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+	    var player = handler.player;
+	
+    	OpenPacCompat.PartyInfo partyInfo =
+	            OpenPacCompat.getPartyInfo(player);
+	
+	    if (!OpenPacCompat.isInstalled()) {
+	        return;
+    	}
+
+	    if (!partyInfo.inParty()) {
+	        System.out.println(
+	                "[SkyblockMulti] OpenPAC: "
+ 	                       + player.getGameProfile().name()
+ 	                       + " no pertenece a una party."
+  	      );
+   	     return;
+	    }
+	
+	    if (partyInfo.owner()) {
+	        System.out.println(
+ 	               "[SkyblockMulti] OpenPAC: "
+ 	                       + player.getGameProfile().name()
+	                        + " es owner de la party "
+ 	                       + partyInfo.partyId()
+ 	                       + "."
+ 	       );
+ 	   } else {
+	        System.out.println(
+ 	               "[SkyblockMulti] OpenPAC: "
+ 	                       + player.getGameProfile().name()
+ 	                       + " pertenece a la party "
+  	                      + partyInfo.partyId()
+  	                      + ". Owner: "
+  	                      + partyInfo.ownerName()
+  	                      + "."
+ 	       );
+	    }
+	});
         registerServerStartedEvent();
         System.out.println("[SkyblockMulti] Mod 0.1.1-beta inicializado. Configuración: " + configPath);
     }
