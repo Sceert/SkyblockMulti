@@ -165,7 +165,7 @@ public final class SkyblockMultiMod implements ModInitializer {
 ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
     var player = handler.player;
 
-    // Mensaje informativo mostrado una sola vez por jugador.
+    // Mensaje informativo sobre integración con OpenPAC.
 	if (OpenPacCompat.isInstalled()) {
 		player.sendSystemMessage(
 				Component.literal(
