@@ -5,10 +5,10 @@
       "id": "minecraft:slime_ball"
     },
     "title": {
-      "text": "Gel del vacío"
+      "translate": "skyblockmulti.advancement.combat.slime_kill.title"
     },
     "description": {
-      "text": "Derrota a un slime."
+      "translate": "skyblockmulti.advancement.combat.slime_kill.description"
     },
     "frame": "task",
     "show_toast": true,

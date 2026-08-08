@@ -5,10 +5,10 @@
       "id": "minecraft:quartz"
     },
     "title": {
-      "text": "Cristal infernal"
+      "translate": "skyblockmulti.advancement.nether.quartz.title"
     },
     "description": {
-      "text": "Obtén cuarzo del Nether."
+      "translate": "skyblockmulti.advancement.nether.quartz.description"
     },
     "frame": "task",
     "show_toast": true,

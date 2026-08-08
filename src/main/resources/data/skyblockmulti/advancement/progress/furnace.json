@@ -5,10 +5,10 @@
       "id": "minecraft:furnace"
     },
     "title": {
-      "text": "El primer horno"
+      "translate": "skyblockmulti.advancement.progress.furnace.title"
     },
     "description": {
-      "text": "Obtén un horno."
+      "translate": "skyblockmulti.advancement.progress.furnace.description"
     },
     "frame": "task",
     "show_toast": true,

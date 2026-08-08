@@ -5,10 +5,10 @@
       "id": "minecraft:white_wool"
     },
     "title": {
-      "text": "Lana del cielo"
+      "translate": "skyblockmulti.advancement.nature.wool.title"
     },
     "description": {
-      "text": "Obtén lana."
+      "translate": "skyblockmulti.advancement.nature.wool.description"
     },
     "frame": "task",
     "show_toast": true,

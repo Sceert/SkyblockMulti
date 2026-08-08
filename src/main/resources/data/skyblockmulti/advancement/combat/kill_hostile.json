@@ -5,10 +5,10 @@
       "id": "minecraft:iron_sword"
     },
     "title": {
-      "text": "Primera amenaza"
+      "translate": "skyblockmulti.advancement.combat.kill_hostile.title"
     },
     "description": {
-      "text": "Derrota una criatura hostil."
+      "translate": "skyblockmulti.advancement.combat.kill_hostile.description"
     },
     "frame": "task",
     "show_toast": true,

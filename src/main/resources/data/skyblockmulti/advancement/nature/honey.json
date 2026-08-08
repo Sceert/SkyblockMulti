@@ -5,10 +5,10 @@
       "id": "minecraft:honey_bottle"
     },
     "title": {
-      "text": "Dulce producción"
+      "translate": "skyblockmulti.advancement.nature.honey.title"
     },
     "description": {
-      "text": "Obtén una botella de miel."
+      "translate": "skyblockmulti.advancement.nature.honey.description"
     },
     "frame": "task",
     "show_toast": true,

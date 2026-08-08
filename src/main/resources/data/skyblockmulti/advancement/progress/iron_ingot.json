@@ -5,10 +5,10 @@
       "id": "minecraft:iron_ingot"
     },
     "title": {
-      "text": "Una nueva era"
+      "translate": "skyblockmulti.advancement.progress.iron_ingot.title"
     },
     "description": {
-      "text": "Obtén un lingote de hierro."
+      "translate": "skyblockmulti.advancement.progress.iron_ingot.description"
     },
     "frame": "task",
     "show_toast": true,

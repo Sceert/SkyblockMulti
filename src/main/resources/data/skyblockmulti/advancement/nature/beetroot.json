@@ -5,10 +5,10 @@
       "id": "minecraft:beetroot"
     },
     "title": {
-      "text": "Huerto diverso"
+      "translate": "skyblockmulti.advancement.nature.beetroot.title"
     },
     "description": {
-      "text": "Obtén una remolacha."
+      "translate": "skyblockmulti.advancement.nature.beetroot.description"
     },
     "frame": "task",
     "show_toast": true,

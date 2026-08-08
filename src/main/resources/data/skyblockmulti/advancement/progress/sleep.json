@@ -5,10 +5,10 @@
       "id": "minecraft:red_bed"
     },
     "title": {
-      "text": "Hogar, dulce hogar"
+      "translate": "skyblockmulti.advancement.progress.sleep.title"
     },
     "description": {
-      "text": "Duerme en una cama."
+      "translate": "skyblockmulti.advancement.progress.sleep.description"
     },
     "frame": "task",
     "show_toast": true,

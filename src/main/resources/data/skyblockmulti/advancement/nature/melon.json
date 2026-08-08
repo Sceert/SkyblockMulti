@@ -5,10 +5,10 @@
       "id": "minecraft:melon_slice"
     },
     "title": {
-      "text": "Fruta en las alturas"
+      "translate": "skyblockmulti.advancement.nature.melon.title"
     },
     "description": {
-      "text": "Obtén una rodaja de sandía."
+      "translate": "skyblockmulti.advancement.nature.melon.description"
     },
     "frame": "task",
     "show_toast": true,

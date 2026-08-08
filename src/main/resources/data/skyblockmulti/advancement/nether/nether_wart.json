@@ -5,10 +5,10 @@
       "id": "minecraft:nether_wart"
     },
     "title": {
-      "text": "Cultivo infernal"
+      "translate": "skyblockmulti.advancement.nether.nether_wart.title"
     },
     "description": {
-      "text": "Obtén verruga del Nether."
+      "translate": "skyblockmulti.advancement.nether.nether_wart.description"
     },
     "frame": "task",
     "show_toast": true,

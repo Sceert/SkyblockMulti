@@ -4,10 +4,10 @@
       "id": "minecraft:wheat"
     },
     "title": {
-      "text": "Primera cosecha"
+      "translate": "skyblockmulti.advancement.nature.first_crop.title"
     },
     "description": {
-      "text": "Consigue trigo."
+      "translate": "skyblockmulti.advancement.nature.first_crop.description"
     },
     "frame": "task",
     "show_toast": true,

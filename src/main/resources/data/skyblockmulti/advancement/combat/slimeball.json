@@ -5,10 +5,10 @@
       "id": "minecraft:slime_ball"
     },
     "title": {
-      "text": "Elasticidad renovable"
+      "translate": "skyblockmulti.advancement.combat.slimeball.title"
     },
     "description": {
-      "text": "Consigue una bola de slime."
+      "translate": "skyblockmulti.advancement.combat.slimeball.description"
     },
     "frame": "task",
     "show_toast": true,

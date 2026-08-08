@@ -5,10 +5,10 @@
       "id": "minecraft:pumpkin"
     },
     "title": {
-      "text": "Cosecha de calabazas"
+      "translate": "skyblockmulti.advancement.nature.pumpkin.title"
     },
     "description": {
-      "text": "Obtén una calabaza."
+      "translate": "skyblockmulti.advancement.nature.pumpkin.description"
     },
     "frame": "task",
     "show_toast": true,

@@ -5,10 +5,10 @@
       "id": "minecraft:shulker_shell"
     },
     "title": {
-      "text": "Caparazón extraño"
+      "translate": "skyblockmulti.advancement.end.shulker_shell.title"
     },
     "description": {
-      "text": "Obtén un caparazón de shulker."
+      "translate": "skyblockmulti.advancement.end.shulker_shell.description"
     },
     "frame": "task",
     "show_toast": true,

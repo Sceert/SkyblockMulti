@@ -5,10 +5,10 @@
       "id": "minecraft:ghast_tear"
     },
     "title": {
-      "text": "Botín fantasmal"
+      "translate": "skyblockmulti.advancement.combat.ghast_tear.title"
     },
     "description": {
-      "text": "Consigue una lágrima de ghast."
+      "translate": "skyblockmulti.advancement.combat.ghast_tear.description"
     },
     "frame": "task",
     "show_toast": true,

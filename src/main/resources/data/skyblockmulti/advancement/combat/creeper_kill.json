@@ -5,10 +5,10 @@
       "id": "minecraft:gunpowder"
     },
     "title": {
-      "text": "Paso en falso"
+      "translate": "skyblockmulti.advancement.combat.creeper_kill.title"
     },
     "description": {
-      "text": "Derrota a un creeper."
+      "translate": "skyblockmulti.advancement.combat.creeper_kill.description"
     },
     "frame": "task",
     "show_toast": true,

@@ -4,10 +4,10 @@
       "id": "minecraft:blaze_rod"
     },
     "title": {
-      "text": "Fuego concentrado"
+      "translate": "skyblockmulti.advancement.nether.blaze_rod.title"
     },
     "description": {
-      "text": "Consigue una vara de blaze."
+      "translate": "skyblockmulti.advancement.nether.blaze_rod.description"
     },
     "frame": "task",
     "show_toast": true,

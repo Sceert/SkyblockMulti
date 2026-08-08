@@ -5,10 +5,10 @@
       "id": "minecraft:blaze_rod"
     },
     "title": {
-      "text": "Fuego capturado"
+      "translate": "skyblockmulti.advancement.combat.blaze_kill.title"
     },
     "description": {
-      "text": "Derrota a un blaze."
+      "translate": "skyblockmulti.advancement.combat.blaze_kill.description"
     },
     "frame": "task",
     "show_toast": true,

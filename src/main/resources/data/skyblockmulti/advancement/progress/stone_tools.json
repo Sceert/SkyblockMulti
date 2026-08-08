@@ -4,10 +4,10 @@
       "id": "minecraft:stone_pickaxe"
     },
     "title": {
-      "text": "Edad de piedra"
+      "translate": "skyblockmulti.advancement.progress.stone_tools.title"
     },
     "description": {
-      "text": "Consigue un pico de piedra."
+      "translate": "skyblockmulti.advancement.progress.stone_tools.description"
     },
     "frame": "task",
     "show_toast": true,

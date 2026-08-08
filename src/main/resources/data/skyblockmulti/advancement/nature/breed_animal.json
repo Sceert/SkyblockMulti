@@ -5,10 +5,10 @@
       "id": "minecraft:wheat"
     },
     "title": {
-      "text": "Nueva generación"
+      "translate": "skyblockmulti.advancement.nature.breed_animal.title"
     },
     "description": {
-      "text": "Reproduce dos animales."
+      "translate": "skyblockmulti.advancement.nature.breed_animal.description"
     },
     "frame": "task",
     "show_toast": true,

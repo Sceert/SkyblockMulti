@@ -4,10 +4,10 @@
       "id": "minecraft:lava_bucket"
     },
     "title": {
-      "text": "Lo esencial"
+      "translate": "skyblockmulti.advancement.challenge.hard_start.title"
     },
     "description": {
-      "text": "Comienza en dificultad Difícil."
+      "translate": "skyblockmulti.advancement.challenge.hard_start.description"
     },
     "frame": "challenge",
     "show_toast": true,

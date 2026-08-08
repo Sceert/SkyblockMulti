@@ -27,5 +27,5 @@ function skyblock:slots/create_anchor with storage skyblock:slots s24
 execute if score #anchors sb3_const matches 24 in minecraft:overworld positioned 0 100 0 run summon minecraft:marker ~ ~ ~ {Tags:["skyblock_slots_ready_v2"]}
 execute if score #anchors sb3_const matches 24 run function skyblock:slots/sync_occupancy
 execute if score #anchors sb3_const matches 24 run function skyblock:slots/remove_forceload
-execute if score #anchors sb3_const matches 24 run tellraw @a [{"text":"[SkyblockMulti] ","color":"aqua","bold":true},{"text":"Las 24 anclas están disponibles en Y=64.","color":"green"}]
+execute if score #anchors sb3_const matches 24 run tellraw @a [{"text":"[SkyblockMulti] ","color":"aqua","bold":true},{"translate":"skyblockmulti.system.anchors_ready","color":"green"}]
 execute unless score #anchors sb3_const matches 24 run scoreboard players set #slotgen sb3_const 40

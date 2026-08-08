@@ -5,10 +5,10 @@
       "id": "minecraft:comparator"
     },
     "title": {
-      "text": "Señal precisa"
+      "translate": "skyblockmulti.advancement.automation.comparator.title"
     },
     "description": {
-      "text": "Obtén un comparador de redstone."
+      "translate": "skyblockmulti.advancement.automation.comparator.description"
     },
     "frame": "task",
     "show_toast": true,

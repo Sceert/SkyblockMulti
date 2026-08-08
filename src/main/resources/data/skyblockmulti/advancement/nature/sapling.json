@@ -5,10 +5,10 @@
       "id": "minecraft:oak_sapling"
     },
     "title": {
-      "text": "El ciclo continúa"
+      "translate": "skyblockmulti.advancement.nature.sapling.title"
     },
     "description": {
-      "text": "Obtén un retoño para volver a plantar."
+      "translate": "skyblockmulti.advancement.nature.sapling.description"
     },
     "frame": "task",
     "show_toast": true,

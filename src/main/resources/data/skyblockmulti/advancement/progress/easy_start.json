@@ -4,10 +4,10 @@
       "id": "minecraft:white_bed"
     },
     "title": {
-      "text": "Primeros auxilios"
+      "translate": "skyblockmulti.advancement.progress.easy_start.title"
     },
     "description": {
-      "text": "Comienza en dificultad Fácil."
+      "translate": "skyblockmulti.advancement.progress.easy_start.description"
     },
     "frame": "task",
     "show_toast": true,

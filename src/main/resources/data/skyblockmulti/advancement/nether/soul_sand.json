@@ -5,10 +5,10 @@
       "id": "minecraft:soul_sand"
     },
     "title": {
-      "text": "Arena de almas"
+      "translate": "skyblockmulti.advancement.nether.soul_sand.title"
     },
     "description": {
-      "text": "Obtén arena de almas."
+      "translate": "skyblockmulti.advancement.nether.soul_sand.description"
     },
     "frame": "task",
     "show_toast": true,

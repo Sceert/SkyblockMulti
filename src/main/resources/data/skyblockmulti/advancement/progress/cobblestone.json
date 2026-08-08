@@ -5,10 +5,10 @@
       "id": "minecraft:cobblestone"
     },
     "title": {
-      "text": "Piedra del vacío"
+      "translate": "skyblockmulti.advancement.progress.cobblestone.title"
     },
     "description": {
-      "text": "Obtén adoquín."
+      "translate": "skyblockmulti.advancement.progress.cobblestone.description"
     },
     "frame": "task",
     "show_toast": true,

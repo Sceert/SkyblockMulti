@@ -5,10 +5,10 @@
       "id": "minecraft:observer"
     },
     "title": {
-      "text": "Todo bajo observación"
+      "translate": "skyblockmulti.advancement.automation.observer.title"
     },
     "description": {
-      "text": "Obtén un observador."
+      "translate": "skyblockmulti.advancement.automation.observer.description"
     },
     "frame": "task",
     "show_toast": true,

@@ -5,10 +5,10 @@
       "id": "minecraft:emerald"
     },
     "title": {
-      "text": "Moneda del cielo"
+      "translate": "skyblockmulti.advancement.trade.emerald.title"
     },
     "description": {
-      "text": "Obtén una esmeralda."
+      "translate": "skyblockmulti.advancement.trade.emerald.description"
     },
     "frame": "task",
     "show_toast": true,

@@ -5,10 +5,10 @@
       "id": "minecraft:spawner"
     },
     "title": {
-      "text": "Granja hostil inicial"
+      "translate": "skyblockmulti.advancement.combat.basic_farm.title"
     },
     "description": {
-      "text": "Reúne carne podrida, huesos, hilo y pólvora."
+      "translate": "skyblockmulti.advancement.combat.basic_farm.description"
     },
     "frame": "goal",
     "show_toast": true,

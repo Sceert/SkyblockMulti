@@ -5,10 +5,10 @@
       "id": "minecraft:bucket"
     },
     "title": {
-      "text": "Recipiente indispensable"
+      "translate": "skyblockmulti.advancement.progress.bucket.title"
     },
     "description": {
-      "text": "Fabrica u obtén un cubo vacío."
+      "translate": "skyblockmulti.advancement.progress.bucket.description"
     },
     "frame": "task",
     "show_toast": true,

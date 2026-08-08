@@ -40,6 +40,7 @@ public final class SkyblockMultiMod implements ModInitializer {
     public static final int MIN_DISTANCE = 256;
     public static final int MAX_DISTANCE = 100000;
     public static final int PLAYER_CAPACITY = 24;
+    private static final int OPENPAC_PARTY_CHECK_INTERVAL_TICKS = 20;
 
     private static final Pattern DISTANCE_PATTERN = Pattern.compile("\\\"islandDistance\\\"\\s*:\\s*(-?\\d+)");
     private static final Pattern BONUS_CHEST_MODE_PATTERN = Pattern.compile("\\\"bonusChestMode\\\"\\s*:\\s*\\\"([a-z_]+)\\\"", Pattern.CASE_INSENSITIVE);
@@ -212,21 +213,11 @@ public final class SkyblockMultiMod implements ModInitializer {
             // Mensaje informativo sobre integración con OpenPAC.
             if (OpenPacCompat.isInstalled()) {
                 player.sendSystemMessage(
-                        Component.literal(
-                                "[SkyblockMulti] Open Parties and Claims detectado. " +
-                                "Para jugar en equipo puedes crear una party o aceptar una invitación " +
-                                "y compartir la isla del propietario. " +
-                                "Al abandonar una party, SkyblockMulti puede aplicar una dificultad mínima " +
-                                "más exigente según la configuración del mundo."
-                        )
+                        Component.translatable("skyblockmulti.openpac.detected")
                 );
             } else {
                 player.sendSystemMessage(
-                        Component.literal(
-                                "[SkyblockMulti] Modo individual activo. " +
-                                "Para jugar en equipo puedes instalar Open Parties and Claims. " +
-                                "Este mod es opcional y SkyblockMulti funciona normalmente sin él."
-                        )
+                        Component.translatable("skyblockmulti.openpac.solo")
                 );
             }
 
@@ -276,7 +267,7 @@ public final class SkyblockMultiMod implements ModInitializer {
             openPacPartyCheckTicks++;
 
             // Comprobar cambios reales de party una vez por segundo.
-            if (openPacPartyCheckTicks < 20) {
+            if (openPacPartyCheckTicks < OPENPAC_PARTY_CHECK_INTERVAL_TICKS) {
                 return;
             }
 
