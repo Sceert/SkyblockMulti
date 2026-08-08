@@ -20,6 +20,12 @@ import java.util.regex.Pattern;
 import cl.treecs.skyblockmulti.compatibility.openpac.OpenPacCompat;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.server.level.ServerPlayer;
+
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
 
 public final class SkyblockMultiMod implements ModInitializer {
     public static final String MOD_ID = "skyblockmulti";
@@ -122,6 +128,38 @@ public final class SkyblockMultiMod implements ModInitializer {
         configPath = FabricLoader.getInstance().getConfigDir().resolve("skyblockmulti.json");
         ensureConfigExists();
 	OpenPacCompat.initialize();
+	
+	CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+    dispatcher.register(
+            literal("skyblockmulti")
+                    .then(
+                            literal("openpac_claim")
+                                    .then(
+                                            argument("x", IntegerArgumentType.integer())
+                                                    .then(
+                                                            argument("z", IntegerArgumentType.integer())
+                                                                    .executes(context -> {
+                                                                        if (!OpenPacCompat.isInstalled()) {
+                                                                            return 0;
+                                                                        }
+
+                                                                        if (!(context.getSource().getEntity() instanceof ServerPlayer player)) {
+                                                                            return 0;
+                                                                        }
+
+                                                                        int x = IntegerArgumentType.getInteger(context, "x");
+                                                                        int z = IntegerArgumentType.getInteger(context, "z");
+
+                                                                        OpenPacCompat.claimInitialIsland(player, x, z);
+
+                                                                        return 1;
+                                                                    })
+                                                    )
+                                    )
+                    )
+    );
+});
+	
 	ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 	    var player = handler.player;
 	

@@ -18,6 +18,7 @@ $execute in minecraft:overworld if block $(x) 63 $(z) minecraft:bedrock position
 $execute if score #claim sb3_const matches 1 run scoreboard players set @s sb3_slot $(slot)
 $execute if score #claim sb3_const matches 1 run scoreboard players set @s sb3_x $(x)
 $execute if score #claim sb3_const matches 1 run scoreboard players set @s sb3_z $(z)
+$execute if score #claim sb3_const matches 1 run skyblockmulti openpac_claim $(x) $(z)
 $execute if score #claim sb3_const matches 1 in minecraft:overworld run spawnpoint @s $(x) 65 $(z)
 $execute if score #claim sb3_const matches 1 in minecraft:overworld positioned $(x) 65 $(z) run teleport @s ~0.5 ~ ~0.5
 $execute if score #claim sb3_const matches 1 in minecraft:overworld run forceload remove $(x) $(z)
