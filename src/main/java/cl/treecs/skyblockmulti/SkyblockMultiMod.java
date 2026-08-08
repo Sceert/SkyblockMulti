@@ -124,6 +124,11 @@ public final class SkyblockMultiMod implements ModInitializer {
 	ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 	    var player = handler.player;
 	
+	System.out.println(
+  	      "[SkyblockMulti] DEBUG JOIN detectado para "
+      	          + player.getGameProfile().name()
+	);
+	
     	OpenPacCompat.PartyInfo partyInfo =
 	            OpenPacCompat.getPartyInfo(player);
 	
