@@ -164,6 +164,8 @@ public final class SkyblockMultiMod implements ModInitializer {
 	
 ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
     var player = handler.player;
+	
+	updateActiveIslandOnJoin(server, player);
 
     // Mensaje informativo sobre integración con OpenPAC.
 	if (OpenPacCompat.isInstalled()) {
@@ -389,6 +391,94 @@ ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
         }
         return count;
     }
+
+	private static void updateActiveIslandOnJoin(Object server, ServerPlayer player) {
+
+    String playerName = player.getGameProfile().name();
+
+    try {
+        ServerCommandExecutor executor = new ServerCommandExecutor(server);
+
+        // Por defecto, la isla activa siempre vuelve a ser la isla personal.
+        // Solo se copia si el jugador realmente tiene una isla asignada.
+        executor.run(
+                "execute if score " + playerName +
+                        " sb3_state matches 2 run scoreboard players operation " +
+                        playerName + " sb_active_x = " +
+                        playerName + " sb3_x"
+        );
+
+        executor.run(
+                "execute if score " + playerName +
+                        " sb3_state matches 2 run scoreboard players operation " +
+                        playerName + " sb_active_z = " +
+                        playerName + " sb3_z"
+        );
+
+        // Sin OpenPAC termina aquí.
+        if (!OpenPacCompat.isInstalled()) {
+            return;
+        }
+
+        OpenPacCompat.PartyInfo partyInfo =
+                OpenPacCompat.getPartyInfo(player);
+
+        // Sin party o siendo owner, la isla activa continúa siendo la personal.
+        if (!partyInfo.inParty() || partyInfo.owner()) {
+            return;
+        }
+
+        String ownerName = partyInfo.ownerName();
+
+        // Primero comprobamos que el owner realmente tenga una isla.
+        int ownerHasIsland = executor.run(
+                "execute if score " + ownerName +
+                        " sb3_state matches 2 run scoreboard players get " +
+                        ownerName + " sb3_state"
+        );
+
+        if (ownerHasIsland <= 0) {
+            System.out.println(
+                    "[SkyblockMulti] OpenPAC: la party de "
+                            + playerName
+                            + " tiene owner "
+                            + ownerName
+                            + ", pero el owner todavía no tiene una isla asignada."
+            );
+            return;
+        }
+
+        // La isla personal del miembro NO se modifica.
+        // Solo cambiamos las coordenadas activas.
+        executor.run(
+                "scoreboard players operation " +
+                        playerName + " sb_active_x = " +
+                        ownerName + " sb3_x"
+        );
+
+        executor.run(
+                "scoreboard players operation " +
+                        playerName + " sb_active_z = " +
+                        ownerName + " sb3_z"
+        );
+
+        System.out.println(
+                "[SkyblockMulti] OpenPAC: isla activa de "
+                        + playerName
+                        + " vinculada a la isla de "
+                        + ownerName
+                        + "."
+        );
+
+    } catch (Exception e) {
+        System.err.println(
+                "[SkyblockMulti] No fue posible actualizar la isla activa de "
+                        + playerName
+                        + ": "
+                        + e
+        );
+    }
+}
 
     private static void registerServerStartedEvent() {
         try {
