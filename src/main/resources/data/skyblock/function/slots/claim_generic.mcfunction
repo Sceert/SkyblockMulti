@@ -20,7 +20,6 @@ $execute if score #claim sb3_const matches 1 run scoreboard players set @s sb3_x
 $execute if score #claim sb3_const matches 1 run scoreboard players set @s sb3_z $(z)
 execute if score #claim sb3_const matches 1 run scoreboard players operation @s sb_active_x = @s sb3_x
 execute if score #claim sb3_const matches 1 run scoreboard players operation @s sb_active_z = @s sb3_z
-$execute if score #claim sb3_const matches 1 run skyblockmulti openpac_claim $(x) $(z)
 $execute if score #claim sb3_const matches 1 in minecraft:overworld run spawnpoint @s $(x) 65 $(z)
 $execute if score #claim sb3_const matches 1 in minecraft:overworld positioned $(x) 65 $(z) run teleport @s ~0.5 ~ ~0.5
 $execute if score #claim sb3_const matches 1 in minecraft:overworld run forceload remove $(x) $(z)
@@ -35,6 +34,7 @@ execute if score #claim sb3_const matches 1 run scoreboard players set @s sb_dif
 execute if score #claim sb3_const matches 1 run scoreboard players set @s sb_menu 0
 execute if score #claim sb3_const matches 1 run tag @s remove skyblock_menu_shown_v1
 execute if score #claim sb3_const matches 1 run scoreboard players set @s sb3_state 2
+$execute if score #claim sb3_const matches 1 run skyblockmulti openpac_claim $(x) $(z)
 execute if score #claim sb3_const matches 1 run function skyblock:player/unlock_selection
 $execute if score #claim sb3_const matches 1 in minecraft:overworld positioned $(x) 67 $(z) run kill @e[type=minecraft:text_display,tag=skyblock_island_label,distance=..2]
 execute if score #claim sb3_const matches 1 run advancement grant @s only skyblockmulti:progress/first_island

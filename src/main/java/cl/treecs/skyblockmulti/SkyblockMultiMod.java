@@ -23,6 +23,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.MinecraftServer;
 
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
@@ -151,133 +152,140 @@ public final class SkyblockMultiMod implements ModInitializer {
     public void onInitialize() {
         configPath = FabricLoader.getInstance().getConfigDir().resolve("skyblockmulti.json");
         ensureConfigExists();
-	OpenPacCompat.initialize();
-	
-	CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-    dispatcher.register(
-            literal("skyblockmulti")
-                    .then(
-                            literal("openpac_claim")
-                                    .then(
-                                            argument("x", IntegerArgumentType.integer())
-                                                    .then(
-                                                            argument("z", IntegerArgumentType.integer())
-                                                                    .executes(context -> {
-                                                                        if (!OpenPacCompat.isInstalled()) {
-                                                                            return 0;
-                                                                        }
+        OpenPacCompat.initialize();
 
-                                                                        if (!(context.getSource().getEntity() instanceof ServerPlayer player)) {
-                                                                            return 0;
-                                                                        }
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+            dispatcher.register(
+                    literal("skyblockmulti")
+                            .then(
+                                    literal("openpac_claim")
+                                            .then(
+                                                    argument("x", IntegerArgumentType.integer())
+                                                            .then(
+                                                                    argument("z", IntegerArgumentType.integer())
+                                                                            .executes(context -> {
+                                                                                if (!OpenPacCompat.isInstalled()) {
+                                                                                    return 0;
+                                                                                }
 
-                                                                        int x = IntegerArgumentType.getInteger(context, "x");
-                                                                        int z = IntegerArgumentType.getInteger(context, "z");
+                                                                                if (!(context.getSource().getEntity() instanceof ServerPlayer player)) {
+                                                                                    return 0;
+                                                                                }
 
-                                                                        OpenPacCompat.claimInitialIsland(player, x, z);
+                                                                                int x = IntegerArgumentType.getInteger(context, "x");
+                                                                                int z = IntegerArgumentType.getInteger(context, "z");
 
-                                                                        return 1;
-                                                                    })
-                                                    )
-                                    )
-                    )
-    );
-});
-	
-ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-	var player = handler.player;
+                                                                                OpenPacCompat.claimInitialIsland(player, x, z);
 
-	updateActiveIslandOnJoin(server, player);
+                                                                                // La isla ya tiene sb3_state=2 cuando este comando se ejecuta.
+                                                                                // Reconciliamos a todos para que los miembros de la party
+                                                                                // adopten inmediatamente la isla del owner recién creada.
+                                                                                reconcileAllOnlinePlayers(
+                                                                                        context.getSource().getServer(),
+                                                                                        player.getUUID()
+                                                                                );
 
-	if (OpenPacCompat.isInstalled()) {
-		OPENPAC_PARTY_STATES.put(
-				player.getUUID(),
-				PartyState.from(OpenPacCompat.getPartyInfo(player))
-		);
-	}
+                                                                                return 1;
+                                                                            })
+                                                            )
+                                            )
+                            )
+            );
+        });
 
-    // Mensaje informativo sobre integración con OpenPAC.
-	if (OpenPacCompat.isInstalled()) {
-		player.sendSystemMessage(
-				Component.literal(
-						"[SkyblockMulti] Open Parties and Claims detectado. " +
-						"Para jugar en equipo puedes crear una party o aceptar una invitación " +
-						"y compartir la isla del propietario. " +
-						"Al abandonar una party, SkyblockMulti puede aplicar una dificultad mínima " +
-						"más exigente según la configuración del mundo."
-				)
-		);
-	} else {
-		player.sendSystemMessage(
-				Component.literal(
-						"[SkyblockMulti] Modo individual activo. " +
-						"Para jugar en equipo puedes instalar Open Parties and Claims. " +
-						"Este mod es opcional y SkyblockMulti funciona normalmente sin él."
-				)
-		);
-	}
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            ServerPlayer player = handler.player;
 
-    // Sin OpenPAC no debemos intentar consultar su API.
-    if (!OpenPacCompat.isInstalled()) {
-        return;
-    }
+            OpenPacCompat.PartyInfo partyInfo = OpenPacCompat.isInstalled()
+                    ? OpenPacCompat.getPartyInfo(player)
+                    : OpenPacCompat.PartyInfo.noParty();
 
-    OpenPacCompat.PartyInfo partyInfo =
-            OpenPacCompat.getPartyInfo(player);
+            reconcileActiveIsland(server, player, partyInfo, false);
 
-    if (!partyInfo.inParty()) {
-        System.out.println(
-                "[SkyblockMulti] OpenPAC: "
-                        + player.getGameProfile().name()
-                        + " no pertenece a una party."
-        );
-        return;
-    }
+            if (OpenPacCompat.isInstalled()) {
+                OPENPAC_PARTY_STATES.put(
+                        player.getUUID(),
+                        PartyState.from(partyInfo)
+                );
+            }
 
-    if (partyInfo.owner()) {
-        System.out.println(
-                "[SkyblockMulti] OpenPAC: "
-                        + player.getGameProfile().name()
-                        + " es owner de la party "
-                        + partyInfo.partyId()
-                        + "."
-        );
-    } else {
-        System.out.println(
-                "[SkyblockMulti] OpenPAC: "
-                        + player.getGameProfile().name()
-                        + " pertenece a la party "
-                        + partyInfo.partyId()
-                        + ". Owner: "
-                        + partyInfo.ownerName()
-                        + "."
-        );
-    }
-});
+            // Mensaje informativo sobre integración con OpenPAC.
+            if (OpenPacCompat.isInstalled()) {
+                player.sendSystemMessage(
+                        Component.literal(
+                                "[SkyblockMulti] Open Parties and Claims detectado. " +
+                                "Para jugar en equipo puedes crear una party o aceptar una invitación " +
+                                "y compartir la isla del propietario. " +
+                                "Al abandonar una party, SkyblockMulti puede aplicar una dificultad mínima " +
+                                "más exigente según la configuración del mundo."
+                        )
+                );
+            } else {
+                player.sendSystemMessage(
+                        Component.literal(
+                                "[SkyblockMulti] Modo individual activo. " +
+                                "Para jugar en equipo puedes instalar Open Parties and Claims. " +
+                                "Este mod es opcional y SkyblockMulti funciona normalmente sin él."
+                        )
+                );
+            }
 
-	ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
-		OPENPAC_PARTY_STATES.remove(handler.player.getUUID());
-	});
+            if (!OpenPacCompat.isInstalled()) {
+                return;
+            }
 
-	ServerTickEvents.END_SERVER_TICK.register(server -> {
+            if (!partyInfo.inParty()) {
+                System.out.println(
+                        "[SkyblockMulti] OpenPAC: "
+                                + player.getGameProfile().name()
+                                + " no pertenece a una party."
+                );
+                return;
+            }
 
-		if (!OpenPacCompat.isInstalled()) {
-			return;
-		}
+            if (partyInfo.owner()) {
+                System.out.println(
+                        "[SkyblockMulti] OpenPAC: "
+                                + player.getGameProfile().name()
+                                + " es owner de la party "
+                                + partyInfo.partyId()
+                                + "."
+                );
+            } else {
+                System.out.println(
+                        "[SkyblockMulti] OpenPAC: "
+                                + player.getGameProfile().name()
+                                + " pertenece a la party "
+                                + partyInfo.partyId()
+                                + ". Owner: "
+                                + partyInfo.ownerName()
+                                + "."
+                );
+            }
+        });
 
-		openPacPartyCheckTicks++;
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+            OPENPAC_PARTY_STATES.remove(handler.player.getUUID());
+        });
 
-		// Comprobar cambios de party una vez por segundo.
-		if (openPacPartyCheckTicks < 20) {
-			return;
-		}
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            if (!OpenPacCompat.isInstalled()) {
+                return;
+            }
 
-		openPacPartyCheckTicks = 0;
+            openPacPartyCheckTicks++;
 
-		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-			checkOpenPacPartyChange(server, player);
-		}
-	});
+            // Comprobar cambios reales de party una vez por segundo.
+            if (openPacPartyCheckTicks < 20) {
+                return;
+            }
+
+            openPacPartyCheckTicks = 0;
+
+            for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+                checkOpenPacPartyChange(server, player);
+            }
+        });
 
         registerServerStartedEvent();
         System.out.println("[SkyblockMulti] Mod 0.1.1-beta inicializado. Configuración: " + configPath);
@@ -445,106 +453,135 @@ ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
         return count;
     }
 
-	private static void checkOpenPacPartyChange(Object server, ServerPlayer player) {
+    private static void checkOpenPacPartyChange(MinecraftServer server, ServerPlayer player) {
+        OpenPacCompat.PartyInfo partyInfo = OpenPacCompat.getPartyInfo(player);
+        PartyState currentState = PartyState.from(partyInfo);
+        PartyState previousState = OPENPAC_PARTY_STATES.put(player.getUUID(), currentState);
 
-		OpenPacCompat.PartyInfo partyInfo =
-				OpenPacCompat.getPartyInfo(player);
-
-		PartyState currentState =
-				PartyState.from(partyInfo);
-
-		PartyState previousState =
-				OPENPAC_PARTY_STATES.put(player.getUUID(), currentState);
-
-		// Primera lectura conocida del jugador.
-		if (previousState == null) {
-			return;
-		}
-
-		// La party no ha cambiado.
-		if (previousState.equals(currentState)) {
-			return;
-		}
-
-		System.out.println(
-				"[SkyblockMulti] OpenPAC: cambio de party detectado para "
-						+ player.getGameProfile().name()
-						+ "."
-		);
-
-		updateActiveIslandOnJoin(server, player);
-	}
-
-	private static void updateActiveIslandOnJoin(Object server, ServerPlayer player) {
-
-    String playerName = player.getGameProfile().name();
-
-    try {
-        ServerCommandExecutor executor = new ServerCommandExecutor(server);
-
-        // Por defecto, la isla activa siempre vuelve a ser la isla personal.
-        // Solo se copia si el jugador realmente tiene una isla asignada.
-        executor.run(
-                "execute if score " + playerName +
-                        " sb3_state matches 2 run scoreboard players operation " +
-                        playerName + " sb_active_x = " +
-                        playerName + " sb3_x"
-        );
-
-        executor.run(
-                "execute if score " + playerName +
-                        " sb3_state matches 2 run scoreboard players operation " +
-                        playerName + " sb_active_z = " +
-                        playerName + " sb3_z"
-        );
-
-        // Sin OpenPAC termina aquí.
-        if (!OpenPacCompat.isInstalled()) {
+        // La primera lectura se usa como estado base. JOIN ya hizo la reconciliación inicial.
+        if (previousState == null) {
             return;
         }
 
-        OpenPacCompat.PartyInfo partyInfo =
-                OpenPacCompat.getPartyInfo(player);
-
-        // Sin party o siendo owner, la isla activa continúa siendo la personal.
-        if (!partyInfo.inParty() || partyInfo.owner()) {
+        if (previousState.equals(currentState)) {
             return;
         }
 
-		String ownerName = partyInfo.ownerName();
-
-		// Solo vinculamos la isla activa si el owner tiene una isla asignada.
-		executor.run(
-				"execute if score " + ownerName +
-						" sb3_state matches 2 run scoreboard players operation " +
-						playerName + " sb_active_x = " +
-						ownerName + " sb3_x"
-		);
-
-		executor.run(
-				"execute if score " + ownerName +
-						" sb3_state matches 2 run scoreboard players operation " +
-						playerName + " sb_active_z = " +
-						ownerName + " sb3_z"
-		);
-
-		System.out.println(
-				"[SkyblockMulti] OpenPAC: sincronización de isla activa solicitada para "
-						+ playerName
-						+ " usando la isla de "
-						+ ownerName
-						+ "."
-		);
-
-    } catch (Exception e) {
-        System.err.println(
-                "[SkyblockMulti] No fue posible actualizar la isla activa de "
-                        + playerName
-                        + ": "
-                        + e
+        System.out.println(
+                "[SkyblockMulti] OpenPAC: cambio de party detectado para "
+                        + player.getGameProfile().name()
+                        + "."
         );
+
+        // Un cambio real de party siempre recalcula el destino activo.
+        // Si el jugador quedó como miembro de otra persona y el owner ya tiene isla,
+        // también se envía automáticamente a sb_home.
+        reconcileActiveIsland(server, player, partyInfo, true);
     }
-}
+
+    private static void reconcileAllOnlinePlayers(MinecraftServer server, UUID newlyAvailableOwnerUuid) {
+        try {
+            for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+
+                OpenPacCompat.PartyInfo partyInfo = OpenPacCompat.isInstalled()
+                        ? OpenPacCompat.getPartyInfo(player)
+                        : OpenPacCompat.PartyInfo.noParty();
+
+                boolean autoHome = newlyAvailableOwnerUuid != null
+                        && partyInfo.inParty()
+                        && !partyInfo.owner()
+                        && newlyAvailableOwnerUuid.equals(partyInfo.ownerUuid());
+
+                reconcileActiveIsland(server, player, partyInfo, autoHome);
+
+                if (OpenPacCompat.isInstalled()) {
+                    OPENPAC_PARTY_STATES.put(player.getUUID(), PartyState.from(partyInfo));
+                }
+            }
+        } catch (Exception e) {
+            System.err.println(
+                    "[SkyblockMulti] No fue posible reconciliar las islas activas online: " + e
+            );
+        }
+    }
+
+    private static void reconcileActiveIsland(
+            MinecraftServer server,
+            ServerPlayer player,
+            OpenPacCompat.PartyInfo partyInfo,
+            boolean autoHomeOnPartyTarget
+    ) {
+        String playerName = player.getGameProfile().name();
+
+        try {
+            ServerCommandExecutor executor = new ServerCommandExecutor(server);
+
+            // Limpiamos primero cualquier destino activo antiguo. Esto es importante para
+            // jugadores que estaban en una party pero todavía no tienen isla personal.
+            executor.run("scoreboard players reset " + playerName + " sb_active_x");
+            executor.run("scoreboard players reset " + playerName + " sb_active_z");
+
+            // La isla personal es siempre el fallback cuando existe.
+            executor.run(
+                    "execute if score " + playerName +
+                            " sb3_state matches 2 run scoreboard players operation " +
+                            playerName + " sb_active_x = " +
+                            playerName + " sb3_x"
+            );
+
+            executor.run(
+                    "execute if score " + playerName +
+                            " sb3_state matches 2 run scoreboard players operation " +
+                            playerName + " sb_active_z = " +
+                            playerName + " sb3_z"
+            );
+
+            if (!OpenPacCompat.isInstalled() || !partyInfo.inParty() || partyInfo.owner()) {
+                return;
+            }
+
+            String ownerName = partyInfo.ownerName();
+
+            // Si el owner tiene una isla válida, esa pasa a ser la isla activa del miembro.
+            executor.run(
+                    "execute if score " + ownerName +
+                            " sb3_state matches 2 run scoreboard players operation " +
+                            playerName + " sb_active_x = " +
+                            ownerName + " sb3_x"
+            );
+
+            executor.run(
+                    "execute if score " + ownerName +
+                            " sb3_state matches 2 run scoreboard players operation " +
+                            playerName + " sb_active_z = " +
+                            ownerName + " sb3_z"
+            );
+
+            System.out.println(
+                    "[SkyblockMulti] OpenPAC: reconciliación de isla activa solicitada para "
+                            + playerName
+                            + " usando la isla de "
+                            + ownerName
+                            + "."
+            );
+
+            if (autoHomeOnPartyTarget) {
+                // El propio execute comprueba que el owner tenga isla antes de llamar home.
+                executor.run(
+                        "execute if score " + ownerName +
+                                " sb3_state matches 2 as " + playerName +
+                                " run function skyblock:player/home"
+                );
+            }
+        } catch (Exception e) {
+            System.err.println(
+                    "[SkyblockMulti] No fue posible reconciliar la isla activa de "
+                            + playerName
+                            + ": "
+                            + e
+            );
+        }
+    }
 
     private static void registerServerStartedEvent() {
         try {
