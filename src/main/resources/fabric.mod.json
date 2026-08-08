@@ -12,7 +12,8 @@
   "icon": "assets/skyblockmulti/icon.png",
   "entrypoints": {
     "main": [
-      "cl.treecs.skyblockmulti.SkyblockMultiMod"
+      "cl.treecs.skyblockmulti.SkyblockMultiMod",
+      "cl.treecs.skyblockmulti.SkyblockDebugOverlay"
     ],
     "modmenu": [
       "cl.treecs.skyblockmulti.client.SkyblockMultiModMenu"
