@@ -29,6 +29,10 @@ import static net.minecraft.commands.Commands.literal;
 
 import net.minecraft.network.chat.Component;
 
+import java.util.HashMap;
+import java.util.UUID;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+
 public final class SkyblockMultiMod implements ModInitializer {
     public static final String MOD_ID = "skyblockmulti";
     public static final int DEFAULT_DISTANCE = 2048;
@@ -42,6 +46,24 @@ public final class SkyblockMultiMod implements ModInitializer {
     private static final Pattern LEGACY_BONUS_CHEST_TIER_PATTERN = Pattern.compile("\\\"bonusChestTier\\\"\\s*:\\s*\\\"([a-z_]+)\\\"", Pattern.CASE_INSENSITIVE);
     private static Path configPath;
     private static volatile Object activeServer;
+	
+	// Estado conocido de las parties de OpenPAC.
+	private static final Map<UUID, PartyState> OPENPAC_PARTY_STATES = new HashMap<>();
+	private static int openPacPartyCheckTicks = 0;
+	
+	private record PartyState(
+        boolean inParty,
+        UUID partyId,
+        UUID ownerUuid
+) {
+    private static PartyState from(OpenPacCompat.PartyInfo info) {
+        return new PartyState(
+                info.inParty(),
+                info.partyId(),
+                info.ownerUuid()
+        );
+    }
+}
 
     public enum TreeOption {
         OAK("oak", "Roble", 1),
@@ -163,9 +185,16 @@ public final class SkyblockMultiMod implements ModInitializer {
 });
 	
 ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-    var player = handler.player;
-	
+	var player = handler.player;
+
 	updateActiveIslandOnJoin(server, player);
+
+	if (OpenPacCompat.isInstalled()) {
+		OPENPAC_PARTY_STATES.put(
+				player.getUUID(),
+				PartyState.from(OpenPacCompat.getPartyInfo(player))
+		);
+	}
 
     // Mensaje informativo sobre integración con OpenPAC.
 	if (OpenPacCompat.isInstalled()) {
@@ -225,6 +254,30 @@ ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
         );
     }
 });
+
+	ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+		OPENPAC_PARTY_STATES.remove(handler.player.getUUID());
+	});
+
+	ServerTickEvents.END_SERVER_TICK.register(server -> {
+
+		if (!OpenPacCompat.isInstalled()) {
+			return;
+		}
+
+		openPacPartyCheckTicks++;
+
+		// Comprobar cambios de party una vez por segundo.
+		if (openPacPartyCheckTicks < 20) {
+			return;
+		}
+
+		openPacPartyCheckTicks = 0;
+
+		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+			checkOpenPacPartyChange(server, player);
+		}
+	});
 
         registerServerStartedEvent();
         System.out.println("[SkyblockMulti] Mod 0.1.1-beta inicializado. Configuración: " + configPath);
@@ -391,6 +444,36 @@ ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
         }
         return count;
     }
+
+	private static void checkOpenPacPartyChange(Object server, ServerPlayer player) {
+
+		OpenPacCompat.PartyInfo partyInfo =
+				OpenPacCompat.getPartyInfo(player);
+
+		PartyState currentState =
+				PartyState.from(partyInfo);
+
+		PartyState previousState =
+				OPENPAC_PARTY_STATES.put(player.getUUID(), currentState);
+
+		// Primera lectura conocida del jugador.
+		if (previousState == null) {
+			return;
+		}
+
+		// La party no ha cambiado.
+		if (previousState.equals(currentState)) {
+			return;
+		}
+
+		System.out.println(
+				"[SkyblockMulti] OpenPAC: cambio de party detectado para "
+						+ player.getGameProfile().name()
+						+ "."
+		);
+
+		updateActiveIslandOnJoin(server, player);
+	}
 
 	private static void updateActiveIslandOnJoin(Object server, ServerPlayer player) {
 
