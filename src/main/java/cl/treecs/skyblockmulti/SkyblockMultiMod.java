@@ -24,6 +24,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.commands.CommandSourceStack;
 
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
@@ -690,7 +691,8 @@ public final class SkyblockMultiMod implements ModInitializer {
                     "net.minecraft.class_2168"
             );
             this.commands = invokeNoArgReturning(server, commandsClass);
-            this.source = invokeNoArgReturning(server, sourceClass);
+            this.source = ((CommandSourceStack) invokeNoArgReturning(server, sourceClass))
+				.withSuppressedOutput();
             this.commandMethod = findCommandMethod(commands.getClass(), sourceClass);
             if (this.commandMethod == null) {
                 this.dispatcher = findDispatcher(commands);
