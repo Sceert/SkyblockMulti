@@ -582,16 +582,87 @@ public final class SkyblockMultiMod implements ModInitializer {
             return;
         }
 
+        String playerName = player.getGameProfile().name();
+        UUID playerUuid = player.getUUID();
+
+        boolean wasMemberOfAnotherPlayer =
+                previousState.inParty()
+                        && previousState.ownerUuid() != null
+                        && !playerUuid.equals(previousState.ownerUuid());
+
+        boolean isMemberOfAnotherPlayer =
+                currentState.inParty()
+                        && !partyInfo.owner()
+                        && currentState.ownerUuid() != null
+                        && !playerUuid.equals(currentState.ownerUuid());
+
+        boolean ownerChanged =
+                previousState.ownerUuid() == null
+                        ? currentState.ownerUuid() != null
+                        : !previousState.ownerUuid().equals(currentState.ownerUuid());
+
+        // Solo teletransportamos automáticamente hacia un owner cuando el jugador
+        // acaba de convertirse en miembro o cambia de owner/party.
+        boolean autoHomeToPartyOwner =
+                isMemberOfAnotherPlayer
+                        && (!wasMemberOfAnotherPlayer || ownerChanged);
+
+        // Si antes compartía la isla de otro jugador y ahora ya no es miembro,
+        // debe volver físicamente a su isla personal o, si nunca tuvo una, al HUB.
+        boolean returnAfterLeavingSharedIsland =
+                wasMemberOfAnotherPlayer && !isMemberOfAnotherPlayer;
+
         System.out.println(
                 "[SkyblockMulti] OpenPAC: cambio de party detectado para "
-                        + player.getGameProfile().name()
+                        + playerName
                         + "."
         );
 
-        // Un cambio real de party siempre recalcula el destino activo.
-        // Si el jugador quedó como miembro de otra persona y el owner ya tiene isla,
-        // también se envía automáticamente a sb_home.
-        reconcileActiveIsland(server, player, partyInfo, true);
+        // Siempre recalculamos ACTIVE primero.
+        reconcileActiveIsland(server, player, partyInfo, autoHomeToPartyOwner);
+
+        if (returnAfterLeavingSharedIsland) {
+            returnPlayerAfterLeavingParty(server, player);
+        }
+    }
+
+    private static void returnPlayerAfterLeavingParty(
+            MinecraftServer server,
+            ServerPlayer player
+    ) {
+        String playerName = player.getGameProfile().name();
+
+        try {
+            ServerCommandExecutor executor = new ServerCommandExecutor(server);
+
+            // Con isla personal: ACTIVE ya fue restaurado a OWN por reconcileActiveIsland().
+            executor.run(
+                    "execute if score " + playerName
+                            + " sb3_state matches 2 as " + playerName
+                            + " run function skyblock:player/home"
+            );
+
+            // Sin isla personal: vuelve al HUB. Más adelante este caso enlazará
+            // con el flujo especial de dificultad/inventario tras abandonar una party.
+            executor.run(
+                    "execute unless score " + playerName
+                            + " sb3_state matches 2 as " + playerName
+                            + " run function skyblock:player/hub"
+            );
+
+            System.out.println(
+                    "[SkyblockMulti] OpenPAC: retorno tras salir de party solicitado para "
+                            + playerName
+                            + "."
+            );
+        } catch (Exception e) {
+            System.err.println(
+                    "[SkyblockMulti] No fue posible devolver a "
+                            + playerName
+                            + " tras salir de la party: "
+                            + e
+            );
+        }
     }
 
     private static void reconcileAllOnlinePlayers(MinecraftServer server, UUID newlyAvailableOwnerUuid) {

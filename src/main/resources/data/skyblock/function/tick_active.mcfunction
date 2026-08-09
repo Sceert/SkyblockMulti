@@ -20,10 +20,12 @@ execute as @a[scores={sb3_state=1}] run function skyblock:player/freeze_selectio
 execute as @a[scores={sb3_state=3}] run function skyblock:player/freeze_selection
 execute as @a[scores={sb3_state=4}] run function skyblock:player/freeze_selection
 # Habilitar únicamente triggers que forman parte del flujo de selección.
+# Se habilitan SOLO mientras su valor es 0 para impedir que el mismo botón
+# pueda volver a activarse durante el tick en que está siendo procesado.
 # sb_hub, sb_home y sb_info NO se habilitan para jugadores normales.
-scoreboard players enable @a[scores={sb3_state=1}] sb_tree
-scoreboard players enable @a[scores={sb3_state=1}] sb_menu
-scoreboard players enable @a[scores={sb3_state=4}] sb_difficulty
+scoreboard players enable @a[scores={sb3_state=1,sb_tree=0}] sb_tree
+scoreboard players enable @a[scores={sb3_state=1,sb_menu=0}] sb_menu
+scoreboard players enable @a[scores={sb3_state=4,sb_difficulty=0}] sb_difficulty
 # Mostrar selector solo cuando las anclas estén listas.
 execute if entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] as @a[scores={sb3_state=1},tag=!skyblock_menu_shown_v1] run function skyblock:player/menu
 # Procesar exclusivamente botones del flujo de selección.
