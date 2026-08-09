@@ -31,7 +31,7 @@
   "skyblockmulti.menu.tree.pale_oak.hover": "Isla con roble pálido",
   "skyblockmulti.menu.tree.azalea": "[   AZALEA   ]",
   "skyblockmulti.menu.tree.azalea.hover": "Isla con azalea",
-  "skyblockmulti.menu.tree.flowering_azalea": "[ AZALEA FL. ]",
+  "skyblockmulti.menu.tree.flowering_azalea": "[ AZALEA FL  ]",
   "skyblockmulti.menu.tree.flowering_azalea.hover": "Isla con azalea florecida",
   "skyblockmulti.config.title": "SkyblockMulti",
   "skyblockmulti.config.distance.field": "Distancia entre islas",
@@ -99,10 +99,10 @@
   "skyblockmulti.difficulty.easy.desc": "Recursos adicionales y cama.",
   "skyblockmulti.openpac.detected": "[SkyblockMulti] Open Parties and Claims detectado. Para jugar en equipo puedes crear una party o aceptar una invitación y compartir la isla del propietario. Al abandonar una party, SkyblockMulti puede aplicar una dificultad mínima más exigente según la configuración del mundo.",
   "skyblockmulti.openpac.solo": "[SkyblockMulti] Modo individual activo. Para jugar en equipo puedes instalar Open Parties and Claims. Este mod es opcional y SkyblockMulti funciona normalmente sin él.",
-  "skyblockmulti.difficulty.extreme.label": "[Extremo]",
-  "skyblockmulti.difficulty.hard.label": "[Difícil]",
-  "skyblockmulti.difficulty.standard.label": "[Estándar]",
-  "skyblockmulti.difficulty.easy.label": "[Fácil]",
+  "skyblockmulti.difficulty.extreme.label": "[ EXTREMO  ]",
+  "skyblockmulti.difficulty.hard.label": "[ DIFÍCIL  ]",
+  "skyblockmulti.difficulty.standard.label": "[ ESTÁNDAR ]",
+  "skyblockmulti.difficulty.easy.label": "[  FÁCIL   ]",
   "skyblockmulti.island.created": "Tu ancla fue sustituida por una isla en Y=64.",
   "skyblockmulti.island.commands": "Usa /trigger sb_hub para ir al HUB, /trigger sb_home para volver y /trigger sb_info para consultar tu asignación.",
   "skyblockmulti.system.loaded": "SkyblockMulti 0.1.1-beta cargado.",
@@ -310,5 +310,6 @@
   "skyblockmulti.config.party_leave.mode.button": "Dificultad mínima al salir de una party: %s",
   "skyblockmulti.config.party_leave.mode.note": "Se aplica al salir de una party sin una isla personal previa.",
   "skyblockmulti.config.distance.button": "%s bloques · %s chunks",
-  "skyblockmulti.config.distance.note": "Cicla entre distancias alineadas a chunks: 32, 64, 128, 256 y 512 chunks."
+  "skyblockmulti.config.distance.note": "Cicla entre distancias alineadas a chunks: 32, 64, 128, 256 y 512 chunks.",
+  "skyblockmulti.difficulty.disabled.hover": "Bloqueado por la dificultad mínima configurada."
 }

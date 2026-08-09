@@ -31,7 +31,7 @@
   "skyblockmulti.menu.tree.pale_oak.hover": "Island with Pale Oak",
   "skyblockmulti.menu.tree.azalea": "[   AZALEA   ]",
   "skyblockmulti.menu.tree.azalea.hover": "Island with Azalea",
-  "skyblockmulti.menu.tree.flowering_azalea": "[ AZALEA FL. ]",
+  "skyblockmulti.menu.tree.flowering_azalea": "[ AZALEA FL  ]",
   "skyblockmulti.menu.tree.flowering_azalea.hover": "Island with Flowering Azalea",
   "skyblockmulti.config.title": "SkyblockMulti",
   "skyblockmulti.config.distance.field": "Island distance",
@@ -99,10 +99,10 @@
   "skyblockmulti.difficulty.easy.desc": "Additional resources and a bed.",
   "skyblockmulti.openpac.detected": "[SkyblockMulti] Open Parties and Claims detected. To play as a team, create a party or accept an invitation and share the owner’s island. When leaving a party, SkyblockMulti may apply a harder minimum difficulty according to the world configuration.",
   "skyblockmulti.openpac.solo": "[SkyblockMulti] Solo mode active. To play as a team, install Open Parties and Claims. It is optional and SkyblockMulti works normally without it.",
-  "skyblockmulti.difficulty.extreme.label": "[Extreme]",
-  "skyblockmulti.difficulty.hard.label": "[Hard]",
-  "skyblockmulti.difficulty.standard.label": "[Standard]",
-  "skyblockmulti.difficulty.easy.label": "[Easy]",
+  "skyblockmulti.difficulty.extreme.label": "[ EXTREME  ]",
+  "skyblockmulti.difficulty.hard.label": "[   HARD   ]",
+  "skyblockmulti.difficulty.standard.label": "[ STANDARD ]",
+  "skyblockmulti.difficulty.easy.label": "[   EASY   ]",
   "skyblockmulti.island.created": "Your anchor was replaced by an island at Y=64.",
   "skyblockmulti.island.commands": "Use /trigger sb_hub to go to the HUB, /trigger sb_home to return, and /trigger sb_info to check your assignment.",
   "skyblockmulti.system.loaded": "SkyblockMulti 0.1.1-beta loaded.",
@@ -310,5 +310,6 @@
   "skyblockmulti.config.party_leave.mode.button": "Minimum difficulty after leaving a party: %s",
   "skyblockmulti.config.party_leave.mode.note": "Applies when leaving a party without a previous personal island.",
   "skyblockmulti.config.distance.button": "%s blocks · %s chunks",
-  "skyblockmulti.config.distance.note": "Cycles through chunk-aligned distances: 32, 64, 128, 256 and 512 chunks."
+  "skyblockmulti.config.distance.note": "Cycles through chunk-aligned distances: 32, 64, 128, 256 and 512 chunks.",
+  "skyblockmulti.difficulty.disabled.hover": "Disabled by the configured minimum difficulty."
 }
