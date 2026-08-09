@@ -1,4 +1,3 @@
-
 # Respaldo de inicialización.
 execute in minecraft:overworld unless entity @e[type=minecraft:marker,tag=skyblock_system_v1,limit=1] run function skyblock:bootstrap
 # Garantizar el HUB.
@@ -20,22 +19,17 @@ execute as @a[tag=skyblock_respawn_pending,scores={sb3_state=2,sb_since_death=1.
 execute as @a[scores={sb3_state=1}] run function skyblock:player/freeze_selection
 execute as @a[scores={sb3_state=3}] run function skyblock:player/freeze_selection
 execute as @a[scores={sb3_state=4}] run function skyblock:player/freeze_selection
-# Habilitar triggers.
+# Habilitar únicamente triggers que forman parte del flujo de selección.
+# sb_hub, sb_home y sb_info NO se habilitan para jugadores normales.
 scoreboard players enable @a[scores={sb3_state=1}] sb_tree
 scoreboard players enable @a[scores={sb3_state=1}] sb_menu
 scoreboard players enable @a[scores={sb3_state=4}] sb_difficulty
-scoreboard players enable @a[scores={sb3_state=2}] sb_home
-scoreboard players enable @a[tag=skyblock_registered_v1] sb_hub
-scoreboard players enable @a[tag=skyblock_registered_v1] sb_info
 # Mostrar selector solo cuando las anclas estén listas.
 execute if entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] as @a[scores={sb3_state=1},tag=!skyblock_menu_shown_v1] run function skyblock:player/menu
-# Procesar botones y comandos.
+# Procesar exclusivamente botones del flujo de selección.
 execute as @a[scores={sb_menu=1..,sb3_state=1}] run function skyblock:player/menu
 execute as @a[scores={sb_tree=1..12,sb3_state=1}] run function skyblock:player/select
 execute as @a[scores={sb_difficulty=1..4,sb3_state=4}] run function skyblock:player/difficulty_select
-execute as @a[scores={sb_home=1..,sb3_state=2}] run function skyblock:player/home
-execute as @a[scores={sb_hub=1..}] run function skyblock:player/hub
-execute as @a[scores={sb_info=1..}] run function skyblock:player/info
 # Limpiar valores inválidos de selección.
 scoreboard players set @a[scores={sb_tree=13..}] sb_tree 0
 scoreboard players set @a[scores={sb_difficulty=5..}] sb_difficulty 0
