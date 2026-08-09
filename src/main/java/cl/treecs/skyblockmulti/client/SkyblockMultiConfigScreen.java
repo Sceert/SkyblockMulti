@@ -15,7 +15,8 @@ public final class SkyblockMultiConfigScreen extends Screen {
     private final Screen parent;
     private final EnumMap<TreeOption, Boolean> treeStates;
     private final EnumMap<TreeOption, Button> treeButtons = new EnumMap<>(TreeOption.class);
-    private EditBox distanceField;
+    private Button distanceButton;
+    private int islandDistance;
     private EditBox capacityField;
     private Button bonusChestModeButton;
     private Button partyLeaveDifficultyButton;
@@ -29,6 +30,7 @@ public final class SkyblockMultiConfigScreen extends Screen {
         super(Component.translatable("skyblockmulti.config.title"));
         this.parent = parent;
         this.treeStates = SkyblockMultiMod.getConfiguredTreeStates();
+        this.islandDistance = SkyblockMultiMod.getConfiguredDistance();
         this.bonusChestMode = SkyblockMultiMod.getConfiguredBonusChestMode();
         this.partyLeaveDifficultyMode = SkyblockMultiMod.getConfiguredPartyLeaveDifficultyMode();
     }
@@ -37,14 +39,10 @@ public final class SkyblockMultiConfigScreen extends Screen {
     protected void init() {
         int centerX = this.width / 2;
 
-        this.distanceField = new EditBox(
-                this.font, centerX - 155, 52, 150, 20,
-                Component.translatable("skyblockmulti.config.distance.field")
+        this.distanceButton = this.addRenderableWidget(
+                Button.builder(distanceLabel(), button -> cycleDistance())
+                        .bounds(centerX - 155, 52, 150, 20).build()
         );
-        this.distanceField.setMaxLength(6);
-        this.distanceField.setValue(Integer.toString(SkyblockMultiMod.getConfiguredDistance()));
-        this.distanceField.setResponder(value -> clearStatus());
-        this.addRenderableWidget(this.distanceField);
 
         this.capacityField = new EditBox(
                 this.font, centerX + 5, 52, 150, 20,
@@ -86,6 +84,20 @@ public final class SkyblockMultiConfigScreen extends Screen {
                 .bounds(centerX - 50, footerY, 100, 20).build());
         this.addRenderableWidget(Button.builder(Component.translatable("skyblockmulti.config.save"), button -> save())
                 .bounds(centerX + 55, footerY, 100, 20).build());
+    }
+
+    private void cycleDistance() {
+        this.islandDistance = SkyblockMultiMod.getNextConfiguredDistance(this.islandDistance);
+        this.distanceButton.setMessage(distanceLabel());
+        clearStatus();
+    }
+
+    private Component distanceLabel() {
+        return Component.translatable(
+                "skyblockmulti.config.distance.button",
+                this.islandDistance,
+                SkyblockMultiMod.getDistanceChunks(this.islandDistance)
+        );
     }
 
     private void clearStatus() {
@@ -143,7 +155,8 @@ public final class SkyblockMultiConfigScreen extends Screen {
     }
 
     private void resetDefaults() {
-        this.distanceField.setValue(Integer.toString(SkyblockMultiMod.DEFAULT_DISTANCE));
+        this.islandDistance = SkyblockMultiMod.DEFAULT_DISTANCE;
+        if (this.distanceButton != null) this.distanceButton.setMessage(distanceLabel());
         this.capacityField.setValue(Integer.toString(SkyblockMultiMod.DEFAULT_CAPACITY));
         for (TreeOption tree : TreeOption.values()) {
             treeStates.put(tree, true);
@@ -167,14 +180,6 @@ public final class SkyblockMultiConfigScreen extends Screen {
         return count;
     }
 
-    private int previewDistance() {
-        try {
-            return SkyblockMultiMod.normalizeDistance(Integer.parseInt(this.distanceField.getValue().trim()));
-        } catch (NumberFormatException exception) {
-            return -1;
-        }
-    }
-
     private int previewCapacity() {
         try {
             int value = Integer.parseInt(this.capacityField.getValue().trim());
@@ -192,13 +197,7 @@ public final class SkyblockMultiConfigScreen extends Screen {
             setStatus("skyblockmulti.config.status.one_tree", 0xFFFF5555);
             return;
         }
-        final int requestedDistance;
-        try {
-            requestedDistance = Integer.parseInt(this.distanceField.getValue().trim());
-        } catch (NumberFormatException exception) {
-            setStatus("skyblockmulti.config.status.number", 0xFFFF5555);
-            return;
-        }
+        final int requestedDistance = this.islandDistance;
 
         final int requestedCapacity;
         try {
@@ -224,7 +223,8 @@ public final class SkyblockMultiConfigScreen extends Screen {
                 bonusChestMode,
                 partyLeaveDifficultyMode
         )) {
-            this.distanceField.setValue(Integer.toString(normalizedDistance));
+            this.islandDistance = normalizedDistance;
+            if (this.distanceButton != null) this.distanceButton.setMessage(distanceLabel());
             this.capacityField.setValue(Integer.toString(normalizedCapacity));
             setStatus("skyblockmulti.config.status.saved", 0xFF55FF55);
         } else {
@@ -252,17 +252,13 @@ public final class SkyblockMultiConfigScreen extends Screen {
                 0xFFDDDDDD
         );
 
-        int distance = previewDistance();
+        int distance = this.islandDistance;
         int capacity = previewCapacity();
-        if (distance > 0 && capacity > 0) {
+        if (capacity > 0) {
             int radius = distance * 2;
             graphics.centeredText(this.font,
                     Component.translatable("skyblockmulti.config.capacity", capacity, radius),
                     centerX, 80, 0xFF55FFFF);
-        } else if (distance <= 0) {
-            graphics.centeredText(this.font,
-                    Component.translatable("skyblockmulti.config.invalid_distance"),
-                    centerX, 80, 0xFFFF5555);
         } else {
             graphics.centeredText(this.font,
                     Component.translatable("skyblockmulti.config.invalid_capacity"),

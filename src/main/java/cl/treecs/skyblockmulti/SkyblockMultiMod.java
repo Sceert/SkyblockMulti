@@ -38,8 +38,15 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 public final class SkyblockMultiMod implements ModInitializer {
     public static final String MOD_ID = "skyblockmulti";
     public static final int DEFAULT_DISTANCE = 2048;
-    public static final int MIN_DISTANCE = 256;
-    public static final int MAX_DISTANCE = 100000;
+
+    /**
+     * Distancias permitidas entre centros de isla.
+     * Todas son potencias de dos y múltiplos exactos de 16 bloques:
+     * 512=32 chunks, 1024=64, 2048=128, 4096=256, 8192=512.
+     */
+    public static final int[] ISLAND_DISTANCE_OPTIONS = {512, 1024, 2048, 4096, 8192};
+    public static final int MIN_DISTANCE = ISLAND_DISTANCE_OPTIONS[0];
+    public static final int MAX_DISTANCE = ISLAND_DISTANCE_OPTIONS[ISLAND_DISTANCE_OPTIONS.length - 1];
     public static final int PLAYER_CAPACITY = 24; // Máximo físico de posiciones.
     public static final int DEFAULT_CAPACITY = PLAYER_CAPACITY;
     public static final int MIN_CAPACITY = 1;
@@ -390,8 +397,34 @@ public final class SkyblockMultiMod implements ModInitializer {
     }
 
     public static int normalizeDistance(int value) {
-        value = Math.max(MIN_DISTANCE, Math.min(MAX_DISTANCE, value));
-        return Math.max(MIN_DISTANCE, Math.round(value / 16.0f) * 16);
+        int best = ISLAND_DISTANCE_OPTIONS[0];
+        long bestDelta = Math.abs((long) value - best);
+
+        for (int option : ISLAND_DISTANCE_OPTIONS) {
+            long delta = Math.abs((long) value - option);
+            if (delta < bestDelta) {
+                best = option;
+                bestDelta = delta;
+            }
+        }
+
+        return best;
+    }
+
+    public static int getNextConfiguredDistance(int current) {
+        int normalized = normalizeDistance(current);
+
+        for (int i = 0; i < ISLAND_DISTANCE_OPTIONS.length; i++) {
+            if (ISLAND_DISTANCE_OPTIONS[i] == normalized) {
+                return ISLAND_DISTANCE_OPTIONS[(i + 1) % ISLAND_DISTANCE_OPTIONS.length];
+            }
+        }
+
+        return DEFAULT_DISTANCE;
+    }
+
+    public static int getDistanceChunks(int distance) {
+        return normalizeDistance(distance) / 16;
     }
 
     public static int normalizeCapacity(int value) {

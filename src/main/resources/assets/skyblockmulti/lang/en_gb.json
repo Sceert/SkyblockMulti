@@ -35,7 +35,7 @@
   "skyblockmulti.menu.tree.flowering_azalea.hover": "Island with Flowering Azalea",
   "skyblockmulti.config.title": "SkyblockMulti",
   "skyblockmulti.config.distance.field": "Island distance",
-  "skyblockmulti.config.distance.label": "Island distance, in blocks",
+  "skyblockmulti.config.distance.label": "Island distance",
   "skyblockmulti.config.capacity": "Capacity: %s assignable islands | extent: ±%s blocks",
   "skyblockmulti.config.invalid_distance": "Invalid distance",
   "skyblockmulti.config.allowed_trees": "Allowed trees: %s/%s",
@@ -308,5 +308,7 @@
   "skyblockmulti.config.invalid_capacity": "Invalid capacity",
   "skyblockmulti.config.status.capacity": "Enter an island capacity between 1 and 24.",
   "skyblockmulti.config.party_leave.mode.button": "Minimum difficulty after leaving a party: %s",
-  "skyblockmulti.config.party_leave.mode.note": "Applies when leaving a party without a previous personal island."
+  "skyblockmulti.config.party_leave.mode.note": "Applies when leaving a party without a previous personal island.",
+  "skyblockmulti.config.distance.button": "%s blocks · %s chunks",
+  "skyblockmulti.config.distance.note": "Cycles through chunk-aligned distances: 32, 64, 128, 256 and 512 chunks."
 }
