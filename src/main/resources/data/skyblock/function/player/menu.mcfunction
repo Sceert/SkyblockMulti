@@ -15,7 +15,10 @@ execute if score #tree_dark_oak sb3_cfg matches 1 run function skyblock:player/m
 execute if score #tree_pale_oak sb3_cfg matches 1 run function skyblock:player/menu/tree/pale_oak
 execute if score #tree_azalea sb3_cfg matches 1 run function skyblock:player/menu/tree/azalea
 execute if score #tree_flowering_azalea sb3_cfg matches 1 run function skyblock:player/menu/tree/flowering_azalea
+tellraw @s {"text":""}
 execute if score #enabled_count sb3_cfg matches 1.. run function skyblock:player/menu/tree/random
-tellraw @s {"translate":"skyblockmulti.menu.capacity","with":[{"score":{"name":"#capacity","objective":"sb3_cfg"}}],"color":"gray"}
+tellraw @s {"text":""}
+execute unless score #openpac sb3_cfg matches 1 run tellraw @s {"translate":"skyblockmulti.menu.capacity.solo","with":[{"score":{"name":"#capacity","objective":"sb3_cfg"}}],"color":"gray"}
+execute if score #openpac sb3_cfg matches 1 run tellraw @s {"translate":"skyblockmulti.menu.capacity.team","with":[{"score":{"name":"#capacity","objective":"sb3_cfg"}}],"color":"gray"}
 tellraw @s {"translate":"skyblockmulti.menu.footer","color":"gray","italic":true}
 tellraw @s {"translate":"skyblockmulti.menu.random_note","color":"dark_gray","italic":true}

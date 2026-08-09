@@ -628,6 +628,7 @@ public final class SkyblockMultiMod implements ModInitializer {
             executor.run("data modify storage skyblock:config island_distance set value " + distance);
             executor.run("scoreboard players set #distance sb3_const " + distance);
             executor.run("scoreboard players set #capacity sb3_cfg " + PLAYER_CAPACITY);
+            executor.run("scoreboard players set #openpac sb3_cfg " + (OpenPacCompat.isInstalled() ? 1 : 0));
             executor.run("scoreboard players set #enabled_count sb3_cfg " + countEnabled(config.trees()));
             executor.run("scoreboard players set #bonus_tier sb3_cfg " + config.bonusChestMode().scoreValue());
 
@@ -692,7 +693,7 @@ public final class SkyblockMultiMod implements ModInitializer {
             );
             this.commands = invokeNoArgReturning(server, commandsClass);
             this.source = ((CommandSourceStack) invokeNoArgReturning(server, sourceClass))
-				.withSuppressedOutput();
+                    .withSuppressedOutput();
             this.commandMethod = findCommandMethod(commands.getClass(), sourceClass);
             if (this.commandMethod == null) {
                 this.dispatcher = findDispatcher(commands);

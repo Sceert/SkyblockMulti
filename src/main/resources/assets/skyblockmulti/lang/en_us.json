@@ -277,5 +277,16 @@
   "skyblockmulti.advancement.trade.emerald.title": "Currency of the Sky",
   "skyblockmulti.advancement.trade.emerald.description": "Obtain an emerald.",
   "skyblockmulti.advancement.trade.enchanted_book.title": "Valuable Knowledge",
-  "skyblockmulti.advancement.trade.enchanted_book.description": "Obtain an enchanted book."
+  "skyblockmulti.advancement.trade.enchanted_book.description": "Obtain an enchanted book.",
+  "skyblockmulti.menu.capacity.solo": "Maximum capacity: %s players.",
+  "skyblockmulti.menu.capacity.team": "Maximum capacity: %s players or teams.",
+  "skyblockmulti.menu.tree.random.1": "R",
+  "skyblockmulti.menu.tree.random.2": "A",
+  "skyblockmulti.menu.tree.random.3": "N",
+  "skyblockmulti.menu.tree.random.4": "D",
+  "skyblockmulti.menu.tree.random.5": "O",
+  "skyblockmulti.menu.tree.random.6": "M",
+  "skyblockmulti.menu.tree.random.7": "",
+  "skyblockmulti.menu.tree.random.8": "",
+  "skyblockmulti.menu.tree.random.9": ""
 }

@@ -277,5 +277,16 @@
   "skyblockmulti.advancement.trade.emerald.title": "Moneda del cielo",
   "skyblockmulti.advancement.trade.emerald.description": "Obtén una esmeralda.",
   "skyblockmulti.advancement.trade.enchanted_book.title": "Conocimiento valioso",
-  "skyblockmulti.advancement.trade.enchanted_book.description": "Obtén un libro encantado."
+  "skyblockmulti.advancement.trade.enchanted_book.description": "Obtén un libro encantado.",
+  "skyblockmulti.menu.capacity.solo": "Capacidad máxima: %s jugadores.",
+  "skyblockmulti.menu.capacity.team": "Capacidad máxima: %s jugadores o equipos.",
+  "skyblockmulti.menu.tree.random.1": "A",
+  "skyblockmulti.menu.tree.random.2": "L",
+  "skyblockmulti.menu.tree.random.3": "E",
+  "skyblockmulti.menu.tree.random.4": "A",
+  "skyblockmulti.menu.tree.random.5": "T",
+  "skyblockmulti.menu.tree.random.6": "O",
+  "skyblockmulti.menu.tree.random.7": "R",
+  "skyblockmulti.menu.tree.random.8": "I",
+  "skyblockmulti.menu.tree.random.9": "O"
 }
