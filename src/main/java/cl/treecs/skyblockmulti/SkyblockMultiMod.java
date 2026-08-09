@@ -40,10 +40,14 @@ public final class SkyblockMultiMod implements ModInitializer {
     public static final int DEFAULT_DISTANCE = 2048;
     public static final int MIN_DISTANCE = 256;
     public static final int MAX_DISTANCE = 100000;
-    public static final int PLAYER_CAPACITY = 24;
+    public static final int PLAYER_CAPACITY = 24; // Máximo físico de posiciones.
+    public static final int DEFAULT_CAPACITY = PLAYER_CAPACITY;
+    public static final int MIN_CAPACITY = 1;
+    public static final int MAX_CAPACITY = PLAYER_CAPACITY;
     private static final int OPENPAC_PARTY_CHECK_INTERVAL_TICKS = 20;
 
     private static final Pattern DISTANCE_PATTERN = Pattern.compile("\\\"islandDistance\\\"\\s*:\\s*(-?\\d+)");
+    private static final Pattern CAPACITY_PATTERN = Pattern.compile("\\\"islandCapacity\\\"\\s*:\\s*(-?\\d+)");
     private static final Pattern BONUS_CHEST_MODE_PATTERN = Pattern.compile("\\\"bonusChestMode\\\"\\s*:\\s*\\\"([a-z_]+)\\\"", Pattern.CASE_INSENSITIVE);
     private static final Pattern LEGACY_BONUS_CHEST_ENABLED_PATTERN = Pattern.compile("\\\"bonusChestEnabled\\\"\\s*:\\s*(true|false)", Pattern.CASE_INSENSITIVE);
     private static final Pattern LEGACY_BONUS_CHEST_TIER_PATTERN = Pattern.compile("\\\"bonusChestTier\\\"\\s*:\\s*\\\"([a-z_]+)\\\"", Pattern.CASE_INSENSITIVE);
@@ -291,8 +295,15 @@ public final class SkyblockMultiMod implements ModInitializer {
         return new EnumMap<>(loadConfig().trees());
     }
 
+    /**
+     * Máximo físico de posiciones disponibles en la distribución actual.
+     */
     public static int getPlayerCapacity(int distance) {
         return PLAYER_CAPACITY;
+    }
+
+    public static int getConfiguredCapacity() {
+        return loadConfig().capacity();
     }
 
     public static BonusChestMode getConfiguredBonusChestMode() {
@@ -301,23 +312,47 @@ public final class SkyblockMultiMod implements ModInitializer {
 
     public static boolean saveConfiguredDistance(int requestedDistance) {
         ConfigData current = loadConfig();
-        return saveConfiguration(requestedDistance, current.trees(), current.bonusChestMode());
+        return saveConfiguration(
+                requestedDistance,
+                current.capacity(),
+                current.trees(),
+                current.bonusChestMode()
+        );
     }
 
     public static boolean saveConfiguration(int requestedDistance, Map<TreeOption, Boolean> requestedTrees) {
         ConfigData current = loadConfig();
-        return saveConfiguration(requestedDistance, requestedTrees, current.bonusChestMode());
+        return saveConfiguration(
+                requestedDistance,
+                current.capacity(),
+                requestedTrees,
+                current.bonusChestMode()
+        );
     }
 
     public static boolean saveConfiguration(int requestedDistance, Map<TreeOption, Boolean> requestedTrees,
                                             BonusChestMode bonusChestMode) {
+        ConfigData current = loadConfig();
+        return saveConfiguration(
+                requestedDistance,
+                current.capacity(),
+                requestedTrees,
+                bonusChestMode
+        );
+    }
+
+    public static boolean saveConfiguration(int requestedDistance, int requestedCapacity,
+                                            Map<TreeOption, Boolean> requestedTrees,
+                                            BonusChestMode bonusChestMode) {
         ensureConfigReady();
         int normalized = normalizeDistance(requestedDistance);
+        int normalizedCapacity = normalizeCapacity(requestedCapacity);
         EnumMap<TreeOption, Boolean> trees = normalizeTrees(requestedTrees);
         BonusChestMode safeMode = bonusChestMode == null ? BonusChestMode.STANDARD : bonusChestMode;
         try {
-            writeConfig(normalized, trees, safeMode);
+            writeConfig(normalized, normalizedCapacity, trees, safeMode);
             System.out.println("[SkyblockMulti] Configuración guardada: distancia=" + normalized
+                    + ", capacidad=" + normalizedCapacity
                     + ", árboles=" + countEnabled(trees)
                     + ", cofre=" + safeMode.configKey());
             Object server = activeServer;
@@ -336,6 +371,10 @@ public final class SkyblockMultiMod implements ModInitializer {
         return Math.max(MIN_DISTANCE, Math.round(value / 16.0f) * 16);
     }
 
+    public static int normalizeCapacity(int value) {
+        return Math.max(MIN_CAPACITY, Math.min(MAX_CAPACITY, value));
+    }
+
     private static void ensureConfigReady() {
         if (configPath == null) {
             configPath = FabricLoader.getInstance().getConfigDir().resolve("skyblockmulti.json");
@@ -348,18 +387,19 @@ public final class SkyblockMultiMod implements ModInitializer {
         try {
             Files.createDirectories(configPath.getParent());
             if (Files.notExists(configPath)) {
-                writeConfig(DEFAULT_DISTANCE, defaultTrees(), BonusChestMode.STANDARD);
+                writeConfig(DEFAULT_DISTANCE, DEFAULT_CAPACITY, defaultTrees(), BonusChestMode.STANDARD);
             }
         } catch (IOException e) {
             System.err.println("[SkyblockMulti] No se pudo crear el archivo de configuración: " + e.getMessage());
         }
     }
 
-    private static void writeConfig(int distance, Map<TreeOption, Boolean> trees,
+    private static void writeConfig(int distance, int capacity, Map<TreeOption, Boolean> trees,
                                     BonusChestMode bonusChestMode) throws IOException {
         StringBuilder json = new StringBuilder();
         json.append("{\n");
         json.append("  \"islandDistance\": ").append(distance).append(",\n");
+        json.append("  \"islandCapacity\": ").append(capacity).append(",\n");
         json.append("  \"bonusChestMode\": \"").append(bonusChestMode.configKey()).append("\",\n");
         json.append("  \"enabledTrees\": {\n");
         TreeOption[] values = TreeOption.values();
@@ -378,6 +418,7 @@ public final class SkyblockMultiMod implements ModInitializer {
     private static ConfigData loadConfig() {
         ensureConfigReady();
         int distance = DEFAULT_DISTANCE;
+        int capacity = DEFAULT_CAPACITY;
         EnumMap<TreeOption, Boolean> trees = defaultTrees();
         BonusChestMode bonusChestMode = BonusChestMode.STANDARD;
         try {
@@ -385,6 +426,11 @@ public final class SkyblockMultiMod implements ModInitializer {
             Matcher matcher = DISTANCE_PATTERN.matcher(raw);
             if (matcher.find()) {
                 distance = Integer.parseInt(matcher.group(1));
+            }
+
+            Matcher capacityMatcher = CAPACITY_PATTERN.matcher(raw);
+            if (capacityMatcher.find()) {
+                capacity = Integer.parseInt(capacityMatcher.group(1));
             }
 
             Matcher modeMatcher = BONUS_CHEST_MODE_PATTERN.matcher(raw);
@@ -417,7 +463,12 @@ public final class SkyblockMultiMod implements ModInitializer {
         } catch (Exception e) {
             System.err.println("[SkyblockMulti] Configuración inválida; se usarán valores seguros: " + e.getMessage());
         }
-        return new ConfigData(normalizeDistance(distance), normalizeTrees(trees), bonusChestMode);
+        return new ConfigData(
+                normalizeDistance(distance),
+                normalizeCapacity(capacity),
+                normalizeTrees(trees),
+                bonusChestMode
+        );
     }
 
     private static EnumMap<TreeOption, Boolean> defaultTrees() {
@@ -612,6 +663,7 @@ public final class SkyblockMultiMod implements ModInitializer {
     private static void applyConfiguration(Object server) {
         ConfigData config = loadConfig();
         int distance = config.distance();
+        int capacity = config.capacity();
         try {
             ServerCommandExecutor executor = new ServerCommandExecutor(server);
 
@@ -627,7 +679,7 @@ public final class SkyblockMultiMod implements ModInitializer {
 
             executor.run("data modify storage skyblock:config island_distance set value " + distance);
             executor.run("scoreboard players set #distance sb3_const " + distance);
-            executor.run("scoreboard players set #capacity sb3_cfg " + PLAYER_CAPACITY);
+            executor.run("scoreboard players set #capacity sb3_cfg " + capacity);
             executor.run("scoreboard players set #openpac sb3_cfg " + (OpenPacCompat.isInstalled() ? 1 : 0));
             executor.run("scoreboard players set #enabled_count sb3_cfg " + countEnabled(config.trees()));
             executor.run("scoreboard players set #bonus_tier sb3_cfg " + config.bonusChestMode().scoreValue());
@@ -651,7 +703,7 @@ public final class SkyblockMultiMod implements ModInitializer {
             executor.run("execute in minecraft:overworld if biome 0 64 0 minecraft:the_void run function skyblock:slots/forceload");
             executor.run("execute in minecraft:overworld if biome 0 64 0 minecraft:the_void run scoreboard players set #slotgen sb3_const 60");
             System.out.println("[SkyblockMulti] Configuración aplicada: distancia=" + distance
-                    + ", capacidad=" + PLAYER_CAPACITY + ", árboles=" + countEnabled(config.trees())
+                    + ", capacidad=" + capacity + ", árboles=" + countEnabled(config.trees())
                     + ", cofre=" + config.bonusChestMode().configKey());
         } catch (Exception e) {
             System.err.println("[SkyblockMulti] No fue posible aplicar la configuración al servidor: " + e);
@@ -671,7 +723,7 @@ public final class SkyblockMultiMod implements ModInitializer {
         return slots;
     }
 
-    private record ConfigData(int distance, EnumMap<TreeOption, Boolean> trees,
+    private record ConfigData(int distance, int capacity, EnumMap<TreeOption, Boolean> trees,
                               BonusChestMode bonusChestMode) {}
     private record Slot(int index, int x, int z) {}
 
