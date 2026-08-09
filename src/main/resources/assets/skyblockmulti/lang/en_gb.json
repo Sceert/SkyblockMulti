@@ -106,7 +106,7 @@
   "skyblockmulti.island.created": "Your anchor was replaced by an island at Y=64.",
   "skyblockmulti.island.commands": "Use /trigger sb_hub to go to the HUB, /trigger sb_home to return, and /trigger sb_info to check your assignment.",
   "skyblockmulti.system.loaded": "SkyblockMulti 0.1.1-beta loaded.",
-  "skyblockmulti.system.anchors_ready": "All 24 anchors are available at Y=64.",
+  "skyblockmulti.system.anchors_ready": "Available island slots: %s. Anchors ready at Y=64.",
   "skyblockmulti.info.title": "=== SKYBLOCKMULTI ===",
   "skyblockmulti.info.state": "State: %s | Island: %s",
   "skyblockmulti.info.center": "Center X: %s | Z: %s",
@@ -306,5 +306,7 @@
   "skyblockmulti.config.capacity.field": "Island capacity",
   "skyblockmulti.config.capacity.label": "Island capacity (1–24)",
   "skyblockmulti.config.invalid_capacity": "Invalid capacity",
-  "skyblockmulti.config.status.capacity": "Enter an island capacity between 1 and 24."
+  "skyblockmulti.config.status.capacity": "Enter an island capacity between 1 and 24.",
+  "skyblockmulti.config.party_leave.mode.button": "Minimum difficulty after leaving a party: %s",
+  "skyblockmulti.config.party_leave.mode.note": "Applies when leaving a party without a previous personal island."
 }

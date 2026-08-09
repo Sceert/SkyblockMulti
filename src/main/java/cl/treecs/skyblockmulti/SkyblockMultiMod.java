@@ -49,6 +49,7 @@ public final class SkyblockMultiMod implements ModInitializer {
     private static final Pattern DISTANCE_PATTERN = Pattern.compile("\\\"islandDistance\\\"\\s*:\\s*(-?\\d+)");
     private static final Pattern CAPACITY_PATTERN = Pattern.compile("\\\"islandCapacity\\\"\\s*:\\s*(-?\\d+)");
     private static final Pattern BONUS_CHEST_MODE_PATTERN = Pattern.compile("\\\"bonusChestMode\\\"\\s*:\\s*\\\"([a-z_]+)\\\"", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PARTY_LEAVE_DIFFICULTY_PATTERN = Pattern.compile("\\\"partyLeaveDifficultyMode\\\"\\s*:\\s*\\\"([a-z_]+)\\\"", Pattern.CASE_INSENSITIVE);
     private static final Pattern LEGACY_BONUS_CHEST_ENABLED_PATTERN = Pattern.compile("\\\"bonusChestEnabled\\\"\\s*:\\s*(true|false)", Pattern.CASE_INSENSITIVE);
     private static final Pattern LEGACY_BONUS_CHEST_TIER_PATTERN = Pattern.compile("\\\"bonusChestTier\\\"\\s*:\\s*\\\"([a-z_]+)\\\"", Pattern.CASE_INSENSITIVE);
     private static Path configPath;
@@ -310,6 +311,10 @@ public final class SkyblockMultiMod implements ModInitializer {
         return loadConfig().bonusChestMode();
     }
 
+    public static BonusChestMode getConfiguredPartyLeaveDifficultyMode() {
+        return loadConfig().partyLeaveDifficultyMode();
+    }
+
     public static boolean saveConfiguredDistance(int requestedDistance) {
         ConfigData current = loadConfig();
         return saveConfiguration(
@@ -344,17 +349,35 @@ public final class SkyblockMultiMod implements ModInitializer {
     public static boolean saveConfiguration(int requestedDistance, int requestedCapacity,
                                             Map<TreeOption, Boolean> requestedTrees,
                                             BonusChestMode bonusChestMode) {
+        ConfigData current = loadConfig();
+        return saveConfiguration(
+                requestedDistance,
+                requestedCapacity,
+                requestedTrees,
+                bonusChestMode,
+                current.partyLeaveDifficultyMode()
+        );
+    }
+
+    public static boolean saveConfiguration(int requestedDistance, int requestedCapacity,
+                                            Map<TreeOption, Boolean> requestedTrees,
+                                            BonusChestMode bonusChestMode,
+                                            BonusChestMode partyLeaveDifficultyMode) {
         ensureConfigReady();
         int normalized = normalizeDistance(requestedDistance);
         int normalizedCapacity = normalizeCapacity(requestedCapacity);
         EnumMap<TreeOption, Boolean> trees = normalizeTrees(requestedTrees);
         BonusChestMode safeMode = bonusChestMode == null ? BonusChestMode.STANDARD : bonusChestMode;
+        BonusChestMode safePartyLeaveMode = partyLeaveDifficultyMode == null
+                ? BonusChestMode.BASIC
+                : partyLeaveDifficultyMode;
         try {
-            writeConfig(normalized, normalizedCapacity, trees, safeMode);
+            writeConfig(normalized, normalizedCapacity, trees, safeMode, safePartyLeaveMode);
             System.out.println("[SkyblockMulti] Configuración guardada: distancia=" + normalized
                     + ", capacidad=" + normalizedCapacity
                     + ", árboles=" + countEnabled(trees)
-                    + ", cofre=" + safeMode.configKey());
+                    + ", cofre=" + safeMode.configKey()
+                    + ", salida_party=" + safePartyLeaveMode.configKey());
             Object server = activeServer;
             if (server != null) {
                 applyConfiguration(server);
@@ -387,7 +410,13 @@ public final class SkyblockMultiMod implements ModInitializer {
         try {
             Files.createDirectories(configPath.getParent());
             if (Files.notExists(configPath)) {
-                writeConfig(DEFAULT_DISTANCE, DEFAULT_CAPACITY, defaultTrees(), BonusChestMode.STANDARD);
+                writeConfig(
+                        DEFAULT_DISTANCE,
+                        DEFAULT_CAPACITY,
+                        defaultTrees(),
+                        BonusChestMode.STANDARD,
+                        BonusChestMode.BASIC
+                );
             }
         } catch (IOException e) {
             System.err.println("[SkyblockMulti] No se pudo crear el archivo de configuración: " + e.getMessage());
@@ -395,12 +424,15 @@ public final class SkyblockMultiMod implements ModInitializer {
     }
 
     private static void writeConfig(int distance, int capacity, Map<TreeOption, Boolean> trees,
-                                    BonusChestMode bonusChestMode) throws IOException {
+                                    BonusChestMode bonusChestMode,
+                                    BonusChestMode partyLeaveDifficultyMode) throws IOException {
         StringBuilder json = new StringBuilder();
         json.append("{\n");
         json.append("  \"islandDistance\": ").append(distance).append(",\n");
         json.append("  \"islandCapacity\": ").append(capacity).append(",\n");
         json.append("  \"bonusChestMode\": \"").append(bonusChestMode.configKey()).append("\",\n");
+        json.append("  \"partyLeaveDifficultyMode\": \"")
+                .append(partyLeaveDifficultyMode.configKey()).append("\",\n");
         json.append("  \"enabledTrees\": {\n");
         TreeOption[] values = TreeOption.values();
         for (int i = 0; i < values.length; i++) {
@@ -421,6 +453,7 @@ public final class SkyblockMultiMod implements ModInitializer {
         int capacity = DEFAULT_CAPACITY;
         EnumMap<TreeOption, Boolean> trees = defaultTrees();
         BonusChestMode bonusChestMode = BonusChestMode.STANDARD;
+        BonusChestMode partyLeaveDifficultyMode = BonusChestMode.BASIC;
         try {
             String raw = Files.readString(configPath, StandardCharsets.UTF_8);
             Matcher matcher = DISTANCE_PATTERN.matcher(raw);
@@ -453,6 +486,11 @@ public final class SkyblockMultiMod implements ModInitializer {
                 }
             }
 
+            Matcher partyLeaveMatcher = PARTY_LEAVE_DIFFICULTY_PATTERN.matcher(raw);
+            if (partyLeaveMatcher.find()) {
+                partyLeaveDifficultyMode = BonusChestMode.fromConfig(partyLeaveMatcher.group(1));
+            }
+
             for (TreeOption tree : TreeOption.values()) {
                 Pattern pattern = Pattern.compile("\\\"" + Pattern.quote(tree.configKey()) + "\\\"\\s*:\\s*(true|false)", Pattern.CASE_INSENSITIVE);
                 Matcher treeMatcher = pattern.matcher(raw);
@@ -467,7 +505,8 @@ public final class SkyblockMultiMod implements ModInitializer {
                 normalizeDistance(distance),
                 normalizeCapacity(capacity),
                 normalizeTrees(trees),
-                bonusChestMode
+                bonusChestMode,
+                partyLeaveDifficultyMode
         );
     }
 
@@ -683,6 +722,8 @@ public final class SkyblockMultiMod implements ModInitializer {
             executor.run("scoreboard players set #openpac sb3_cfg " + (OpenPacCompat.isInstalled() ? 1 : 0));
             executor.run("scoreboard players set #enabled_count sb3_cfg " + countEnabled(config.trees()));
             executor.run("scoreboard players set #bonus_tier sb3_cfg " + config.bonusChestMode().scoreValue());
+            executor.run("scoreboard players set #party_leave_tier sb3_cfg "
+                    + config.partyLeaveDifficultyMode().scoreValue());
 
             for (TreeOption tree : TreeOption.values()) {
                 executor.run("scoreboard players set " + tree.scoreHolder() + " sb3_cfg "
@@ -704,7 +745,8 @@ public final class SkyblockMultiMod implements ModInitializer {
             executor.run("execute in minecraft:overworld if biome 0 64 0 minecraft:the_void run scoreboard players set #slotgen sb3_const 60");
             System.out.println("[SkyblockMulti] Configuración aplicada: distancia=" + distance
                     + ", capacidad=" + capacity + ", árboles=" + countEnabled(config.trees())
-                    + ", cofre=" + config.bonusChestMode().configKey());
+                    + ", cofre=" + config.bonusChestMode().configKey()
+                    + ", salida_party=" + config.partyLeaveDifficultyMode().configKey());
         } catch (Exception e) {
             System.err.println("[SkyblockMulti] No fue posible aplicar la configuración al servidor: " + e);
             e.printStackTrace(System.err);
@@ -724,7 +766,8 @@ public final class SkyblockMultiMod implements ModInitializer {
     }
 
     private record ConfigData(int distance, int capacity, EnumMap<TreeOption, Boolean> trees,
-                              BonusChestMode bonusChestMode) {}
+                              BonusChestMode bonusChestMode,
+                              BonusChestMode partyLeaveDifficultyMode) {}
     private record Slot(int index, int x, int z) {}
 
     private static final class ServerCommandExecutor {

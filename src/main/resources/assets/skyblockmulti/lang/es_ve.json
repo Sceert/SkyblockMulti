@@ -106,7 +106,7 @@
   "skyblockmulti.island.created": "Tu ancla fue sustituida por una isla en Y=64.",
   "skyblockmulti.island.commands": "Usa /trigger sb_hub para ir al HUB, /trigger sb_home para volver y /trigger sb_info para consultar tu asignación.",
   "skyblockmulti.system.loaded": "SkyblockMulti 0.1.1-beta cargado.",
-  "skyblockmulti.system.anchors_ready": "Las 24 anclas están disponibles en Y=64.",
+  "skyblockmulti.system.anchors_ready": "Plazas de isla disponibles: %s. Anclas listas en Y=64.",
   "skyblockmulti.info.title": "=== SKYBLOCKMULTI ===",
   "skyblockmulti.info.state": "Estado: %s | Isla: %s",
   "skyblockmulti.info.center": "Centro X: %s | Z: %s",
@@ -306,5 +306,7 @@
   "skyblockmulti.config.capacity.field": "Capacidad de islas",
   "skyblockmulti.config.capacity.label": "Capacidad de islas (1–24)",
   "skyblockmulti.config.invalid_capacity": "Capacidad inválida",
-  "skyblockmulti.config.status.capacity": "Introduce una capacidad de islas entre 1 y 24."
+  "skyblockmulti.config.status.capacity": "Introduce una capacidad de islas entre 1 y 24.",
+  "skyblockmulti.config.party_leave.mode.button": "Dificultad mínima al salir de una party: %s",
+  "skyblockmulti.config.party_leave.mode.note": "Se aplica al salir de una party sin una isla personal previa."
 }

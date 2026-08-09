@@ -18,7 +18,9 @@ public final class SkyblockMultiConfigScreen extends Screen {
     private EditBox distanceField;
     private EditBox capacityField;
     private Button bonusChestModeButton;
+    private Button partyLeaveDifficultyButton;
     private BonusChestMode bonusChestMode;
+    private BonusChestMode partyLeaveDifficultyMode;
     private Component status = Component.empty();
     private boolean statusVisible;
     private int statusColor = 0xFFAAAAAA;
@@ -28,6 +30,7 @@ public final class SkyblockMultiConfigScreen extends Screen {
         this.parent = parent;
         this.treeStates = SkyblockMultiMod.getConfiguredTreeStates();
         this.bonusChestMode = SkyblockMultiMod.getConfiguredBonusChestMode();
+        this.partyLeaveDifficultyMode = SkyblockMultiMod.getConfiguredPartyLeaveDifficultyMode();
     }
 
     @Override
@@ -71,7 +74,12 @@ public final class SkyblockMultiConfigScreen extends Screen {
                         .bounds(centerX - 155, 210, 310, 20).build()
         );
 
-        int footerY = 240;
+        this.partyLeaveDifficultyButton = this.addRenderableWidget(
+                Button.builder(partyLeaveDifficultyLabel(), button -> cyclePartyLeaveDifficulty())
+                        .bounds(centerX - 155, 235, 310, 20).build()
+        );
+
+        int footerY = 265;
         this.addRenderableWidget(Button.builder(Component.translatable("skyblockmulti.config.reset"), button -> resetDefaults())
                 .bounds(centerX - 155, footerY, 100, 20).build());
         this.addRenderableWidget(Button.builder(Component.translatable("skyblockmulti.config.cancel"), button -> this.onClose())
@@ -119,6 +127,21 @@ public final class SkyblockMultiConfigScreen extends Screen {
         );
     }
 
+    private void cyclePartyLeaveDifficulty() {
+        this.partyLeaveDifficultyMode = this.partyLeaveDifficultyMode.next();
+        this.partyLeaveDifficultyButton.setMessage(partyLeaveDifficultyLabel());
+        clearStatus();
+    }
+
+    private Component partyLeaveDifficultyLabel() {
+        return Component.translatable(
+                "skyblockmulti.config.party_leave.mode.button",
+                Component.translatable(
+                        "skyblockmulti.config.bonus_chest.mode." + partyLeaveDifficultyMode.configKey()
+                )
+        );
+    }
+
     private void resetDefaults() {
         this.distanceField.setValue(Integer.toString(SkyblockMultiMod.DEFAULT_DISTANCE));
         this.capacityField.setValue(Integer.toString(SkyblockMultiMod.DEFAULT_CAPACITY));
@@ -128,7 +151,11 @@ public final class SkyblockMultiConfigScreen extends Screen {
             if (button != null) button.setMessage(treeLabel(tree));
         }
         this.bonusChestMode = BonusChestMode.STANDARD;
+        this.partyLeaveDifficultyMode = BonusChestMode.BASIC;
         if (this.bonusChestModeButton != null) this.bonusChestModeButton.setMessage(bonusChestModeLabel());
+        if (this.partyLeaveDifficultyButton != null) {
+            this.partyLeaveDifficultyButton.setMessage(partyLeaveDifficultyLabel());
+        }
         setStatus("skyblockmulti.config.status.defaults", 0xFFFFFF55);
     }
 
@@ -194,7 +221,8 @@ public final class SkyblockMultiConfigScreen extends Screen {
                 normalizedDistance,
                 normalizedCapacity,
                 treeStates,
-                bonusChestMode
+                bonusChestMode,
+                partyLeaveDifficultyMode
         )) {
             this.distanceField.setValue(Integer.toString(normalizedDistance));
             this.capacityField.setValue(Integer.toString(normalizedCapacity));
@@ -245,13 +273,15 @@ public final class SkyblockMultiConfigScreen extends Screen {
                 Component.translatable("skyblockmulti.config.allowed_trees", enabledTreeCount(), TreeOption.values().length),
                 centerX, 97, enabledTreeCount() > 0 ? 0xFFDDDDDD : 0xFFFF5555);
         graphics.centeredText(this.font, Component.translatable("skyblockmulti.config.bonus_chest.note"),
-                centerX, 265, 0xFFAAAAAA);
+                centerX, 290, 0xFFAAAAAA);
+        graphics.centeredText(this.font, Component.translatable("skyblockmulti.config.party_leave.mode.note"),
+                centerX, 305, 0xFF55FFFF);
         graphics.centeredText(this.font, Component.translatable("skyblockmulti.config.multi_saplings"),
-                centerX, 280, 0xFFFFAA00);
+                centerX, 320, 0xFFFFAA00);
         graphics.centeredText(this.font, Component.translatable("skyblockmulti.config.capacity_note"),
-                centerX, 295, 0xFFAAAAAA);
+                centerX, 335, 0xFFAAAAAA);
         if (this.statusVisible) {
-            graphics.centeredText(this.font, this.status, centerX, 310, this.statusColor);
+            graphics.centeredText(this.font, this.status, centerX, 350, this.statusColor);
         }
     }
 
