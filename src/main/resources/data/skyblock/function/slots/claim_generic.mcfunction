@@ -33,6 +33,8 @@ execute if score #claim sb3_const matches 1 run scoreboard players set @s sb_tre
 execute if score #claim sb3_const matches 1 run scoreboard players set @s sb_difficulty 0
 execute if score #claim sb3_const matches 1 run scoreboard players set @s sb_menu 0
 execute if score #claim sb3_const matches 1 run tag @s remove skyblock_menu_shown_v1
+execute if score #claim sb3_const matches 1 run tag @s remove skyblock_party_reentry
+execute if score #claim sb3_const matches 1 run tag @s remove skyblock_party_guest
 execute if score #claim sb3_const matches 1 run scoreboard players set @s sb3_state 2
 $execute if score #claim sb3_const matches 1 run skyblockmulti openpac_claim $(x) $(z)
 execute if score #claim sb3_const matches 1 run function skyblock:player/unlock_selection

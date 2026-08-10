@@ -324,5 +324,14 @@
   "skyblockmulti.config.layout_summary.single": "%s islands · HUB radius: %s blocks (%s chunks) · ~%s blocks between islands",
   "skyblockmulti.config.layout_summary.random": "One ring · equal HUB radius · random slot assignment",
   "skyblockmulti.config.layout_summary.dual": "24 islands · outer: %s blocks (%s chunks) · inner: %s blocks (%s chunks)",
-  "skyblockmulti.config.layout_summary.dual_policy": "8 inner slots prioritize Easy · 16 outer slots · automatic overflow · random slots"
+  "skyblockmulti.config.layout_summary.dual_policy": "8 inner slots prioritize Easy · 16 outer slots · automatic overflow · random slots",
+  "skyblockmulti.lore_book.received": "You received the Chronicle of the Last Refuge. Keep it: it contains the history of this world.",
+  "skyblockmulti.lore_book.page.1": "THE LAST REFUGE\n\nThe world below the clouds was swallowed by a great flood. When the surface became uninhabitable, the last survivors fled to the islands in the sky. This refuge is one of the final remnants of that evacuation.",
+  "skyblockmulti.lore_book.page.2": "YOUR NEW BEGINNING\n\nChoose the tree that will become your first renewable source of wood and decide how much help you will receive at the start. You will then be sent to a sky island, where survival depends on what you can preserve and renew.",
+  "skyblockmulti.lore_book.page.3": "SURVIVE\n\nProtect your tree. Secure renewable stone. Expand the land. Establish water, food and crops. Learn to obtain resources from creatures and turn a tiny island into a place capable of sustaining life.",
+  "skyblockmulti.lore_book.page.4": "BENEATH YOUR FEET\n\nRuins of an ancient stronghold remain beneath this refuge. A portal to the End lies dormant inside it. There is no direct route from here. If you ever reach those ruins again, you will have to find another way in.",
+  "skyblockmulti.lore_book.page.5": "REMEMBER\n\nThe islands may keep us alive, but memory explains why we are here. As long as someone carries this story, the old world will not be completely lost.",
+  "skyblockmulti.party.reset_no_personal_island": "You left or were removed from a party without having a personal island. Your cycle begins again in the Last Refuge.",
+  "skyblockmulti.advancement.secret.remember_where_you_came_from.title": "Remember Where You Came From",
+  "skyblockmulti.advancement.secret.remember_where_you_came_from.description": "You reached the End while preserving the story of the world we left behind."
 }

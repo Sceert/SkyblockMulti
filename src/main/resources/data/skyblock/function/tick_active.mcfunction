@@ -36,6 +36,9 @@ execute as @a[scores={sb_difficulty=1..4,sb3_state=4}] run function skyblock:pla
 scoreboard players set @a[scores={sb_tree=13..}] sb_tree 0
 scoreboard players set @a[scores={sb_difficulty=5..}] sb_difficulty 0
 
+# Secreto del libro: comprobar únicamente jugadores que estén físicamente en el End.
+execute as @a at @s if dimension minecraft:the_end unless entity @s[advancements={skyblockmulti:secret/remember_where_you_came_from=true}] run function skyblock:advancements/check_lore_book_end
+
 # Progreso de logros: una mitad cada 100 ticks; cada categoría se revisa cada 10 segundos.
 scoreboard players add #adv_timer sb_adv_timer 1
 execute if score #adv_timer sb_adv_timer matches 100.. if score #adv_phase sb_adv_timer matches 0 run function skyblock:advancements/check_group_a

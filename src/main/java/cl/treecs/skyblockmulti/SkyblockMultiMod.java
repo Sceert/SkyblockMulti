@@ -717,6 +717,15 @@ public final class SkyblockMultiMod implements ModInitializer {
         }
 
         if (previousState.equals(currentState)) {
+            // JOIN puede ocurrir antes de que first_join inicialice los scoreboards.
+            // Si el jugador ya pertenecía a una party al entrar y todavía está en
+            // selección inicial, lo reconciliamos en cuanto los scores estén listos.
+            if (currentState.inParty()
+                    && !partyInfo.owner()
+                    && !hasPersonalIsland(server, player)
+                    && !isGameplayState(server, player)) {
+                reconcileActiveIsland(server, player, partyInfo, true);
+            }
             return;
         }
 
@@ -764,6 +773,28 @@ public final class SkyblockMultiMod implements ModInitializer {
         }
     }
 
+    private static boolean hasPersonalIsland(MinecraftServer server, ServerPlayer player) {
+        String playerName = player.getGameProfile().name();
+        try {
+            return new ServerCommandExecutor(server).run(
+                    "execute if score " + playerName + " sb3_slot matches 1..24"
+            ) > 0;
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    private static boolean isGameplayState(MinecraftServer server, ServerPlayer player) {
+        String playerName = player.getGameProfile().name();
+        try {
+            return new ServerCommandExecutor(server).run(
+                    "execute if score " + playerName + " sb3_state matches 2"
+            ) > 0;
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
     private static void returnPlayerAfterLeavingParty(
             MinecraftServer server,
             ServerPlayer player
@@ -773,25 +804,33 @@ public final class SkyblockMultiMod implements ModInitializer {
         try {
             ServerCommandExecutor executor = new ServerCommandExecutor(server);
 
-            // Con isla personal: ACTIVE ya fue restaurado a OWN por reconcileActiveIsland().
-            executor.run(
-                    "execute if score " + playerName
-                            + " sb3_state matches 2 as " + playerName
-                            + " run function skyblock:player/home"
-            );
+            if (hasPersonalIsland(server, player)) {
+                // Conserva su isla personal: ACTIVE ya fue restaurado a OWN por
+                // reconcileActiveIsland(), por lo que solo falta el retorno físico.
+                executor.run("tag " + playerName + " remove skyblock_party_guest");
+                executor.run("tag " + playerName + " remove skyblock_party_reentry");
+                executor.run(
+                        "execute as " + playerName
+                                + " run function skyblock:player/home"
+                );
 
-            // Sin isla personal: vuelve al HUB. Más adelante este caso enlazará
-            // con el flujo especial de dificultad/inventario tras abandonar una party.
+                System.out.println(
+                        "[SkyblockMulti] OpenPAC: " + playerName
+                                + " salió de la party y volvió a su isla personal."
+                );
+                return;
+            }
+
+            // Nunca tuvo una isla personal. Se considera un nuevo ciclo de jugador:
+            // limpieza completa, regreso al Último Refugio y nueva selección.
             executor.run(
-                    "execute unless score " + playerName
-                            + " sb3_state matches 2 as " + playerName
-                            + " run function skyblock:player/hub"
+                    "execute as " + playerName
+                            + " run function skyblock:player/reset_after_party_leave"
             );
 
             System.out.println(
-                    "[SkyblockMulti] OpenPAC: retorno tras salir de party solicitado para "
-                            + playerName
-                            + "."
+                    "[SkyblockMulti] OpenPAC: " + playerName
+                            + " salió de la party sin isla personal; ciclo reiniciado en el HUB."
             );
         } catch (Exception e) {
             System.err.println(
@@ -839,26 +878,29 @@ public final class SkyblockMultiMod implements ModInitializer {
 
         try {
             ServerCommandExecutor executor = new ServerCommandExecutor(server);
+            boolean hasPersonalIsland = hasPersonalIsland(server, player);
 
-            // Limpiamos primero cualquier destino activo antiguo. Esto es importante para
-            // jugadores que estaban en una party pero todavía no tienen isla personal.
+            // Limpiamos primero cualquier destino activo antiguo.
             executor.run("scoreboard players reset " + playerName + " sb_active_x");
             executor.run("scoreboard players reset " + playerName + " sb_active_z");
 
-            // La isla personal es siempre el fallback cuando existe.
+            // OWN solo existe realmente si hay un slot personal asignado.
             executor.run(
-                    "execute if score " + playerName +
-                            " sb3_state matches 2 run scoreboard players operation " +
-                            playerName + " sb_active_x = " +
-                            playerName + " sb3_x"
+                    "execute if score " + playerName
+                            + " sb3_slot matches 1..24 run scoreboard players operation "
+                            + playerName + " sb_active_x = "
+                            + playerName + " sb3_x"
+            );
+            executor.run(
+                    "execute if score " + playerName
+                            + " sb3_slot matches 1..24 run scoreboard players operation "
+                            + playerName + " sb_active_z = "
+                            + playerName + " sb3_z"
             );
 
-            executor.run(
-                    "execute if score " + playerName +
-                            " sb3_state matches 2 run scoreboard players operation " +
-                            playerName + " sb_active_z = " +
-                            playerName + " sb3_z"
-            );
+            if (hasPersonalIsland) {
+                executor.run("tag " + playerName + " remove skyblock_party_guest");
+            }
 
             if (!OpenPacCompat.isInstalled() || !partyInfo.inParty() || partyInfo.owner()) {
                 return;
@@ -868,18 +910,67 @@ public final class SkyblockMultiMod implements ModInitializer {
 
             // Si el owner tiene una isla válida, esa pasa a ser la isla activa del miembro.
             executor.run(
-                    "execute if score " + ownerName +
-                            " sb3_state matches 2 run scoreboard players operation " +
-                            playerName + " sb_active_x = " +
-                            ownerName + " sb3_x"
+                    "execute if score " + ownerName
+                            + " sb3_state matches 2 run scoreboard players operation "
+                            + playerName + " sb_active_x = "
+                            + ownerName + " sb3_x"
+            );
+            executor.run(
+                    "execute if score " + ownerName
+                            + " sb3_state matches 2 run scoreboard players operation "
+                            + playerName + " sb_active_z = "
+                            + ownerName + " sb3_z"
             );
 
-            executor.run(
-                    "execute if score " + ownerName +
-                            " sb3_state matches 2 run scoreboard players operation " +
-                            playerName + " sb_active_z = " +
-                            ownerName + " sb3_z"
-            );
+            if (!hasPersonalIsland) {
+                // Miembro que nunca creó isla propia: deja el flujo de selección y pasa
+                // a jugar directamente en la isla del owner sin consumir un slot.
+                executor.run(
+                        "execute if score " + ownerName
+                                + " sb3_state matches 2 run scoreboard players set "
+                                + playerName + " sb3_state 2"
+                );
+                executor.run(
+                        "execute if score " + ownerName
+                                + " sb3_state matches 2 run scoreboard players set "
+                                + playerName + " sb_tree 0"
+                );
+                executor.run(
+                        "execute if score " + ownerName
+                                + " sb3_state matches 2 run scoreboard players set "
+                                + playerName + " sb_difficulty 0"
+                );
+                executor.run(
+                        "execute if score " + ownerName
+                                + " sb3_state matches 2 run scoreboard players set "
+                                + playerName + " sb_chest -1"
+                );
+                executor.run(
+                        "execute if score " + ownerName
+                                + " sb3_state matches 2 run scoreboard players set "
+                                + playerName + " sb_menu 0"
+                );
+                executor.run(
+                        "execute if score " + ownerName
+                                + " sb3_state matches 2 run tag "
+                                + playerName + " add skyblock_party_guest"
+                );
+                executor.run(
+                        "execute if score " + ownerName
+                                + " sb3_state matches 2 run tag "
+                                + playerName + " remove skyblock_party_reentry"
+                );
+                executor.run(
+                        "execute if score " + ownerName
+                                + " sb3_state matches 2 run tag "
+                                + playerName + " remove skyblock_menu_shown_v1"
+                );
+                executor.run(
+                        "execute if score " + ownerName
+                                + " sb3_state matches 2 as " + playerName
+                                + " run function skyblock:player/unlock_selection"
+                );
+            }
 
             System.out.println(
                     "[SkyblockMulti] OpenPAC: reconciliación de isla activa solicitada para "
@@ -889,12 +980,11 @@ public final class SkyblockMultiMod implements ModInitializer {
                             + "."
             );
 
-            if (autoHomeOnPartyTarget) {
-                // El propio execute comprueba que el owner tenga isla antes de llamar home.
+            if (autoHomeOnPartyTarget || !hasPersonalIsland) {
                 executor.run(
-                        "execute if score " + ownerName +
-                                " sb3_state matches 2 as " + playerName +
-                                " run function skyblock:player/home"
+                        "execute if score " + ownerName
+                                + " sb3_state matches 2 as " + playerName
+                                + " run function skyblock:player/home"
                 );
             }
         } catch (Exception e) {

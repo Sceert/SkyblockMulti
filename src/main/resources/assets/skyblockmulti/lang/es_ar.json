@@ -324,5 +324,14 @@
   "skyblockmulti.config.layout_summary.single": "%s islas · radio HUB: %s bloques (%s chunks) · ~%s bloques entre islas",
   "skyblockmulti.config.layout_summary.random": "Un anillo · mismo radio desde el HUB · asignación aleatoria de slots",
   "skyblockmulti.config.layout_summary.dual": "24 islas · exterior: %s bloques (%s chunks) · interior: %s bloques (%s chunks)",
-  "skyblockmulti.config.layout_summary.dual_policy": "8 slots interiores priorizan Fácil · 16 exteriores · overflow automático · slots aleatorios"
+  "skyblockmulti.config.layout_summary.dual_policy": "8 slots interiores priorizan Fácil · 16 exteriores · overflow automático · slots aleatorios",
+  "skyblockmulti.lore_book.received": "Has recibido la Crónica del Último Refugio. Consérvala: contiene la historia de este mundo.",
+  "skyblockmulti.lore_book.page.1": "EL ÚLTIMO REFUGIO\n\nEl mundo bajo las nubes fue devorado por una inundación. Cuando la superficie dejó de ser habitable, los últimos supervivientes huyeron hacia las islas del cielo. Este refugio es uno de los últimos vestigios de aquella evacuación.",
+  "skyblockmulti.lore_book.page.2": "TU NUEVO COMIENZO\n\nElige el árbol que sostendrá tu primera fuente renovable de madera y decide cuánta ayuda recibirás al comenzar. Después serás enviado a una isla del cielo. Allí dependerás de lo que seas capaz de conservar y renovar.",
+  "skyblockmulti.lore_book.page.3": "SOBREVIVIR\n\nProtege tu árbol. Consigue piedra renovable. Expande el terreno. Asegura agua, alimento y cultivos. Aprende a obtener recursos de criaturas y a transformar una pequeña isla en un lugar capaz de sostener vida.",
+  "skyblockmulti.lore_book.page.4": "BAJO TUS PIES\n\nDebajo de este refugio permanecen ruinas de una antigua fortaleza. En su interior duerme un portal hacia el End. No existe un acceso directo desde aquí. Si algún día regresas a esas ruinas, tendrás que encontrar otro camino.",
+  "skyblockmulti.lore_book.page.5": "RECUERDA\n\nLas islas pueden mantenernos vivos, pero la memoria explica por qué estamos aquí. Mientras alguien conserve esta historia, el viejo mundo no habrá desaparecido por completo.",
+  "skyblockmulti.party.reset_no_personal_island": "Abandonaste o fuiste eliminado de una party sin tener una isla personal. Tu ciclo comienza nuevamente en el Último Refugio.",
+  "skyblockmulti.advancement.secret.remember_where_you_came_from.title": "No olvides de dónde vienes",
+  "skyblockmulti.advancement.secret.remember_where_you_came_from.description": "Llegaste hasta el End conservando la historia del mundo que dejamos atrás."
 }
