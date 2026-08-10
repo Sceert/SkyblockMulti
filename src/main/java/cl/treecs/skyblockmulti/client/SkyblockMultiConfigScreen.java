@@ -25,6 +25,7 @@ public final class SkyblockMultiConfigScreen extends Screen {
     private BonusChestMode bonusChestMode;
     private BonusChestMode partyLeaveDifficultyMode;
     private final boolean geometryLocked;
+    private final boolean openPacAvailable;
 
     private Component status = Component.empty();
     private boolean statusVisible;
@@ -42,6 +43,7 @@ public final class SkyblockMultiConfigScreen extends Screen {
         this.bonusChestMode = SkyblockMultiMod.getConfiguredBonusChestMode();
         this.partyLeaveDifficultyMode = SkyblockMultiMod.getConfiguredPartyLeaveDifficultyMode();
         this.geometryLocked = SkyblockMultiMod.isWorldGeometryLocked();
+        this.openPacAvailable = SkyblockMultiMod.isOpenPacInstalled();
     }
 
     @Override
@@ -63,7 +65,7 @@ public final class SkyblockMultiConfigScreen extends Screen {
         this.treeButtons.clear();
         TreeOption[] trees = TreeOption.values();
         int startX = centerX - 160;
-        int startY = 134;
+        int startY = 138;
         for (int i = 0; i < trees.length; i++) {
             TreeOption tree = trees[i];
             int x = startX + (i % 3) * 108;
@@ -76,18 +78,24 @@ public final class SkyblockMultiConfigScreen extends Screen {
 
         this.bonusChestModeButton = this.addRenderableWidget(
                 Button.builder(bonusChestModeLabel(), button -> cycleBonusChestMode())
-                        .bounds(centerX - 155, 230, 310, 20).build()
+                        .bounds(centerX - 155, 233, 310, 20).build()
         );
 
-        this.partyLeaveDifficultyButton = this.addRenderableWidget(
-                Button.builder(partyLeaveDifficultyLabel(), button -> cyclePartyLeaveDifficulty())
-                        .bounds(centerX - 155, 255, 310, 20).build()
-        );
+        int footerY;
+        if (openPacAvailable) {
+            this.partyLeaveDifficultyButton = this.addRenderableWidget(
+                    Button.builder(partyLeaveDifficultyLabel(), button -> cyclePartyLeaveDifficulty())
+                            .bounds(centerX - 155, 258, 310, 20).build()
+            );
+            footerY = 284;
+        } else {
+            this.partyLeaveDifficultyButton = null;
+            footerY = 258;
+        }
 
-        int footerY = 285;
         this.addRenderableWidget(Button.builder(Component.translatable("skyblockmulti.config.reset"), button -> resetDefaults())
                 .bounds(centerX - 155, footerY, 100, 20).build());
-        this.addRenderableWidget(Button.builder(Component.translatable("skyblockmulti.config.cancel"), button -> this.onClose())
+        this.addRenderableWidget(Button.builder(Component.translatable("skyblockmulti.config.back"), button -> this.onClose())
                 .bounds(centerX - 50, footerY, 100, 20).build());
         this.addRenderableWidget(Button.builder(Component.translatable("skyblockmulti.config.save"), button -> save())
                 .bounds(centerX + 55, footerY, 100, 20).build());
@@ -118,10 +126,12 @@ public final class SkyblockMultiConfigScreen extends Screen {
     }
 
     private Component radiusLabel() {
+        int chunks = SkyblockMultiMod.getRadiusChunks(this.islandRadius, this.islandCapacity);
         return Component.translatable(
-                "skyblockmulti.config.radius.button",
-                this.islandRadius,
-                SkyblockMultiMod.getRadiusChunks(this.islandRadius, this.islandCapacity)
+                this.islandCapacity == 24
+                        ? "skyblockmulti.config.radius.outer.button"
+                        : "skyblockmulti.config.radius.button",
+                chunks
         );
     }
 
@@ -165,8 +175,11 @@ public final class SkyblockMultiConfigScreen extends Screen {
     }
 
     private void cyclePartyLeaveDifficulty() {
+        if (!openPacAvailable) return;
         this.partyLeaveDifficultyMode = this.partyLeaveDifficultyMode.next();
-        this.partyLeaveDifficultyButton.setMessage(partyLeaveDifficultyLabel());
+        if (this.partyLeaveDifficultyButton != null) {
+            this.partyLeaveDifficultyButton.setMessage(partyLeaveDifficultyLabel());
+        }
         clearStatus();
     }
 
@@ -192,8 +205,8 @@ public final class SkyblockMultiConfigScreen extends Screen {
             if (button != null) button.setMessage(treeLabel(tree));
         }
 
-        this.bonusChestMode = BonusChestMode.STANDARD;
-        this.partyLeaveDifficultyMode = BonusChestMode.BASIC;
+        this.bonusChestMode = BonusChestMode.BEGINNER;
+        this.partyLeaveDifficultyMode = BonusChestMode.BEGINNER;
         if (this.bonusChestModeButton != null) this.bonusChestModeButton.setMessage(bonusChestModeLabel());
         if (this.partyLeaveDifficultyButton != null) {
             this.partyLeaveDifficultyButton.setMessage(partyLeaveDifficultyLabel());
@@ -255,26 +268,62 @@ public final class SkyblockMultiConfigScreen extends Screen {
                 0xFFDDDDDD
         );
 
-        graphics.centeredText(
-                this.font,
-                Component.translatable(
-                        "skyblockmulti.config.layout_summary",
-                        this.islandCapacity,
-                        this.islandRadius,
-                        SkyblockMultiMod.getApproxNeighborDistance(this.islandRadius, this.islandCapacity)
-                ),
-                centerX,
-                82,
-                0xFF55FFFF
-        );
+        if (this.islandCapacity == 24) {
+            int outerChunks = SkyblockMultiMod.getRadiusChunks(this.islandRadius, this.islandCapacity);
+            int innerRadius = SkyblockMultiMod.getInnerRadius(this.islandRadius, this.islandCapacity);
+            int innerChunks = innerRadius / 16;
+            graphics.centeredText(
+                    this.font,
+                    Component.translatable(
+                            "skyblockmulti.config.layout_summary.dual",
+                            this.islandRadius,
+                            outerChunks,
+                            innerRadius,
+                            innerChunks
+                    ),
+                    centerX,
+                    80,
+                    0xFF55FFFF
+            );
+            graphics.centeredText(
+                    this.font,
+                    Component.translatable("skyblockmulti.config.layout_summary.dual_policy"),
+                    centerX,
+                    93,
+                    0xFF55FFFF
+            );
+        } else {
+            graphics.centeredText(
+                    this.font,
+                    Component.translatable(
+                            "skyblockmulti.config.layout_summary.single",
+                            this.islandCapacity,
+                            this.islandRadius,
+                            SkyblockMultiMod.getRadiusChunks(this.islandRadius, this.islandCapacity),
+                            SkyblockMultiMod.getApproxNeighborDistance(this.islandRadius, this.islandCapacity)
+                    ),
+                    centerX,
+                    80,
+                    0xFF55FFFF
+            );
+            graphics.centeredText(
+                    this.font,
+                    Component.translatable("skyblockmulti.config.layout_summary.random"),
+                    centerX,
+                    93,
+                    0xFF55FFFF
+            );
+        }
 
-        graphics.centeredText(
-                this.font,
-                Component.translatable("skyblockmulti.config.openpac_capacity_note"),
-                centerX,
-                96,
-                0xFFAAAAAA
-        );
+        if (openPacAvailable) {
+            graphics.centeredText(
+                    this.font,
+                    Component.translatable("skyblockmulti.config.openpac_capacity_note"),
+                    centerX,
+                    106,
+                    0xFFAAAAAA
+            );
+        }
 
         graphics.centeredText(
                 this.font,
@@ -284,22 +333,31 @@ public final class SkyblockMultiConfigScreen extends Screen {
                                 : "skyblockmulti.config.geometry.unlocked"
                 ),
                 centerX,
-                108,
+                119,
                 geometryLocked ? 0xFFFFAA00 : 0xFF55FF55
         );
 
         graphics.centeredText(this.font,
                 Component.translatable("skyblockmulti.config.allowed_trees", enabledTreeCount(), TreeOption.values().length),
-                centerX, 120, enabledTreeCount() > 0 ? 0xFFDDDDDD : 0xFFFF5555);
+                centerX, 129, enabledTreeCount() > 0 ? 0xFFDDDDDD : 0xFFFF5555);
+
+        int bonusNoteY = openPacAvailable ? 309 : 283;
+        int multiSaplingsY = openPacAvailable ? 339 : 298;
+        int statusY = openPacAvailable ? 354 : 313;
 
         graphics.centeredText(this.font, Component.translatable("skyblockmulti.config.bonus_chest.note"),
-                centerX, 310, 0xFFAAAAAA);
-        graphics.centeredText(this.font, Component.translatable("skyblockmulti.config.party_leave.mode.note"),
-                centerX, 325, 0xFF55FFFF);
+                centerX, bonusNoteY, 0xFFAAAAAA);
+
+        if (openPacAvailable) {
+            graphics.centeredText(this.font, Component.translatable("skyblockmulti.config.party_leave.mode.note"),
+                    centerX, 324, 0xFF55FFFF);
+        }
+
         graphics.centeredText(this.font, Component.translatable("skyblockmulti.config.multi_saplings"),
-                centerX, 340, 0xFFFFAA00);
+                centerX, multiSaplingsY, 0xFFFFAA00);
+
         if (this.statusVisible) {
-            graphics.centeredText(this.font, this.status, centerX, 355, this.statusColor);
+            graphics.centeredText(this.font, this.status, centerX, statusY, this.statusColor);
         }
     }
 

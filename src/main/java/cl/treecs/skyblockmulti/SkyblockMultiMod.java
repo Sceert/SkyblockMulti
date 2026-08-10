@@ -47,14 +47,17 @@ public final class SkyblockMultiMod implements ModInitializer {
     public static final int DEFAULT_DISTANCE = DEFAULT_RADIUS; // Alias de compatibilidad.
     public static final int[] RADIUS_OPTIONS_8 = {512, 1024, 2048, 4096, 8192};
     public static final int[] RADIUS_OPTIONS_16 = {1024, 2048, 4096, 8192, 16384};
+    // En modo 24, este radio corresponde al anillo EXTERIOR de 16 islas.
+    // El anillo interior de 8 islas usa automáticamente la mitad del radio.
+    public static final int[] RADIUS_OPTIONS_24 = {2048, 4096, 8192, 16384};
 
-    public static final int PLAYER_CAPACITY = 16;
+    public static final int PLAYER_CAPACITY = 24;
     private static final int LEGACY_PLAYER_CAPACITY = 24;
     public static final int DEFAULT_CAPACITY = 8;
     public static final int MIN_CAPACITY = 8;
-    public static final int MAX_CAPACITY = 16;
+    public static final int MAX_CAPACITY = 24;
     private static final int OPENPAC_PARTY_CHECK_INTERVAL_TICKS = 20;
-    private static final int LAYOUT_VERSION = 2;
+    private static final int LAYOUT_VERSION = 3;
 
     private static final Pattern RADIUS_PATTERN = Pattern.compile("\\\"islandRadius\\\"\\s*:\\s*(-?\\d+)");
     private static final Pattern LEGACY_DISTANCE_PATTERN = Pattern.compile("\\\"islandDistance\\\"\\s*:\\s*(-?\\d+)");
@@ -66,6 +69,8 @@ public final class SkyblockMultiMod implements ModInitializer {
     private static Path configPath;
     private static volatile Object activeServer;
     private static volatile boolean worldGeometryLocked = false;
+    private static volatile int activeWorldRadius = -1;
+    private static volatile int activeWorldCapacity = -1;
 	
 	// Estado conocido de las parties de OpenPAC.
 	private static final Map<UUID, PartyState> OPENPAC_PARTY_STATES = new HashMap<>();
@@ -163,7 +168,7 @@ public final class SkyblockMultiMod implements ModInitializer {
                     if (mode.configKey.equalsIgnoreCase(value.trim())) return mode;
                 }
             }
-            return STANDARD;
+            return BEGINNER;
         }
     }
 
@@ -187,8 +192,10 @@ public final class SkyblockMultiMod implements ModInitializer {
                                                                                     return 0;
                                                                                 }
 
-                                                                                // La primera isla asignada fija la geometría de este mundo.
-                                                                                worldGeometryLocked = true;
+                                                                                // La primera isla asignada fija y persiste la geometría de este mundo.
+                                                                                persistWorldGeometryLock(
+                                                                                        context.getSource().getServer()
+                                                                                );
 
                                                                                 int x = IntegerArgumentType.getInteger(context, "x");
                                                                                 int z = IntegerArgumentType.getInteger(context, "z");
@@ -221,7 +228,7 @@ public final class SkyblockMultiMod implements ModInitializer {
                 if (new ServerCommandExecutor(server).run(
                         "execute if score " + playerName + " sb3_state matches 2"
                 ) > 0) {
-                    worldGeometryLocked = true;
+                    persistWorldGeometryLock(server);
                 }
             } catch (Exception ignored) {
                 // En un mundo nuevo los objetivos pueden no estar listos durante los primeros instantes.
@@ -309,10 +316,26 @@ public final class SkyblockMultiMod implements ModInitializer {
         });
 
         registerServerStartedEvent();
+
+        // El bloqueo es persistente DENTRO de cada mundo. Al cerrar el servidor integrado,
+        // limpiamos solo el estado runtime para que Mod Menu vuelva a mostrar los valores
+        // predeterminados destinados a mundos nuevos. Al cargar un mundo existente,
+        // applyConfiguration() restaura su geometría persistida.
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+            activeServer = null;
+            worldGeometryLocked = false;
+            activeWorldRadius = -1;
+            activeWorldCapacity = -1;
+            OPENPAC_PARTY_STATES.clear();
+        });
+
         System.out.println("[SkyblockMulti] Mod 0.1.1-beta inicializado. Configuración: " + configPath);
     }
 
     public static int getConfiguredRadius() {
+        if (activeServer != null && activeWorldRadius > 0) {
+            return activeWorldRadius;
+        }
         return loadConfig().radius();
     }
 
@@ -330,7 +353,14 @@ public final class SkyblockMultiMod implements ModInitializer {
     }
 
     public static int getConfiguredCapacity() {
+        if (activeServer != null && activeWorldCapacity > 0) {
+            return activeWorldCapacity;
+        }
         return loadConfig().capacity();
+    }
+
+    public static boolean isOpenPacInstalled() {
+        return OpenPacCompat.isInstalled();
     }
 
     public static boolean isWorldGeometryLocked() {
@@ -405,8 +435,11 @@ public final class SkyblockMultiMod implements ModInitializer {
         int normalizedCapacity = normalizeCapacity(requestedCapacity);
         int normalizedRadius = normalizeRadius(requestedRadius, normalizedCapacity);
 
+        int lockedCapacity = activeWorldCapacity > 0 ? activeWorldCapacity : current.capacity();
+        int lockedRadius = activeWorldRadius > 0 ? activeWorldRadius : current.radius();
+
         if (worldGeometryLocked
-                && (normalizedCapacity != current.capacity() || normalizedRadius != current.radius())) {
+                && (normalizedCapacity != lockedCapacity || normalizedRadius != lockedRadius)) {
             System.err.println(
                     "[SkyblockMulti] Radio/capacidad bloqueados: el mundo ya tiene una isla asignada."
             );
@@ -414,12 +447,18 @@ public final class SkyblockMultiMod implements ModInitializer {
         }
 
         EnumMap<TreeOption, Boolean> trees = normalizeTrees(requestedTrees);
-        BonusChestMode safeMode = bonusChestMode == null ? BonusChestMode.STANDARD : bonusChestMode;
+        BonusChestMode safeMode = bonusChestMode == null ? BonusChestMode.BEGINNER : bonusChestMode;
         BonusChestMode safePartyLeaveMode = partyLeaveDifficultyMode == null
-                ? BonusChestMode.BASIC
+                ? BonusChestMode.BEGINNER
                 : partyLeaveDifficultyMode;
+
+        // Si estamos dentro de un mundo ya bloqueado, modificar árboles/dificultades
+        // no debe reemplazar los valores predeterminados de geometría para mundos nuevos.
+        int radiusToWrite = worldGeometryLocked ? current.radius() : normalizedRadius;
+        int capacityToWrite = worldGeometryLocked ? current.capacity() : normalizedCapacity;
+
         try {
-            writeConfig(normalizedRadius, normalizedCapacity, trees, safeMode, safePartyLeaveMode);
+            writeConfig(radiusToWrite, capacityToWrite, trees, safeMode, safePartyLeaveMode);
             System.out.println("[SkyblockMulti] Configuración guardada: radio_hub=" + normalizedRadius
                     + ", capacidad=" + normalizedCapacity
                     + ", árboles=" + countEnabled(trees)
@@ -437,7 +476,11 @@ public final class SkyblockMultiMod implements ModInitializer {
     }
 
     public static int[] getRadiusOptions(int capacity) {
-        return normalizeCapacity(capacity) == 8 ? RADIUS_OPTIONS_8 : RADIUS_OPTIONS_16;
+        return switch (normalizeCapacity(capacity)) {
+            case 8 -> RADIUS_OPTIONS_8;
+            case 16 -> RADIUS_OPTIONS_16;
+            default -> RADIUS_OPTIONS_24;
+        };
     }
 
     public static int normalizeRadius(int value, int capacity) {
@@ -473,17 +516,36 @@ public final class SkyblockMultiMod implements ModInitializer {
     public static int getApproxNeighborDistance(int radius, int capacity) {
         int normalizedCapacity = normalizeCapacity(capacity);
         int normalizedRadius = normalizeRadius(radius, normalizedCapacity);
+        int ringSize = normalizedCapacity == 24 ? 16 : normalizedCapacity;
         return (int) Math.round(
-                2.0D * normalizedRadius * Math.sin(Math.PI / normalizedCapacity)
+                2.0D * normalizedRadius * Math.sin(Math.PI / ringSize)
         );
     }
 
+    public static int getInnerRadius(int radius, int capacity) {
+        if (normalizeCapacity(capacity) != 24) {
+            return normalizeRadius(radius, capacity);
+        }
+        return normalizeRadius(radius, 24) / 2;
+    }
+
+    public static int getApproxInnerNeighborDistance(int radius, int capacity) {
+        int innerRadius = getInnerRadius(radius, capacity);
+        return (int) Math.round(2.0D * innerRadius * Math.sin(Math.PI / 8.0D));
+    }
+
     public static int getNextConfiguredCapacity(int current) {
-        return normalizeCapacity(current) == 8 ? 16 : 8;
+        return switch (normalizeCapacity(current)) {
+            case 8 -> 16;
+            case 16 -> 24;
+            default -> 8;
+        };
     }
 
     public static int normalizeCapacity(int value) {
-        return value <= 8 ? 8 : 16;
+        if (value <= 8) return 8;
+        if (value <= 16) return 16;
+        return 24;
     }
 
     // Alias de compatibilidad con el código previo.
@@ -515,8 +577,8 @@ public final class SkyblockMultiMod implements ModInitializer {
                         DEFAULT_RADIUS,
                         DEFAULT_CAPACITY,
                         defaultTrees(),
-                        BonusChestMode.STANDARD,
-                        BonusChestMode.BASIC
+                        BonusChestMode.BEGINNER,
+                        BonusChestMode.BEGINNER
                 );
             }
         } catch (IOException e) {
@@ -553,14 +615,14 @@ public final class SkyblockMultiMod implements ModInitializer {
         int radius = DEFAULT_RADIUS;
         int capacity = DEFAULT_CAPACITY;
         EnumMap<TreeOption, Boolean> trees = defaultTrees();
-        BonusChestMode bonusChestMode = BonusChestMode.STANDARD;
-        BonusChestMode partyLeaveDifficultyMode = BonusChestMode.BASIC;
+        BonusChestMode bonusChestMode = BonusChestMode.BEGINNER;
+        BonusChestMode partyLeaveDifficultyMode = BonusChestMode.BEGINNER;
         try {
             String raw = Files.readString(configPath, StandardCharsets.UTF_8);
 
             Matcher radiusMatcher = RADIUS_PATTERN.matcher(raw);
             if (radiusMatcher.find()) {
-                // Nuevo esquema: islandRadius + capacidad 8/16.
+                // Nuevo esquema: islandRadius + capacidad 8/16/24.
                 radius = Integer.parseInt(radiusMatcher.group(1));
                 Matcher capacityMatcher = CAPACITY_PATTERN.matcher(raw);
                 if (capacityMatcher.find()) {
@@ -867,6 +929,8 @@ public final class SkyblockMultiMod implements ModInitializer {
                         if (method.getName().equals("onServerStarted") && args != null && args.length == 1) {
                             activeServer = args[0];
                             worldGeometryLocked = false;
+                            activeWorldRadius = -1;
+                            activeWorldCapacity = -1;
                             applyConfiguration(args[0]);
                         }
                         return null;
@@ -880,6 +944,48 @@ public final class SkyblockMultiMod implements ModInitializer {
         }
     }
 
+    private static void persistWorldGeometryLock(MinecraftServer server) {
+        try {
+            ServerCommandExecutor executor = new ServerCommandExecutor(server);
+            executor.run("scoreboard objectives add sb3_const dummy");
+            executor.run("scoreboard objectives add sb3_cfg dummy");
+            executor.run("scoreboard players set #geometry_locked sb3_cfg 1");
+            executor.run("scoreboard players operation #world_capacity sb3_cfg = #capacity sb3_cfg");
+            executor.run("scoreboard players operation #world_radius sb3_const = #distance sb3_const");
+
+            int capacity = executor.run("scoreboard players get #capacity sb3_cfg");
+            int radius = executor.run("scoreboard players get #distance sb3_const");
+            if (isExactCapacity(capacity) && isExactRadiusOption(radius, capacity)) {
+                activeWorldCapacity = capacity;
+                activeWorldRadius = radius;
+            }
+            worldGeometryLocked = true;
+        } catch (Exception e) {
+            System.err.println("[SkyblockMulti] No fue posible persistir el bloqueo de geometría: " + e);
+        }
+    }
+
+    private static boolean isExactCapacity(int capacity) {
+        return capacity == 8 || capacity == 16 || capacity == 24;
+    }
+
+    private static boolean isExactRadiusOption(int radius, int capacity) {
+        for (int option : getRadiusOptions(capacity)) {
+            if (option == radius) return true;
+        }
+        return false;
+    }
+
+    private static boolean anyIslandSlotUsed(ServerCommandExecutor executor) throws ReflectiveOperationException {
+        for (int i = 1; i <= LEGACY_PLAYER_CAPACITY; i++) {
+            String key = String.format(Locale.ROOT, "%02d", i);
+            if (executor.run("execute if score #" + key + " sb3_used matches 1") > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static void applyConfiguration(Object server) {
         ConfigData config = loadConfig();
         int radius = config.radius();
@@ -891,6 +997,51 @@ public final class SkyblockMultiMod implements ModInitializer {
             executor.run("scoreboard objectives add sb3_cfg dummy");
             executor.run("scoreboard objectives add sb3_used dummy");
 
+            boolean persistentLock =
+                    executor.run("execute if score #geometry_locked sb3_cfg matches 1") > 0;
+
+            int storedCapacity = persistentLock
+                    ? executor.run("scoreboard players get #world_capacity sb3_cfg")
+                    : -1;
+            int storedRadius = persistentLock
+                    ? executor.run("scoreboard players get #world_radius sb3_const")
+                    : -1;
+
+            // Migración transparente desde la primera versión circular, que bloqueaba
+            // solo durante la sesión. Los scores de ocupación/capacidad/radio sí persistían.
+            if (!persistentLock && anyIslandSlotUsed(executor)) {
+                int previousCapacity = executor.run("scoreboard players get #capacity sb3_cfg");
+                int previousRadius = executor.run("scoreboard players get #distance sb3_const");
+                if (isExactCapacity(previousCapacity)
+                        && isExactRadiusOption(previousRadius, previousCapacity)) {
+                    storedCapacity = previousCapacity;
+                    storedRadius = previousRadius;
+                    persistentLock = true;
+                    executor.run("scoreboard players set #geometry_locked sb3_cfg 1");
+                    executor.run("scoreboard players set #world_capacity sb3_cfg " + storedCapacity);
+                    executor.run("scoreboard players set #world_radius sb3_const " + storedRadius);
+                    System.out.println(
+                            "[SkyblockMulti] Geometría circular existente migrada a bloqueo persistente."
+                    );
+                }
+            }
+
+            if (persistentLock
+                    && isExactCapacity(storedCapacity)
+                    && isExactRadiusOption(storedRadius, storedCapacity)) {
+                capacity = storedCapacity;
+                radius = storedRadius;
+                worldGeometryLocked = true;
+            } else {
+                persistentLock = false;
+                worldGeometryLocked = false;
+                capacity = config.capacity();
+                radius = config.radius();
+            }
+
+            activeWorldCapacity = capacity;
+            activeWorldRadius = radius;
+
             // Retirar tickets de la geometría anterior antes de reescribir los slots.
             executor.run("execute in minecraft:overworld if biome 0 64 0 minecraft:the_void run function skyblock:slots/remove_forceload");
             executor.run("execute in minecraft:overworld if biome 0 64 0 minecraft:the_void run function skyblock:slots/remove_free_anchors");
@@ -898,7 +1049,6 @@ public final class SkyblockMultiMod implements ModInitializer {
             executor.run("execute in minecraft:overworld run kill @e[type=minecraft:marker,tag=skyblock_slots_ready_v2]");
 
             executor.run("data modify storage skyblock:config island_radius set value " + radius);
-            // Alias interno para funciones antiguas que todavía consulten island_distance.
             executor.run("data modify storage skyblock:config island_distance set value " + radius);
             executor.run("scoreboard players set #distance sb3_const " + radius);
             executor.run("scoreboard players set #layout_version sb3_const " + LAYOUT_VERSION);
@@ -910,12 +1060,19 @@ public final class SkyblockMultiMod implements ModInitializer {
             executor.run("scoreboard players set #party_leave_tier sb3_cfg "
                     + config.partyLeaveDifficultyMode().scoreValue());
 
+            if (persistentLock) {
+                executor.run("scoreboard players set #geometry_locked sb3_cfg 1");
+                executor.run("scoreboard players set #world_capacity sb3_cfg " + capacity);
+                executor.run("scoreboard players set #world_radius sb3_const " + radius);
+            }
+
             for (TreeOption tree : TreeOption.values()) {
                 executor.run("scoreboard players set " + tree.scoreHolder() + " sb3_cfg "
                         + (Boolean.TRUE.equals(config.trees().get(tree)) ? 1 : 0));
             }
 
             // Borrar definiciones de slots previas y reiniciar ocupación lógica.
+            // Las islas construidas se vuelven a detectar por su bedrock central.
             for (int i = 1; i <= LEGACY_PLAYER_CAPACITY; i++) {
                 String key = String.format(Locale.ROOT, "%02d", i);
                 executor.run("data remove storage skyblock:slots s" + key);
@@ -936,7 +1093,9 @@ public final class SkyblockMultiMod implements ModInitializer {
             executor.run("execute in minecraft:overworld if biome 0 64 0 minecraft:the_void run scoreboard players set #slotgen sb3_const 60");
             System.out.println("[SkyblockMulti] Configuración aplicada: radio_hub=" + radius
                     + ", capacidad=" + capacity
+                    + (capacity == 24 ? ", radio_interior=" + getInnerRadius(radius, capacity) : "")
                     + ", separación_aprox=" + getApproxNeighborDistance(radius, capacity)
+                    + ", geometría_bloqueada=" + worldGeometryLocked
                     + ", árboles=" + countEnabled(config.trees())
                     + ", cofre=" + config.bonusChestMode().configKey()
                     + ", salida_party=" + config.partyLeaveDifficultyMode().configKey());
@@ -951,7 +1110,29 @@ public final class SkyblockMultiMod implements ModInitializer {
         int normalizedRadius = normalizeRadius(radius, normalizedCapacity);
         List<Slot> slots = new ArrayList<>(normalizedCapacity);
 
-        // Slot 1 comienza al norte del HUB y los restantes avanzan en sentido horario.
+        if (normalizedCapacity == 24) {
+            // Slots 01..08: anillo interior, a la mitad del radio exterior.
+            // Se priorizan para dificultad Fácil durante la asignación.
+            int innerRadius = normalizedRadius / 2;
+            for (int i = 0; i < 8; i++) {
+                double angle = (Math.PI * 2.0D * i) / 8.0D;
+                int x = roundToChunk(Math.sin(angle) * innerRadius);
+                int z = roundToChunk(-Math.cos(angle) * innerRadius);
+                slots.add(new Slot(i + 1, x, z));
+            }
+
+            // Slots 09..24: anillo exterior de 16 posiciones.
+            // Se desfasa medio paso para que no quede alineado radialmente con el interior.
+            for (int i = 0; i < 16; i++) {
+                double angle = (Math.PI * 2.0D * (i + 0.5D)) / 16.0D;
+                int x = roundToChunk(Math.sin(angle) * normalizedRadius);
+                int z = roundToChunk(-Math.cos(angle) * normalizedRadius);
+                slots.add(new Slot(i + 9, x, z));
+            }
+            return slots;
+        }
+
+        // Modos 8 y 16: un único anillo. Slot 1 comienza al norte del HUB.
         for (int i = 0; i < normalizedCapacity; i++) {
             double angle = (Math.PI * 2.0D * i) / normalizedCapacity;
             int x = roundToChunk(Math.sin(angle) * normalizedRadius);

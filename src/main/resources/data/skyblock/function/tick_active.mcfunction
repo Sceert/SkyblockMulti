@@ -2,7 +2,7 @@
 execute in minecraft:overworld unless entity @e[type=minecraft:marker,tag=skyblock_system_v1,limit=1] run function skyblock:bootstrap
 # Garantizar el HUB.
 execute in minecraft:overworld unless block 0 100 0 minecraft:bedrock run function skyblock:hub/build
-# Preparar las 8/16 anclas del anillo después de que sus chunks estén cargados.
+# Preparar las 8/16/24 anclas del anillo después de que sus chunks estén cargados.
 execute unless entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] if score #slotgen sb3_const matches 1.. run scoreboard players remove #slotgen sb3_const 1
 execute unless entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] if score #slotgen sb3_const matches 0 run function skyblock:slots/generate_all
 # Registrar jugadores.
