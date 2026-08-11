@@ -776,9 +776,13 @@ public final class SkyblockMultiMod implements ModInitializer {
     private static boolean hasPersonalIsland(MinecraftServer server, ServerPlayer player) {
         String playerName = player.getGameProfile().name();
         try {
-            return new ServerCommandExecutor(server).run(
-                    "execute if score " + playerName + " sb3_slot matches 1..24"
-            ) > 0;
+            // No usar `execute if score ...` sin `run`: es un comando incompleto y
+            // puede devolver falso/ser rechazado aunque el score exista. Leer el
+            // valor real del scoreboard hace la comprobación determinista.
+            int slot = new ServerCommandExecutor(server).run(
+                    "scoreboard players get " + playerName + " sb3_slot"
+            );
+            return slot >= 1 && slot <= PLAYER_CAPACITY;
         } catch (Exception ignored) {
             return false;
         }
@@ -787,9 +791,10 @@ public final class SkyblockMultiMod implements ModInitializer {
     private static boolean isGameplayState(MinecraftServer server, ServerPlayer player) {
         String playerName = player.getGameProfile().name();
         try {
-            return new ServerCommandExecutor(server).run(
-                    "execute if score " + playerName + " sb3_state matches 2"
-            ) > 0;
+            int state = new ServerCommandExecutor(server).run(
+                    "scoreboard players get " + playerName + " sb3_state"
+            );
+            return state == 2;
         } catch (Exception ignored) {
             return false;
         }
