@@ -15,9 +15,27 @@ import java.util.UUID;
 public final class OpenPacCompat {
 
     public static final String MOD_ID = "openpartiesandclaims";
+    public static final String ASCENSION_NEXUS_CANONICAL_NAME = "The Ascension Nexus";
+
     private static final UUID SERVER_CLAIM_UUID = new UUID(0L, 0L);
-    private static final int RESERVED_RADIUS_CHUNKS = 2; // 5x5
-    private static final int PLAYER_RADIUS_CHUNKS = 1;   // 3x3
+
+    // Futuras islas: reserva 5x5. Al asignarse, el jugador recibe 3x3.
+    private static final int RESERVED_RADIUS_CHUNKS = 2;
+    private static final int PLAYER_RADIUS_CHUNKS = 1;
+
+    // The Ascension Nexus: 31x31 chunks, centrado en 0,0.
+    // OpenPAC protege toda la columna vertical de estos chunks, por lo que
+    // cubre HUB, futura dungeon y fortaleza/Portal del End bajo el HUB.
+    private static final int ASCENSION_NEXUS_RADIUS_CHUNKS = 15;
+
+    /*
+     * El Server Claim central del Nexus se usa además como marca persistente.
+     * Si existe al reiniciar, SkyblockMulti entiende que las reservas territoriales
+     * iniciales ya fueron creadas y NO vuelve a recorrer/reclamar los slots.
+     */
+    private static MinecraftServer claimInitializationServer;
+    private static boolean initializeIslandReservationsThisSession;
+    private static boolean claimInitializationDecisionLogged;
 
     private OpenPacCompat() {
     }
@@ -35,11 +53,13 @@ public final class OpenPacCompat {
     }
 
     public static PartyInfo getPartyInfo(ServerPlayer player) {
+
         if (!isInstalled()) {
             return PartyInfo.noParty();
         }
 
         MinecraftServer server = player.level().getServer();
+
         if (server == null) {
             return PartyInfo.noParty();
         }
@@ -65,8 +85,175 @@ public final class OpenPacCompat {
         );
     }
 
-    public static boolean reserveIslandSlot(MinecraftServer server, int blockX, int blockZ) {
+    /**
+     * Determina una única vez por instancia de servidor si este mundo necesita
+     * inicializar sus Server Claims de SkyblockMulti.
+     *
+     * - Si el Nexus central todavía no existe: lo crea y permite crear los 5x5.
+     * - Si el Nexus ya existe: no vuelve a crear/modificar reservas de islas.
+     *
+     * Esto hace que la reserva de futuros slots sea una operación de creación /
+     * migración de mundo, no una tarea de cada arranque.
+     */
+    private static boolean shouldInitializeWorldClaims(MinecraftServer server) {
+
+        if (claimInitializationServer != server) {
+            claimInitializationServer = server;
+            claimInitializationDecisionLogged = false;
+
+            boolean nexusAlreadyPresent = isAscensionNexusClaimPresent(server);
+
+            initializeIslandReservationsThisSession = !nexusAlreadyPresent;
+
+            if (initializeIslandReservationsThisSession) {
+                boolean nexusCreated = reserveAscensionNexus(server);
+
+                if (!nexusCreated) {
+                    initializeIslandReservationsThisSession = false;
+                }
+            }
+        }
+
+        if (!claimInitializationDecisionLogged) {
+            claimInitializationDecisionLogged = true;
+
+            if (initializeIslandReservationsThisSession) {
+                System.out.println(
+                        "[SkyblockMulti] OpenPAC: inicialización territorial activada. "
+                                + "Las reservas 5x5 de futuras islas se crearán una única vez."
+                );
+            } else {
+                System.out.println(
+                        "[SkyblockMulti] OpenPAC: "
+                                + ASCENSION_NEXUS_CANONICAL_NAME
+                                + " ya existe o no pudo inicializarse. "
+                                + "No se recrearán reservas de futuras islas en este arranque."
+                );
+            }
+        }
+
+        return initializeIslandReservationsThisSession;
+    }
+
+    private static boolean isAscensionNexusClaimPresent(MinecraftServer server) {
+
         if (!isInstalled() || server == null) {
+            return false;
+        }
+
+        Identifier overworld = Identifier.parse("minecraft:overworld");
+
+        IServerClaimsManagerAPI claims = OpenPACServerAPI
+                .get(server)
+                .getServerClaimsManager();
+
+        // 0,0 pertenece únicamente al área central del Nexus y funciona como
+        // marcador persistente de que la inicialización territorial ya ocurrió.
+        IPlayerChunkClaimAPI center = claims.get(overworld, 0, 0);
+
+        return center != null
+                && SERVER_CLAIM_UUID.equals(center.getPlayerId());
+    }
+
+    /**
+     * Server Claim permanente para la zona central.
+     *
+     * Tamaño actual:
+     * 31x31 chunks = 961 chunks ≈ 496x496 bloques.
+     *
+     * Al ser un claim por chunk de OpenPAC, protege toda la columna vertical:
+     * HUB superior + futura dungeon + fortaleza y sala del Portal del End.
+     *
+     * Este claim nunca se transforma en player claim.
+     */
+    private static boolean reserveAscensionNexus(MinecraftServer server) {
+
+        if (!isInstalled() || server == null) {
+            return false;
+        }
+
+        Identifier overworld = Identifier.parse("minecraft:overworld");
+
+        IServerClaimsManagerAPI claims = OpenPACServerAPI
+                .get(server)
+                .getServerClaimsManager();
+
+        int left = -ASCENSION_NEXUS_RADIUS_CHUNKS;
+        int top = -ASCENSION_NEXUS_RADIUS_CHUNKS;
+        int right = ASCENSION_NEXUS_RADIUS_CHUNKS;
+        int bottom = ASCENSION_NEXUS_RADIUS_CHUNKS;
+
+        // Nunca pisar claims de jugadores existentes.
+        for (int x = left; x <= right; x++) {
+            for (int z = top; z <= bottom; z++) {
+
+                IPlayerChunkClaimAPI existing = claims.get(overworld, x, z);
+
+                if (existing != null
+                        && !SERVER_CLAIM_UUID.equals(existing.getPlayerId())) {
+
+                    System.err.println(
+                            "[SkyblockMulti] OpenPAC: no fue posible reservar completamente "
+                                    + ASCENSION_NEXUS_CANONICAL_NAME
+                                    + ". El chunk "
+                                    + x + "," + z
+                                    + " pertenece a "
+                                    + existing.getPlayerId()
+                                    + "."
+                    );
+
+                    return false;
+                }
+            }
+        }
+
+        for (int x = left; x <= right; x++) {
+            for (int z = top; z <= bottom; z++) {
+
+                if (claims.get(overworld, x, z) == null) {
+                    claims.claim(
+                            overworld,
+                            SERVER_CLAIM_UUID,
+                            0,
+                            x,
+                            z,
+                            false
+                    );
+                }
+            }
+        }
+
+        System.out.println(
+                "[SkyblockMulti] OpenPAC: "
+                        + ASCENSION_NEXUS_CANONICAL_NAME
+                        + " reservado permanentemente como Server Claim 31x31: "
+                        + left + "," + top
+                        + " -> "
+                        + right + "," + bottom
+                        + "."
+        );
+
+        return true;
+    }
+
+    /**
+     * Reserva un futuro slot como Server Claim 5x5.
+     *
+     * IMPORTANTE:
+     * solo funciona durante la primera inicialización territorial del mundo.
+     * En reinicios posteriores retorna false sin modificar ningún claim.
+     */
+    public static boolean reserveIslandSlot(
+            MinecraftServer server,
+            int blockX,
+            int blockZ
+    ) {
+
+        if (!isInstalled() || server == null) {
+            return false;
+        }
+
+        if (!shouldInitializeWorldClaims(server)) {
             return false;
         }
 
@@ -79,20 +266,30 @@ public final class OpenPacCompat {
         int bottom = chunkZ + RESERVED_RADIUS_CHUNKS;
 
         Identifier overworld = Identifier.parse("minecraft:overworld");
+
         IServerClaimsManagerAPI claims = OpenPACServerAPI
                 .get(server)
                 .getServerClaimsManager();
 
+        // No sobrescribir nunca un claim de jugador.
         for (int x = left; x <= right; x++) {
             for (int z = top; z <= bottom; z++) {
+
                 IPlayerChunkClaimAPI existing = claims.get(overworld, x, z);
-                if (existing != null && !SERVER_CLAIM_UUID.equals(existing.getPlayerId())) {
+
+                if (existing != null
+                        && !SERVER_CLAIM_UUID.equals(existing.getPlayerId())) {
+
                     System.out.println(
                             "[SkyblockMulti] OpenPAC: reserva 5x5 omitida en "
                                     + blockX + "," + blockZ
-                                    + " porque el chunk " + x + "," + z
-                                    + " ya pertenece a " + existing.getPlayerId() + "."
+                                    + " porque el chunk "
+                                    + x + "," + z
+                                    + " ya pertenece a "
+                                    + existing.getPlayerId()
+                                    + "."
                     );
+
                     return false;
                 }
             }
@@ -100,26 +297,48 @@ public final class OpenPacCompat {
 
         for (int x = left; x <= right; x++) {
             for (int z = top; z <= bottom; z++) {
+
                 if (claims.get(overworld, x, z) == null) {
-                    claims.claim(overworld, SERVER_CLAIM_UUID, 0, x, z, false);
+                    claims.claim(
+                            overworld,
+                            SERVER_CLAIM_UUID,
+                            0,
+                            x,
+                            z,
+                            false
+                    );
                 }
             }
         }
 
         System.out.println(
                 "[SkyblockMulti] OpenPAC: slot reservado como Server Claim 5x5 en chunks "
-                        + left + "," + top + " -> " + right + "," + bottom + "."
+                        + left + "," + top
+                        + " -> "
+                        + right + "," + bottom
+                        + "."
         );
 
         return true;
     }
 
-    public static boolean assignReservedIsland(ServerPlayer player, int blockX, int blockZ) {
+    /**
+     * Convierte la reserva 5x5 de un slot en claim personal 3x3.
+     *
+     * El 3x3 pasa al jugador y los 16 chunks exteriores dejan de ser Server Claim.
+     */
+    public static boolean assignReservedIsland(
+            ServerPlayer player,
+            int blockX,
+            int blockZ
+    ) {
+
         if (!isInstalled()) {
             return true;
         }
 
         MinecraftServer server = player.level().getServer();
+
         if (server == null) {
             return false;
         }
@@ -138,49 +357,71 @@ public final class OpenPacCompat {
         int playerBottom = chunkZ + PLAYER_RADIUS_CHUNKS;
 
         Identifier overworld = Identifier.parse("minecraft:overworld");
+
         IServerClaimsManagerAPI claims = OpenPACServerAPI
                 .get(server)
                 .getServerClaimsManager();
 
         UUID playerUuid = player.getUUID();
 
+        // El 3x3 central jamás puede pisar un claim de otro jugador.
         for (int x = playerLeft; x <= playerRight; x++) {
             for (int z = playerTop; z <= playerBottom; z++) {
+
                 IPlayerChunkClaimAPI existing = claims.get(overworld, x, z);
 
                 if (existing != null
                         && !SERVER_CLAIM_UUID.equals(existing.getPlayerId())
                         && !playerUuid.equals(existing.getPlayerId())) {
+
                     System.err.println(
                             "[SkyblockMulti] OpenPAC: NO se asignó el claim 3x3 de "
                                     + player.getGameProfile().name()
-                                    + ". El chunk " + x + "," + z
+                                    + ". El chunk "
+                                    + x + "," + z
                                     + " pertenece a otro jugador: "
                                     + existing.getPlayerId()
                     );
+
                     return false;
                 }
             }
         }
 
+        // Transferir el 3x3 central al jugador.
         for (int x = playerLeft; x <= playerRight; x++) {
             for (int z = playerTop; z <= playerBottom; z++) {
-                claims.claim(overworld, playerUuid, 0, x, z, false);
+
+                claims.claim(
+                        overworld,
+                        playerUuid,
+                        0,
+                        x,
+                        z,
+                        false
+                );
             }
         }
 
+        // Liberar el anillo exterior del antiguo 5x5.
         for (int x = reserveLeft; x <= reserveRight; x++) {
             for (int z = reserveTop; z <= reserveBottom; z++) {
+
                 boolean insidePlayerClaim =
-                        x >= playerLeft && x <= playerRight
-                                && z >= playerTop && z <= playerBottom;
+                        x >= playerLeft
+                                && x <= playerRight
+                                && z >= playerTop
+                                && z <= playerBottom;
 
                 if (insidePlayerClaim) {
                     continue;
                 }
 
                 IPlayerChunkClaimAPI existing = claims.get(overworld, x, z);
-                if (existing != null && SERVER_CLAIM_UUID.equals(existing.getPlayerId())) {
+
+                if (existing != null
+                        && SERVER_CLAIM_UUID.equals(existing.getPlayerId())) {
+
                     claims.unclaim(overworld, x, z);
                 }
             }
@@ -191,18 +432,29 @@ public final class OpenPacCompat {
                         + player.getGameProfile().name()
                         + ". Claim personal 3x3: "
                         + playerLeft + "," + playerTop
-                        + " -> " + playerRight + "," + playerBottom + "."
+                        + " -> "
+                        + playerRight + "," + playerBottom
+                        + "."
         );
 
         return true;
     }
 
-    public static void claimInitialIsland(ServerPlayer player, int blockX, int blockZ) {
+    /**
+     * Método antiguo conservado para compatibilidad.
+     */
+    public static void claimInitialIsland(
+            ServerPlayer player,
+            int blockX,
+            int blockZ
+    ) {
+
         if (!isInstalled()) {
             return;
         }
 
         MinecraftServer server = player.level().getServer();
+
         if (server == null) {
             return;
         }
@@ -252,8 +504,15 @@ public final class OpenPacCompat {
             String ownerName,
             boolean owner
     ) {
+
         public static PartyInfo noParty() {
-            return new PartyInfo(false, null, null, null, false);
+            return new PartyInfo(
+                    false,
+                    null,
+                    null,
+                    null,
+                    false
+            );
         }
     }
 }
