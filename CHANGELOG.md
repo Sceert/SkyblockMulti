@@ -1,30 +1,57 @@
 # Changelog
 
-## 0.1.1-beta
+All notable SkyblockMulti milestones are documented here.
 
-Development build for Minecraft 26.2 / Fabric.
+## [0.2.0-beta] — In development
 
-### Current features
-- Multiplayer Skyblock island allocation with 24 island slots.
-- Configurable island spacing.
-- Mandatory tree selection with enabled/disabled tree species.
-- Per-player starting difficulty: Extreme, Hard, Standard and Easy.
-- Optional Mod Menu configuration interface.
-- Overworld and Nether Skyblock flow with End progression support.
-- Home, hub, information and menu trigger commands.
-- Expanded advancement/progression system.
-- Performance-oriented island loading behavior.
+World Foundation phase.
 
-### Custom recipes
-- 3 dirt + bone meal -> 3 grass blocks.
-- 3 dirt + wheat seeds -> 3 grass blocks.
-- 3 dirt + wheat -> 3 grass blocks.
-- 4 rotten flesh + 4 bone meal + 1 cobblestone -> 1 dirt.
-- Red/brown mushroom blocks + dirt -> 1 mycelium.
+### Development focus
 
-### Secret advancement
-- Hidden advancement awarded when crafting the custom mycelium recipe.
+- New Last Refuge / HUB design
+- Protected glass dome
+- Fortress below the HUB
+- End portal structural progression
+- Initial End Portal Eye configuration: 0%, 25%, 75%
+- World/lore integration
+- Future lateral dungeon access to the fortress
 
-### Compatibility
-- Open Parties and Claims is currently only an optional suggested dependency.
-- Party/island/claim integration is planned but not implemented in this build.
+### Maintenance
+
+- Version metadata is now intended to use `gradle.properties` as the single version source.
+
+> Features listed under this version are development targets and should only be moved into "Added" once implemented and tested.
+
+## [0.1.1-beta] — Multiplayer foundation checkpoint
+
+### Added
+
+- Optional Open Parties and Claims integration
+- Shared party-owner islands
+- Personal `OWN` island and current `ACTIVE` island separation
+- Party join/leave lifecycle handling
+- Full reset flow for party members that never owned a personal island
+- Bed/respawn handling across party transitions
+- Circular 8/16/24 island layouts
+- Two-ring 24-island layout
+- Difficulty-based inner/outer slot priority
+- Persistent per-world geometry lock
+- Initial lore book
+- Secret End advancement tied to preserving the official lore book
+- `/skyblockmulti debug` diagnostic snapshot
+- Expanded English and Spanish localization
+
+### Fixed
+
+- Repeated party-member teleportation
+- Incorrect island reassignment after leaving a party
+- Party members with personal islands now return to their original island
+- Party-context bed spawn points are invalidated correctly
+- Secret lore-book End advancement detection
+
+### Tested
+
+- Minecraft Java 26.2
+- Fabric Loader 0.19.3
+- Java 25
+- Open Parties and Claims 0.29.3
