@@ -764,6 +764,15 @@ public final class SkyblockMultiMod implements ModInitializer {
         // Siempre recalculamos ACTIVE primero.
         reconcileActiveIsland(server, player, partyInfo, autoHomeToPartyOwner);
 
+        // Al entrar/cambiar a la isla de otra party invalidamos cualquier cama
+        // o ancla de reaparición anterior. El nuevo punto base queda en la
+        // posición segura a la que SkyblockMulti acaba de mover al jugador.
+        // Si luego duerme en una cama de la party, Minecraft podrá reemplazarlo
+        // normalmente mientras continúe perteneciendo a esa party.
+        if (autoHomeToPartyOwner && currentState.ownerUuid() != null) {
+            resetRespawnPointAfterPartyMove(server, player, partyInfo.ownerName());
+        }
+
         if (returnAfterLeavingSharedIsland) {
             returnPlayerAfterLeavingParty(server, player);
         }
@@ -797,6 +806,14 @@ public final class SkyblockMultiMod implements ModInitializer {
                     "execute if score " + playerName
                             + " sb3_slot matches 1..24 as " + playerName
                             + " run function skyblock:player/home"
+            );
+            // HOME ya terminó de mover al jugador a OWN. Sobrescribimos aquí
+            // cualquier cama que hubiese fijado mientras estaba en la isla de
+            // la party, para que una muerte posterior no pueda devolverlo allí.
+            executor.run(
+                    "execute if score " + playerName
+                            + " sb3_slot matches 1..24 as " + playerName
+                            + " at @s run spawnpoint @s ~ ~ ~"
             );
 
             // Sin slot personal: recién aquí se considera jugador nuevo y se reinicia.
@@ -835,6 +852,13 @@ public final class SkyblockMultiMod implements ModInitializer {
 
                 reconcileActiveIsland(server, player, partyInfo, autoHome);
 
+                // Caso especial: el miembro ya estaba en la party pero el owner
+                // acaba de obtener su primera isla. Ese primer traslado también
+                // debe invalidar un spawn viejo de cama/ancla.
+                if (autoHome && partyInfo.ownerUuid() != null) {
+                    resetRespawnPointAfterPartyMove(server, player, partyInfo.ownerName());
+                }
+
                 if (OpenPacCompat.isInstalled()) {
                     OPENPAC_PARTY_STATES.put(player.getUUID(), PartyState.from(partyInfo));
                 }
@@ -842,6 +866,37 @@ public final class SkyblockMultiMod implements ModInitializer {
         } catch (Exception e) {
             System.err.println(
                     "[SkyblockMulti] No fue posible reconciliar las islas activas online: " + e
+            );
+        }
+    }
+
+    /**
+     * Invalida el spawn vanilla anterior (cama/ancla) después de un traslado real
+     * hacia la isla activa de una party. Se ejecuta solo si el owner ya tiene isla.
+     * El comando se posiciona EN el jugador después de HOME, por lo que el nuevo
+     * respawn queda en una posición segura de la isla compartida.
+     */
+    private static void resetRespawnPointAfterPartyMove(
+            MinecraftServer server,
+            ServerPlayer player,
+            String ownerName
+    ) {
+        String playerName = player.getGameProfile().name();
+        try {
+            ServerCommandExecutor executor = new ServerCommandExecutor(server);
+            executor.run(
+                    "execute if score " + ownerName
+                            + " sb3_state matches 2 as " + playerName
+                            + " at @s run spawnpoint @s ~ ~ ~"
+            );
+            System.out.println(
+                    "[SkyblockMulti] OpenPAC: punto de reaparición actualizado para "
+                            + playerName + " tras cambio de party."
+            );
+        } catch (Exception e) {
+            System.err.println(
+                    "[SkyblockMulti] No fue posible actualizar el punto de reaparición de "
+                            + playerName + " tras cambio de party: " + e
             );
         }
     }
