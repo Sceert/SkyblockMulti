@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "skyblockmulti",
-  "version": "0.1.1-beta",
+  "version": "${version}",
   "name": "SkyblockMulti",
   "description": "Configurable multiplayer Skyblock for Minecraft 26.2 with island allocation, difficulty selection, progression, custom recipes and optional Mod Menu support.",
   "authors": [
