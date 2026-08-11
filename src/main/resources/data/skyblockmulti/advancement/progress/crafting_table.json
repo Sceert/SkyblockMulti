@@ -4,10 +4,10 @@
       "id": "minecraft:crafting_table"
     },
     "title": {
-      "text": "A trabajar"
+      "translate": "skyblockmulti.advancement.progress.crafting_table.title"
     },
     "description": {
-      "text": "Consigue una mesa de trabajo."
+      "translate": "skyblockmulti.advancement.progress.crafting_table.description"
     },
     "frame": "task",
     "show_toast": true,

@@ -1,6 +1,6 @@
-tellraw @s [{"text":"=== Diagnóstico SkyblockMulti 1.0 ===","color":"aqua","bold":true}]
-execute if entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] run tellraw @s [{"text":"Anclas: LISTAS","color":"green"}]
-execute unless entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] run tellraw @s [{"text":"Anclas: EN PREPARACIÓN","color":"yellow"}]
+tellraw @s {"translate":"skyblockmulti.admin.diagnose.title","color":"aqua","bold":true}
+execute if entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] run tellraw @s {"translate":"skyblockmulti.admin.diagnose.anchors_ready","color":"green"}
+execute unless entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] run tellraw @s {"translate":"skyblockmulti.admin.diagnose.anchors_preparing","color":"yellow"}
 function skyblock:slots/sync_occupancy
 scoreboard players set #used_count sb3_const 0
 execute if score #01 sb3_used matches 1 run scoreboard players add #used_count sb3_const 1
@@ -29,6 +29,6 @@ execute if score #23 sb3_used matches 1 run scoreboard players add #used_count s
 execute if score #24 sb3_used matches 1 run scoreboard players add #used_count sb3_const 1
 scoreboard players operation #free_count sb3_const = #max sb3_const
 scoreboard players operation #free_count sb3_const -= #used_count sb3_const
-tellraw @s [{"text":"Ocupadas: ","color":"gray"},{"score":{"name":"#used_count","objective":"sb3_const"},"color":"white"},{"text":" | Libres: ","color":"gray"},{"score":{"name":"#free_count","objective":"sb3_const"},"color":"white"}]
-tellraw @s [{"text":"Tu estado: ","color":"gray"},{"score":{"name":"@s","objective":"sb3_state"},"color":"white"},{"text":" | Tu isla: ","color":"gray"},{"score":{"name":"@s","objective":"sb3_slot"},"color":"white"}]
-tellraw @s [{"text":"Distancia configurada: ","color":"gray"},{"score":{"name":"#distance","objective":"sb3_const"},"color":"white"},{"text":" bloques","color":"gray"}]
+tellraw @s {"translate":"skyblockmulti.admin.diagnose.occupancy","with":[{"score":{"name":"#used_count","objective":"sb3_const"}},{"score":{"name":"#free_count","objective":"sb3_const"}}],"color":"gray"}
+tellraw @s {"translate":"skyblockmulti.admin.diagnose.player","with":[{"score":{"name":"@s","objective":"sb3_state"}},{"score":{"name":"@s","objective":"sb3_slot"}}],"color":"gray"}
+tellraw @s {"translate":"skyblockmulti.admin.diagnose.distance","with":[{"score":{"name":"#distance","objective":"sb3_const"}}],"color":"gray"}

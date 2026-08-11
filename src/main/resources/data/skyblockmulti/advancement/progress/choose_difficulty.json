@@ -4,10 +4,10 @@
       "id": "minecraft:chest"
     },
     "title": {
-      "text": "Elige tu destino"
+      "translate": "skyblockmulti.advancement.progress.choose_difficulty.title"
     },
     "description": {
-      "text": "Selecciona la dificultad inicial."
+      "translate": "skyblockmulti.advancement.progress.choose_difficulty.description"
     },
     "frame": "task",
     "show_toast": true,

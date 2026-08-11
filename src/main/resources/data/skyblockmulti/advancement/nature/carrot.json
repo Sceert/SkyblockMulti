@@ -5,10 +5,10 @@
       "id": "minecraft:carrot"
     },
     "title": {
-      "text": "Cultivo naranja"
+      "translate": "skyblockmulti.advancement.nature.carrot.title"
     },
     "description": {
-      "text": "Obtén una zanahoria."
+      "translate": "skyblockmulti.advancement.nature.carrot.description"
     },
     "frame": "task",
     "show_toast": true,

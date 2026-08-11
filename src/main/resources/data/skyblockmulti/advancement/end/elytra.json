@@ -4,10 +4,10 @@
       "id": "minecraft:elytra"
     },
     "title": {
-      "text": "Vuelo verdadero"
+      "translate": "skyblockmulti.advancement.end.elytra.title"
     },
     "description": {
-      "text": "Consigue élitros."
+      "translate": "skyblockmulti.advancement.end.elytra.description"
     },
     "frame": "goal",
     "show_toast": true,

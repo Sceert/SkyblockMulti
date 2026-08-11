@@ -5,10 +5,10 @@
       "id": "minecraft:glass_bottle"
     },
     "title": {
-      "text": "Alquimia hostil"
+      "translate": "skyblockmulti.advancement.combat.witch_kill.title"
     },
     "description": {
-      "text": "Derrota a una bruja."
+      "translate": "skyblockmulti.advancement.combat.witch_kill.description"
     },
     "frame": "task",
     "show_toast": true,

@@ -5,10 +5,10 @@
       "id": "minecraft:bow"
     },
     "title": {
-      "text": "Huesos en el aire"
+      "translate": "skyblockmulti.advancement.combat.skeleton_kill.title"
     },
     "description": {
-      "text": "Derrota a un esqueleto."
+      "translate": "skyblockmulti.advancement.combat.skeleton_kill.description"
     },
     "frame": "task",
     "show_toast": true,

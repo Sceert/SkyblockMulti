@@ -5,10 +5,10 @@
       "id": "minecraft:ghast_tear"
     },
     "title": {
-      "text": "Lágrimas del cielo oscuro"
+      "translate": "skyblockmulti.advancement.combat.ghast_kill.title"
     },
     "description": {
-      "text": "Derrota a un ghast."
+      "translate": "skyblockmulti.advancement.combat.ghast_kill.description"
     },
     "frame": "task",
     "show_toast": true,

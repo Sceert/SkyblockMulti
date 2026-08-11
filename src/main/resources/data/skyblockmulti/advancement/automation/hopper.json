@@ -5,10 +5,10 @@
       "id": "minecraft:hopper"
     },
     "title": {
-      "text": "Primer paso automático"
+      "translate": "skyblockmulti.advancement.automation.hopper.title"
     },
     "description": {
-      "text": "Obtén una tolva."
+      "translate": "skyblockmulti.advancement.automation.hopper.description"
     },
     "frame": "task",
     "show_toast": true,

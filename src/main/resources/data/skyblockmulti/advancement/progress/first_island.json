@@ -4,10 +4,10 @@
       "id": "minecraft:bedrock"
     },
     "title": {
-      "text": "Una isla propia"
+      "translate": "skyblockmulti.advancement.progress.first_island.title"
     },
     "description": {
-      "text": "Completa la selección y recibe tu isla."
+      "translate": "skyblockmulti.advancement.progress.first_island.description"
     },
     "frame": "task",
     "show_toast": true,

@@ -4,10 +4,10 @@
       "id": "minecraft:ice"
     },
     "title": {
-      "text": "Preparado"
+      "translate": "skyblockmulti.advancement.progress.standard_start.title"
     },
     "description": {
-      "text": "Comienza en dificultad Estándar."
+      "translate": "skyblockmulti.advancement.progress.standard_start.description"
     },
     "frame": "task",
     "show_toast": true,

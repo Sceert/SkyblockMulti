@@ -4,10 +4,10 @@
       "id": "minecraft:sugar_cane"
     },
     "title": {
-      "text": "Dulce cultivo"
+      "translate": "skyblockmulti.advancement.nature.sugar_cane.title"
     },
     "description": {
-      "text": "Consigue caña de azúcar."
+      "translate": "skyblockmulti.advancement.nature.sugar_cane.description"
     },
     "frame": "task",
     "show_toast": true,

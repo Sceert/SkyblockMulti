@@ -5,10 +5,10 @@
       "id": "minecraft:egg"
     },
     "title": {
-      "text": "La primera puesta"
+      "translate": "skyblockmulti.advancement.nature.egg.title"
     },
     "description": {
-      "text": "Obtén un huevo."
+      "translate": "skyblockmulti.advancement.nature.egg.description"
     },
     "frame": "task",
     "show_toast": true,

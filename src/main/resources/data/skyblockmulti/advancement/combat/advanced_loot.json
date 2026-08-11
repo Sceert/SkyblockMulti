@@ -5,10 +5,10 @@
       "id": "minecraft:ender_pearl"
     },
     "title": {
-      "text": "Botines avanzados"
+      "translate": "skyblockmulti.advancement.combat.advanced_loot.title"
     },
     "description": {
-      "text": "Reúne ojo de araña, slime, redstone y una perla de Ender."
+      "translate": "skyblockmulti.advancement.combat.advanced_loot.description"
     },
     "frame": "goal",
     "show_toast": true,

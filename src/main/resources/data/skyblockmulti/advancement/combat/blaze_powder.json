@@ -5,10 +5,10 @@
       "id": "minecraft:blaze_powder"
     },
     "title": {
-      "text": "Polvo infernal"
+      "translate": "skyblockmulti.advancement.combat.blaze_powder.title"
     },
     "description": {
-      "text": "Consigue polvo de blaze."
+      "translate": "skyblockmulti.advancement.combat.blaze_powder.description"
     },
     "frame": "task",
     "show_toast": true,

@@ -5,10 +5,10 @@
       "id": "minecraft:dragon_head"
     },
     "title": {
-      "text": "El fin... por ahora"
+      "translate": "skyblockmulti.advancement.end.dragon_kill.title"
     },
     "description": {
-      "text": "Derrota al dragón del End."
+      "translate": "skyblockmulti.advancement.end.dragon_kill.description"
     },
     "frame": "challenge",
     "show_toast": true,

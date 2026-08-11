@@ -5,10 +5,10 @@
       "id": "minecraft:piston"
     },
     "title": {
-      "text": "Fuerza mecánica"
+      "translate": "skyblockmulti.advancement.automation.piston.title"
     },
     "description": {
-      "text": "Obtén un pistón."
+      "translate": "skyblockmulti.advancement.automation.piston.description"
     },
     "frame": "task",
     "show_toast": true,

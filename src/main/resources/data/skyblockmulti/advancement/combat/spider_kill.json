@@ -5,10 +5,10 @@
       "id": "minecraft:string"
     },
     "title": {
-      "text": "Tejedor nocturno"
+      "translate": "skyblockmulti.advancement.combat.spider_kill.title"
     },
     "description": {
-      "text": "Derrota a una araña."
+      "translate": "skyblockmulti.advancement.combat.spider_kill.description"
     },
     "frame": "task",
     "show_toast": true,

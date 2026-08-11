@@ -4,10 +4,10 @@
       "id": "minecraft:lava_bucket"
     },
     "title": {
-      "text": "Control del fuego"
+      "translate": "skyblockmulti.advancement.progress.lava_bucket.title"
     },
     "description": {
-      "text": "Consigue un cubo con lava."
+      "translate": "skyblockmulti.advancement.progress.lava_bucket.description"
     },
     "frame": "task",
     "show_toast": true,

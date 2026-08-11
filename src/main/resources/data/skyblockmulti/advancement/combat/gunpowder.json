@@ -4,10 +4,10 @@
       "id": "minecraft:gunpowder"
     },
     "title": {
-      "text": "Pólvora en las alturas"
+      "translate": "skyblockmulti.advancement.combat.gunpowder.title"
     },
     "description": {
-      "text": "Consigue pólvora."
+      "translate": "skyblockmulti.advancement.combat.gunpowder.description"
     },
     "frame": "task",
     "show_toast": true,

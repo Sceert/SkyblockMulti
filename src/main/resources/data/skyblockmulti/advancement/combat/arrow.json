@@ -5,10 +5,10 @@
       "id": "minecraft:arrow"
     },
     "title": {
-      "text": "Munición reciclada"
+      "translate": "skyblockmulti.advancement.combat.arrow.title"
     },
     "description": {
-      "text": "Consigue flechas."
+      "translate": "skyblockmulti.advancement.combat.arrow.description"
     },
     "frame": "task",
     "show_toast": true,

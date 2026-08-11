@@ -5,10 +5,10 @@
       "id": "minecraft:spider_eye"
     },
     "title": {
-      "text": "Ojo vigilante"
+      "translate": "skyblockmulti.advancement.combat.spider_eye.title"
     },
     "description": {
-      "text": "Consigue un ojo de araña."
+      "translate": "skyblockmulti.advancement.combat.spider_eye.description"
     },
     "frame": "task",
     "show_toast": true,

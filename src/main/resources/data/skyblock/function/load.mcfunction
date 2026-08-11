@@ -4,6 +4,8 @@ scoreboard objectives add sb3_state dummy
 scoreboard objectives add sb3_slot dummy
 scoreboard objectives add sb3_x dummy
 scoreboard objectives add sb3_z dummy
+scoreboard objectives add sb_active_x dummy
+scoreboard objectives add sb_active_z dummy
 scoreboard objectives add sb3_const dummy
 scoreboard objectives add sb3_used dummy
 scoreboard objectives add sb3_cfg dummy

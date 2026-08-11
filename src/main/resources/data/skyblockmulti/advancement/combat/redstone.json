@@ -5,10 +5,10 @@
       "id": "minecraft:redstone"
     },
     "title": {
-      "text": "Polvo brillante"
+      "translate": "skyblockmulti.advancement.combat.redstone.title"
     },
     "description": {
-      "text": "Consigue redstone de brujas o del mundo."
+      "translate": "skyblockmulti.advancement.combat.redstone.description"
     },
     "frame": "task",
     "show_toast": true,

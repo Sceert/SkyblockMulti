@@ -1,9 +1,8 @@
-
 # Respaldo de inicialización.
 execute in minecraft:overworld unless entity @e[type=minecraft:marker,tag=skyblock_system_v1,limit=1] run function skyblock:bootstrap
 # Garantizar el HUB.
 execute in minecraft:overworld unless block 0 100 0 minecraft:bedrock run function skyblock:hub/build
-# Preparar las 24 anclas después de que sus chunks estén cargados.
+# Preparar las 8/16/24 anclas del anillo después de que sus chunks estén cargados.
 execute unless entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] if score #slotgen sb3_const matches 1.. run scoreboard players remove #slotgen sb3_const 1
 execute unless entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] if score #slotgen sb3_const matches 0 run function skyblock:slots/generate_all
 # Registrar jugadores.
@@ -20,25 +19,25 @@ execute as @a[tag=skyblock_respawn_pending,scores={sb3_state=2,sb_since_death=1.
 execute as @a[scores={sb3_state=1}] run function skyblock:player/freeze_selection
 execute as @a[scores={sb3_state=3}] run function skyblock:player/freeze_selection
 execute as @a[scores={sb3_state=4}] run function skyblock:player/freeze_selection
-# Habilitar triggers.
-scoreboard players enable @a[scores={sb3_state=1}] sb_tree
-scoreboard players enable @a[scores={sb3_state=1}] sb_menu
-scoreboard players enable @a[scores={sb3_state=4}] sb_difficulty
-scoreboard players enable @a[scores={sb3_state=2}] sb_home
-scoreboard players enable @a[tag=skyblock_registered_v1] sb_hub
-scoreboard players enable @a[tag=skyblock_registered_v1] sb_info
+# Habilitar únicamente triggers que forman parte del flujo de selección.
+# Se habilitan SOLO mientras su valor es 0 para impedir que el mismo botón
+# pueda volver a activarse durante el tick en que está siendo procesado.
+# sb_hub, sb_home y sb_info NO se habilitan para jugadores normales.
+scoreboard players enable @a[scores={sb3_state=1,sb_tree=0}] sb_tree
+scoreboard players enable @a[scores={sb3_state=1,sb_menu=0}] sb_menu
+scoreboard players enable @a[scores={sb3_state=4,sb_difficulty=0}] sb_difficulty
 # Mostrar selector solo cuando las anclas estén listas.
 execute if entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] as @a[scores={sb3_state=1},tag=!skyblock_menu_shown_v1] run function skyblock:player/menu
-# Procesar botones y comandos.
+# Procesar exclusivamente botones del flujo de selección.
 execute as @a[scores={sb_menu=1..,sb3_state=1}] run function skyblock:player/menu
 execute as @a[scores={sb_tree=1..12,sb3_state=1}] run function skyblock:player/select
 execute as @a[scores={sb_difficulty=1..4,sb3_state=4}] run function skyblock:player/difficulty_select
-execute as @a[scores={sb_home=1..,sb3_state=2}] run function skyblock:player/home
-execute as @a[scores={sb_hub=1..}] run function skyblock:player/hub
-execute as @a[scores={sb_info=1..}] run function skyblock:player/info
 # Limpiar valores inválidos de selección.
 scoreboard players set @a[scores={sb_tree=13..}] sb_tree 0
 scoreboard players set @a[scores={sb_difficulty=5..}] sb_difficulty 0
+
+# Secreto del libro: comprobar únicamente jugadores que estén físicamente en el End.
+execute as @a at @s if dimension minecraft:the_end unless entity @s[advancements={skyblockmulti:secret/remember_where_you_came_from=true}] run function skyblock:advancements/check_lore_book_end
 
 # Progreso de logros: una mitad cada 100 ticks; cada categoría se revisa cada 10 segundos.
 scoreboard players add #adv_timer sb_adv_timer 1

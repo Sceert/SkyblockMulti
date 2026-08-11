@@ -5,10 +5,10 @@
       "id": "minecraft:end_crystal"
     },
     "title": {
-      "text": "El regreso se aproxima"
+      "translate": "skyblockmulti.advancement.end.end_crystal.title"
     },
     "description": {
-      "text": "Obtén un cristal del End."
+      "translate": "skyblockmulti.advancement.end.end_crystal.description"
     },
     "frame": "task",
     "show_toast": true,

@@ -5,10 +5,10 @@
       "id": "minecraft:ender_pearl"
     },
     "title": {
-      "text": "Mirada prohibida"
+      "translate": "skyblockmulti.advancement.combat.enderman_kill.title"
     },
     "description": {
-      "text": "Derrota a un enderman."
+      "translate": "skyblockmulti.advancement.combat.enderman_kill.description"
     },
     "frame": "task",
     "show_toast": true,

@@ -5,10 +5,10 @@
       "id": "minecraft:ghast_tear"
     },
     "title": {
-      "text": "Cazador del Nether"
+      "translate": "skyblockmulti.advancement.combat.nether_hunter.title"
     },
     "description": {
-      "text": "Reúne vara de blaze, polvo de blaze y lágrima de ghast."
+      "translate": "skyblockmulti.advancement.combat.nether_hunter.description"
     },
     "frame": "challenge",
     "show_toast": true,

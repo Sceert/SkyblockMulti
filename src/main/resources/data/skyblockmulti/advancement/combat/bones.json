@@ -4,10 +4,10 @@
       "id": "minecraft:bone"
     },
     "title": {
-      "text": "Huesos para crecer"
+      "translate": "skyblockmulti.advancement.combat.bones.title"
     },
     "description": {
-      "text": "Consigue huesos."
+      "translate": "skyblockmulti.advancement.combat.bones.description"
     },
     "frame": "task",
     "show_toast": true,

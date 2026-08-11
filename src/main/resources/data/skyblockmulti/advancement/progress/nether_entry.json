@@ -5,10 +5,10 @@
       "id": "minecraft:flint_and_steel"
     },
     "title": {
-      "text": "Portal al infierno"
+      "translate": "skyblockmulti.advancement.progress.nether_entry.title"
     },
     "description": {
-      "text": "Entra al Nether."
+      "translate": "skyblockmulti.advancement.progress.nether_entry.description"
     },
     "frame": "task",
     "show_toast": true,

@@ -5,10 +5,10 @@
       "id": "minecraft:potato"
     },
     "title": {
-      "text": "Cultivo subterráneo"
+      "translate": "skyblockmulti.advancement.nature.potato.title"
     },
     "description": {
-      "text": "Obtén una papa."
+      "translate": "skyblockmulti.advancement.nature.potato.description"
     },
     "frame": "task",
     "show_toast": true,

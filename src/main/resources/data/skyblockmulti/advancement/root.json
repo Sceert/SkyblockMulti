@@ -4,10 +4,10 @@
       "id": "minecraft:grass_block"
     },
     "title": {
-      "text": "SkyblockMulti"
+      "translate": "skyblockmulti.advancement.root.title"
     },
     "description": {
-      "text": "Progreso en el vacío."
+      "translate": "skyblockmulti.advancement.root.description"
     },
     "frame": "task",
     "show_toast": true,

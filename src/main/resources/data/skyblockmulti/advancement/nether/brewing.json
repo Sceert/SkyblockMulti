@@ -4,10 +4,10 @@
       "id": "minecraft:brewing_stand"
     },
     "title": {
-      "text": "Alquimia posible"
+      "translate": "skyblockmulti.advancement.nether.brewing.title"
     },
     "description": {
-      "text": "Consigue un soporte para pociones."
+      "translate": "skyblockmulti.advancement.nether.brewing.description"
     },
     "frame": "task",
     "show_toast": true,

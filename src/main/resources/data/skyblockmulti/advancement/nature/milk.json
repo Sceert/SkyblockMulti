@@ -5,10 +5,10 @@
       "id": "minecraft:milk_bucket"
     },
     "title": {
-      "text": "Leche fresca"
+      "translate": "skyblockmulti.advancement.nature.milk.title"
     },
     "description": {
-      "text": "Obtén un cubo de leche."
+      "translate": "skyblockmulti.advancement.nature.milk.description"
     },
     "frame": "task",
     "show_toast": true,

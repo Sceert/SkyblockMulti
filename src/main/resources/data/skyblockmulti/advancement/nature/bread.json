@@ -4,10 +4,10 @@
       "id": "minecraft:bread"
     },
     "title": {
-      "text": "Pan del cielo"
+      "translate": "skyblockmulti.advancement.nature.bread.title"
     },
     "description": {
-      "text": "Fabrica u obtiene pan."
+      "translate": "skyblockmulti.advancement.nature.bread.description"
     },
     "frame": "task",
     "show_toast": true,

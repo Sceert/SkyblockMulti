@@ -4,10 +4,10 @@
       "id": "minecraft:ender_pearl"
     },
     "title": {
-      "text": "Perla del vacío"
+      "translate": "skyblockmulti.advancement.combat.ender_pearl.title"
     },
     "description": {
-      "text": "Consigue una perla de Ender."
+      "translate": "skyblockmulti.advancement.combat.ender_pearl.description"
     },
     "frame": "task",
     "show_toast": true,

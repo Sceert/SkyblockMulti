@@ -5,10 +5,10 @@
       "id": "minecraft:string"
     },
     "title": {
-      "text": "Hilo de araña"
+      "translate": "skyblockmulti.advancement.combat.string.title"
     },
     "description": {
-      "text": "Consigue hilo."
+      "translate": "skyblockmulti.advancement.combat.string.description"
     },
     "frame": "task",
     "show_toast": true,

@@ -4,10 +4,10 @@
       "id": "minecraft:shulker_box"
     },
     "title": {
-      "text": "Almacenamiento imposible"
+      "translate": "skyblockmulti.advancement.end.shulker.title"
     },
     "description": {
-      "text": "Consigue una caja de shulker."
+      "translate": "skyblockmulti.advancement.end.shulker.description"
     },
     "frame": "goal",
     "show_toast": true,

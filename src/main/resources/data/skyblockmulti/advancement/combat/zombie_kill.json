@@ -5,10 +5,10 @@
       "id": "minecraft:rotten_flesh"
     },
     "title": {
-      "text": "Sin descanso"
+      "translate": "skyblockmulti.advancement.combat.zombie_kill.title"
     },
     "description": {
-      "text": "Derrota a un zombi."
+      "translate": "skyblockmulti.advancement.combat.zombie_kill.description"
     },
     "frame": "task",
     "show_toast": true,

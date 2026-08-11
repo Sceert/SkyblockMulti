@@ -4,10 +4,10 @@
       "id": "minecraft:barrier"
     },
     "title": {
-      "text": "Sin ayuda"
+      "translate": "skyblockmulti.advancement.challenge.extreme_start.title"
     },
     "description": {
-      "text": "Comienza con cofre Extremo: vacío."
+      "translate": "skyblockmulti.advancement.challenge.extreme_start.description"
     },
     "frame": "challenge",
     "show_toast": true,

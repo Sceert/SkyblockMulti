@@ -5,10 +5,10 @@
       "id": "minecraft:dragon_breath"
     },
     "title": {
-      "text": "Aliento embotellado"
+      "translate": "skyblockmulti.advancement.end.dragon_breath.title"
     },
     "description": {
-      "text": "Obtén aliento de dragón."
+      "translate": "skyblockmulti.advancement.end.dragon_breath.description"
     },
     "frame": "task",
     "show_toast": true,

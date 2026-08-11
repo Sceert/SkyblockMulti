@@ -5,10 +5,10 @@
       "id": "minecraft:potion"
     },
     "title": {
-      "text": "Alquimia inicial"
+      "translate": "skyblockmulti.advancement.nether.potion.title"
     },
     "description": {
-      "text": "Obtén una poción."
+      "translate": "skyblockmulti.advancement.nether.potion.description"
     },
     "frame": "task",
     "show_toast": true,

@@ -4,10 +4,10 @@
       "id": "minecraft:water_bucket"
     },
     "title": {
-      "text": "Agua asegurada"
+      "translate": "skyblockmulti.advancement.progress.water_bucket.title"
     },
     "description": {
-      "text": "Consigue un cubo con agua."
+      "translate": "skyblockmulti.advancement.progress.water_bucket.description"
     },
     "frame": "task",
     "show_toast": true,

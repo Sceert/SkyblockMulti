@@ -5,10 +5,10 @@
       "id": "minecraft:rotten_flesh"
     },
     "title": {
-      "text": "Carne dudosa"
+      "translate": "skyblockmulti.advancement.combat.rotten_flesh.title"
     },
     "description": {
-      "text": "Consigue carne podrida."
+      "translate": "skyblockmulti.advancement.combat.rotten_flesh.description"
     },
     "frame": "task",
     "show_toast": true,
