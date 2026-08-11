@@ -9,6 +9,8 @@ import xaero.pac.common.claims.result.api.AreaClaimResult;
 import xaero.pac.common.server.api.OpenPACServerAPI;
 import xaero.pac.common.server.claims.api.IServerClaimsManagerAPI;
 import xaero.pac.common.server.parties.party.api.IServerPartyAPI;
+import xaero.pac.common.server.player.config.api.v2.IPlayerConfigAPI;
+import xaero.pac.common.server.player.config.api.v2.PlayerConfigOptions;
 
 import java.util.UUID;
 
@@ -16,6 +18,7 @@ public final class OpenPacCompat {
 
     public static final String MOD_ID = "openpartiesandclaims";
     public static final String ASCENSION_NEXUS_CANONICAL_NAME = "The Ascension Nexus";
+    private static final String ASCENSION_NEXUS_SUBCLAIM_ID = "ascension_nexus";
 
     private static final UUID SERVER_CLAIM_UUID = new UUID(0L, 0L);
 
@@ -23,8 +26,8 @@ public final class OpenPacCompat {
     private static final int RESERVED_RADIUS_CHUNKS = 2;
     private static final int PLAYER_RADIUS_CHUNKS = 1;
 
-    // The Ascension Nexus: 31x31 chunks, centrado en 0,0.
-    // OpenPAC protege toda la columna vertical de estos chunks, por lo que
+    // The Ascension Nexus: círculo de radio 15 chunks, centrado en 0,0.
+    // OpenPAC protege toda la columna vertical de cada chunk reclamado, por lo que
     // cubre HUB, futura dungeon y fortaleza/Portal del End bajo el HUB.
     private static final int ASCENSION_NEXUS_RADIUS_CHUNKS = 15;
 
@@ -159,7 +162,8 @@ public final class OpenPacCompat {
      * Server Claim permanente para la zona central.
      *
      * Tamaño actual:
-     * 31x31 chunks = 961 chunks ≈ 496x496 bloques.
+     * círculo discreto de radio 15 chunks (709 chunks reclamados).
+     * Diámetro máximo: 31 chunks ≈ 496 bloques.
      *
      * Al ser un claim por chunk de OpenPAC, protege toda la columna vertical:
      * HUB superior + futura dungeon + fortaleza y sala del Portal del End.
@@ -174,18 +178,61 @@ public final class OpenPacCompat {
 
         Identifier overworld = Identifier.parse("minecraft:overworld");
 
-        IServerClaimsManagerAPI claims = OpenPACServerAPI
-                .get(server)
-                .getServerClaimsManager();
+        OpenPACServerAPI api = OpenPACServerAPI.get(server);
 
-        int left = -ASCENSION_NEXUS_RADIUS_CHUNKS;
-        int top = -ASCENSION_NEXUS_RADIUS_CHUNKS;
-        int right = ASCENSION_NEXUS_RADIUS_CHUNKS;
-        int bottom = ASCENSION_NEXUS_RADIUS_CHUNKS;
+        IServerClaimsManagerAPI claims = api.getServerClaimsManager();
 
-        // Nunca pisar claims de jugadores existentes.
-        for (int x = left; x <= right; x++) {
-            for (int z = top; z <= bottom; z++) {
+        /*
+         * Usamos un sub-claim propio del servidor para que SOLO el centro
+         * aparezca con el nombre "The Ascension Nexus".
+         *
+         * Los futuros slots continúan usando la configuración principal
+         * del Server Claim y, por tanto, no heredan este nombre.
+         */
+        IPlayerConfigAPI serverClaimsConfig = api
+                .getPlayerConfigManager()
+                .getServerClaimConfig();
+
+        IPlayerConfigAPI nexusSubConfig =
+                serverClaimsConfig.getSubConfig(ASCENSION_NEXUS_SUBCLAIM_ID);
+
+        if (nexusSubConfig == null) {
+            nexusSubConfig =
+                    serverClaimsConfig.createSubConfig(ASCENSION_NEXUS_SUBCLAIM_ID);
+        }
+
+        if (nexusSubConfig == null) {
+            System.err.println(
+                    "[SkyblockMulti] OpenPAC: no fue posible crear el sub-claim "
+                            + ASCENSION_NEXUS_SUBCLAIM_ID
+                            + " para "
+                            + ASCENSION_NEXUS_CANONICAL_NAME
+                            + "."
+            );
+            return false;
+        }
+
+        IPlayerConfigAPI.SetResult nameResult = nexusSubConfig.tryToSet(
+                PlayerConfigOptions.CLAIMS_NAME,
+                ASCENSION_NEXUS_CANONICAL_NAME
+        );
+
+        int nexusSubConfigIndex = nexusSubConfig.getSubIndex();
+
+        int radius = ASCENSION_NEXUS_RADIUS_CHUNKS;
+        int radiusSquared = radius * radius;
+
+        /*
+         * Primer pase: seguridad.
+         * Se revisan únicamente los chunks que forman el círculo.
+         * Nunca se pisa un claim de jugador.
+         */
+        for (int x = -radius; x <= radius; x++) {
+            for (int z = -radius; z <= radius; z++) {
+
+                if (x * x + z * z > radiusSquared) {
+                    continue;
+                }
 
                 IPlayerChunkClaimAPI existing = claims.get(overworld, x, z);
 
@@ -207,29 +254,50 @@ public final class OpenPacCompat {
             }
         }
 
-        for (int x = left; x <= right; x++) {
-            for (int z = top; z <= bottom; z++) {
+        int claimedChunks = 0;
 
-                if (claims.get(overworld, x, z) == null) {
+        /*
+         * Segundo pase: círculo discreto de chunks.
+         * Los bordes quedan escalonados, como corresponde a la cuadrícula
+         * de chunks, pero en el mapa se percibe claramente circular.
+         */
+        for (int x = -radius; x <= radius; x++) {
+            for (int z = -radius; z <= radius; z++) {
+
+                if (x * x + z * z > radiusSquared) {
+                    continue;
+                }
+
+                IPlayerChunkClaimAPI existing = claims.get(overworld, x, z);
+
+                boolean alreadyCorrectNexusClaim =
+                        existing != null
+                                && SERVER_CLAIM_UUID.equals(existing.getPlayerId())
+                                && existing.getSubConfigIndex() == nexusSubConfigIndex;
+
+                if (!alreadyCorrectNexusClaim) {
                     claims.claim(
                             overworld,
                             SERVER_CLAIM_UUID,
-                            0,
+                            nexusSubConfigIndex,
                             x,
                             z,
                             false
                     );
                 }
+
+                claimedChunks++;
             }
         }
 
         System.out.println(
                 "[SkyblockMulti] OpenPAC: "
                         + ASCENSION_NEXUS_CANONICAL_NAME
-                        + " reservado permanentemente como Server Claim 31x31: "
-                        + left + "," + top
-                        + " -> "
-                        + right + "," + bottom
+                        + " reservado permanentemente como Server Claim circular. "
+                        + "Radio=" + radius
+                        + " chunks, chunks reclamados=" + claimedChunks
+                        + ", sub-claim=" + ASCENSION_NEXUS_SUBCLAIM_ID
+                        + ", nombre_resultado=" + nameResult
                         + "."
         );
 
@@ -302,7 +370,7 @@ public final class OpenPacCompat {
                     claims.claim(
                             overworld,
                             SERVER_CLAIM_UUID,
-                            0,
+                            -1,
                             x,
                             z,
                             false
@@ -395,7 +463,7 @@ public final class OpenPacCompat {
                 claims.claim(
                         overworld,
                         playerUuid,
-                        0,
+                        -1,
                         x,
                         z,
                         false
