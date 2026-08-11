@@ -34,6 +34,7 @@ import net.minecraft.network.chat.Component;
 import java.util.HashMap;
 import java.util.UUID;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
 public final class SkyblockMultiMod implements ModInitializer {
     public static final String MOD_ID = "skyblockmulti";
@@ -75,7 +76,7 @@ public final class SkyblockMultiMod implements ModInitializer {
 	// Estado conocido de las parties de OpenPAC.
 	private static final Map<UUID, PartyState> OPENPAC_PARTY_STATES = new HashMap<>();
 	private static int openPacPartyCheckTicks = 0;
-	
+	private static int openPacReservationDelayTicks = -1;
 	private record PartyState(
         boolean inParty,
         UUID partyId,
@@ -201,7 +202,7 @@ public final class SkyblockMultiMod implements ModInitializer {
                                                                                 int z = IntegerArgumentType.getInteger(context, "z");
 
                                                                                 if (OpenPacCompat.isInstalled()) {
-                                                                                    OpenPacCompat.claimInitialIsland(player, x, z);
+                                                                                    OpenPacCompat.assignReservedIsland(player, x, z);
 
                                                                                     // La isla ya tiene sb3_state=2 cuando este comando se ejecuta.
                                                                                     // Reconciliamos a todos para que los miembros de la party
@@ -304,6 +305,14 @@ public final class SkyblockMultiMod implements ModInitializer {
                 return;
             }
 
+            if (openPacReservationDelayTicks > 0) {
+                openPacReservationDelayTicks--;
+                if (openPacReservationDelayTicks == 0) {
+                    reserveOpenPacFreeSlots(server);
+                    openPacReservationDelayTicks = -1;
+                }
+            }
+
             openPacPartyCheckTicks++;
 
             // Comprobar cambios reales de party una vez por segundo.
@@ -320,6 +329,11 @@ public final class SkyblockMultiMod implements ModInitializer {
 
         registerServerStartedEvent();
 
+        // OpenPAC: esperamos unos segundos después de SERVER_STARTED.
+        // applyConfiguration() reinicia temporalmente sb3_used y el datapack necesita
+        // algunos ticks para volver a detectar islas existentes por su bedrock central.
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> openPacReservationDelayTicks = 100);
+
         // El bloqueo es persistente DENTRO de cada mundo. Al cerrar el servidor integrado,
         // limpiamos solo el estado runtime para que Mod Menu vuelva a mostrar los valores
         // predeterminados destinados a mundos nuevos. Al cargar un mundo existente,
@@ -329,10 +343,15 @@ public final class SkyblockMultiMod implements ModInitializer {
             worldGeometryLocked = false;
             activeWorldRadius = -1;
             activeWorldCapacity = -1;
+            openPacReservationDelayTicks = -1;
             OPENPAC_PARTY_STATES.clear();
         });
 
-        System.out.println("[SkyblockMulti] Mod 0.1.1-beta inicializado. Configuración: " + configPath);
+        String modVersion = FabricLoader.getInstance()
+                .getModContainer(MOD_ID)
+                .map(container -> container.getMetadata().getVersion().getFriendlyString())
+                .orElse("unknown");
+        System.out.println("[SkyblockMulti] Mod " + modVersion + " inicializado. Configuración: " + configPath);
     }
 
     public static int getConfiguredRadius() {
@@ -1040,6 +1059,57 @@ public final class SkyblockMultiMod implements ModInitializer {
                             + ": "
                             + e
             );
+        }
+    }
+
+    private static void reserveOpenPacFreeSlots(MinecraftServer server) {
+        if (!OpenPacCompat.isInstalled()) {
+            return;
+        }
+
+        try {
+            ServerCommandExecutor executor = new ServerCommandExecutor(server);
+            List<Slot> slots = calculateSlots(
+                    getConfiguredRadius(),
+                    getConfiguredCapacity()
+            );
+
+            int reserved = 0;
+            int skipped = 0;
+
+            for (Slot slot : slots) {
+                String key = String.format(Locale.ROOT, "%02d", slot.index());
+
+                boolean used = executor.run(
+                        "execute if score #" + key + " sb3_used matches 1"
+                ) > 0;
+
+                if (used) {
+                    skipped++;
+                    continue;
+                }
+
+                if (OpenPacCompat.reserveIslandSlot(server, slot.x(), slot.z())) {
+                    reserved++;
+                } else {
+                    skipped++;
+                }
+            }
+
+            System.out.println(
+                    "[SkyblockMulti] OpenPAC: reservas de slots procesadas. "
+                            + "Server Claims 5x5 activos/confirmados="
+                            + reserved
+                            + ", omitidos="
+                            + skipped
+                            + "."
+            );
+        } catch (Exception e) {
+            System.err.println(
+                    "[SkyblockMulti] OpenPAC: no fue posible reservar los slots libres: "
+                            + e
+            );
+            e.printStackTrace(System.err);
         }
     }
 
