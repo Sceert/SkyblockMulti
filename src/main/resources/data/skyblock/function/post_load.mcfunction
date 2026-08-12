@@ -25,10 +25,15 @@ scoreboard players set #claim sb3_const 0
 execute unless data storage skyblock:slots s01.x run function skyblock:slots/default_storage
 execute unless entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] run function skyblock:slots/forceload
 execute unless entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] unless score #slotgen sb3_const matches 1.. run scoreboard players set #slotgen sb3_const 100
-execute in minecraft:overworld run setworldspawn 0 101 0
+
+# The Ascension Nexus: spawn principal.
+execute in minecraft:overworld run setworldspawn 0 161 0
 execute in minecraft:overworld run gamerule respawn_radius 0
 function skyblock:hub/build
-execute in minecraft:overworld unless entity @e[type=minecraft:marker,tag=skyblock_system_v1,limit=1] positioned 0 100 0 run summon minecraft:marker ~ ~ ~ {Tags:["skyblock_system_v1"]}
+
+# Marcador técnico reposicionado al nivel del nuevo HUB.
+execute in minecraft:overworld unless entity @e[type=minecraft:marker,tag=skyblock_system_v1,limit=1] positioned 0 160 0 run summon minecraft:marker ~ ~ ~ {Tags:["skyblock_system_v1"]}
+
 execute if entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] run function skyblock:slots/forceload
 execute if entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] run function skyblock:slots/sync_occupancy
 execute if entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] run function skyblock:slots/remove_forceload

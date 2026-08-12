@@ -19,6 +19,8 @@ public final class OpenPacCompat {
     public static final String MOD_ID = "openpartiesandclaims";
     public static final String ASCENSION_NEXUS_CANONICAL_NAME = "The Ascension Nexus";
     private static final String ASCENSION_NEXUS_SUBCLAIM_ID = "ascension_nexus";
+    private static final int ASCENSION_NEXUS_CLAIM_COLOR = 0x55D6FF; // celeste
+    private static final int RESERVED_ISLAND_CLAIM_COLOR = 0x55CC66; // verde
 
     private static final UUID SERVER_CLAIM_UUID = new UUID(0L, 0L);
 
@@ -193,6 +195,14 @@ public final class OpenPacCompat {
                 .getPlayerConfigManager()
                 .getServerClaimConfig();
 
+        // Identidad visual inicial de los territorios SkyblockMulti.
+        // Las reservas de futuras islas usan el Server Claim principal (verde).
+        // The Ascension Nexus usa su sub-claim propio (celeste).
+        IPlayerConfigAPI.SetResult serverColorResult = serverClaimsConfig.tryToSet(
+                PlayerConfigOptions.CLAIMS_COLOR,
+                RESERVED_ISLAND_CLAIM_COLOR
+        );
+
         IPlayerConfigAPI nexusSubConfig =
                 serverClaimsConfig.getSubConfig(ASCENSION_NEXUS_SUBCLAIM_ID);
 
@@ -215,6 +225,11 @@ public final class OpenPacCompat {
         IPlayerConfigAPI.SetResult nameResult = nexusSubConfig.tryToSet(
                 PlayerConfigOptions.CLAIMS_NAME,
                 ASCENSION_NEXUS_CANONICAL_NAME
+        );
+
+        IPlayerConfigAPI.SetResult nexusColorResult = nexusSubConfig.tryToSet(
+                PlayerConfigOptions.CLAIMS_COLOR,
+                ASCENSION_NEXUS_CLAIM_COLOR
         );
 
         int nexusSubConfigIndex = nexusSubConfig.getSubIndex();
@@ -298,6 +313,8 @@ public final class OpenPacCompat {
                         + " chunks, chunks reclamados=" + claimedChunks
                         + ", sub-claim=" + ASCENSION_NEXUS_SUBCLAIM_ID
                         + ", nombre_resultado=" + nameResult
+                        + ", color_nexus_resultado=" + nexusColorResult
+                        + ", color_reservas_resultado=" + serverColorResult
                         + "."
         );
 

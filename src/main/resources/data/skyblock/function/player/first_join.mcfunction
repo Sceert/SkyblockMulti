@@ -23,7 +23,9 @@ tag @s remove skyblock_respawn_pending
 tag @s remove skyblock_respawn_v2
 tag @s remove skyblock_respawn_handled
 tag @s remove skyblock_menu_shown_v1
-execute in minecraft:overworld run teleport @s 0.5 101 0.5
-execute in minecraft:overworld run spawnpoint @s 0 101 0
+
+# Llegada al Último Refugio, dentro de The Ascension Nexus.
+execute in minecraft:overworld run teleport @s 0.5 161 0.5
+execute in minecraft:overworld run spawnpoint @s 0 161 0
 function skyblock:player/give_lore_book
 tellraw @s [{"text":"[Skyblock] ","color":"aqua","bold":true},{"translate":"skyblockmulti.welcome","color":"yellow"}]
