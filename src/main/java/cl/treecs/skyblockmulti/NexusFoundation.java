@@ -211,9 +211,9 @@ public final class NexusFoundation implements ModInitializer {
     }
 
     private static boolean isOperator(ServerPlayer player) {
-        MinecraftServer server = player.getServer();
+        MinecraftServer server = player.level().getServer();
         return server != null
-                && server.getPlayerList().isOp(player.getGameProfile());
+                && server.getPlayerList().isOp(player.nameAndId());
     }
 
     public static int getConfiguredEndPortalEyesPercent() {
