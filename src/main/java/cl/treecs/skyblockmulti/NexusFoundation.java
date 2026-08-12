@@ -211,16 +211,14 @@ public final class NexusFoundation implements ModInitializer {
     }
 
     /**
-     * El host de un mundo integrado suele ser operador automáticamente.
-     * Por eso NO usamos OP como bypass: haría que el propietario del mundo
-     * ignorara siempre la protección durante las pruebas.
+     * El host de un mundo integrado suele ser operador automáticamente,
+     * por lo que OP no se usa como bypass.
      *
-     * El bypass de desarrollo es explícito mediante:
-     * /tag <jugador> add skyblock_nexus_builder
-     * /tag <jugador> remove skyblock_nexus_builder
+     * Para desarrollo, únicamente Creative permite modificar el Nexus.
+     * Survival y Adventure quedan protegidos aunque el jugador sea OP.
      */
     private static boolean hasBuilderBypass(ServerPlayer player) {
-        return player.getTags().contains("skyblock_nexus_builder");
+        return player.isCreative();
     }
 
     public static int getConfiguredEndPortalEyesPercent() {
