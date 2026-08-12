@@ -13,7 +13,8 @@
   "entrypoints": {
     "main": [
       "cl.treecs.skyblockmulti.SkyblockMultiMod",
-      "cl.treecs.skyblockmulti.SkyblockDebugOverlay"
+      "cl.treecs.skyblockmulti.SkyblockDebugOverlay",
+      "cl.treecs.skyblockmulti.NexusFoundation"
     ],
     "modmenu": [
       "cl.treecs.skyblockmulti.client.SkyblockMultiModMenu"
