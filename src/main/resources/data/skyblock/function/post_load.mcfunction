@@ -37,7 +37,8 @@ execute in minecraft:overworld unless entity @e[type=minecraft:marker,tag=skyblo
 execute if entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] run function skyblock:slots/forceload
 execute if entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] run function skyblock:slots/sync_occupancy
 execute if entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] run function skyblock:slots/remove_forceload
-tellraw @a [{"text":"[SkyblockMulti] ","color":"aqua","bold":true},{"translate":"skyblockmulti.system.loaded","color":"gray"}]
+
+# El mensaje de versión ahora lo envía VersionJoinMessage.java usando la metadata real del mod.
 
 # Limpiar bloqueos residuales de versiones anteriores.
 execute as @a[scores={sb3_state=2},tag=skyblock_selection_locked] run function skyblock:player/unlock_selection

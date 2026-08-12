@@ -148,7 +148,7 @@ public final class NexusFoundation implements ModInitializer {
                 return true;
             }
 
-            return isOperator(serverPlayer);
+            return hasBuilderBypass(serverPlayer);
         });
 
         UseBlockCallback.EVENT.register((player, level, hand, hitResult) -> {
@@ -156,7 +156,7 @@ public final class NexusFoundation implements ModInitializer {
                 return InteractionResult.PASS;
             }
 
-            if (isOperator(serverPlayer)) {
+            if (hasBuilderBypass(serverPlayer)) {
                 return InteractionResult.PASS;
             }
 
@@ -210,10 +210,17 @@ public final class NexusFoundation implements ModInitializer {
                 <= NEXUS_RADIUS_CHUNKS * NEXUS_RADIUS_CHUNKS;
     }
 
-    private static boolean isOperator(ServerPlayer player) {
-        MinecraftServer server = player.level().getServer();
-        return server != null
-                && server.getPlayerList().isOp(player.nameAndId());
+    /**
+     * El host de un mundo integrado suele ser operador automáticamente.
+     * Por eso NO usamos OP como bypass: haría que el propietario del mundo
+     * ignorara siempre la protección durante las pruebas.
+     *
+     * El bypass de desarrollo es explícito mediante:
+     * /tag <jugador> add skyblock_nexus_builder
+     * /tag <jugador> remove skyblock_nexus_builder
+     */
+    private static boolean hasBuilderBypass(ServerPlayer player) {
+        return player.getTags().contains("skyblock_nexus_builder");
     }
 
     public static int getConfiguredEndPortalEyesPercent() {

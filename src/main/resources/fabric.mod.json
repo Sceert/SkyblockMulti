@@ -14,7 +14,8 @@
     "main": [
       "cl.treecs.skyblockmulti.SkyblockMultiMod",
       "cl.treecs.skyblockmulti.SkyblockDebugOverlay",
-      "cl.treecs.skyblockmulti.NexusFoundation"
+      "cl.treecs.skyblockmulti.NexusFoundation",
+      "cl.treecs.skyblockmulti.VersionJoinMessage"
     ],
     "modmenu": [
       "cl.treecs.skyblockmulti.client.SkyblockMultiModMenu"
