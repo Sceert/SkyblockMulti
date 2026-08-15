@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:diamond_axe",
+    "#minecraft:saplings",
+    "#minecraft:saplings",
+    "#minecraft:saplings",
+    "#minecraft:saplings"
+  ],
+  "result": {
+    "id": "minecraft:echo_shard",
+    "count": 1,
+    "components": {
+      "minecraft:custom_name": {"translate": "skyblockmulti.offering.trees", "color": "dark_green", "italic": false},
+      "minecraft:custom_data": {"skyblockmulti": {"offering": "trees"}}
+    }
+  }
+}

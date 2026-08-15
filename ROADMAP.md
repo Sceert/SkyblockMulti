@@ -27,7 +27,7 @@ Status: **Current development**
 - Transparent observation floor
 - Fortress beneath the HUB
 - Stronghold-style End portal chamber
-- 0% / 25% / 75% initial End Portal Eye configuration
+- 0% / 25% / 50% / 75% initial End Portal Eye configuration
 - Per-world structural persistence
 - No direct dome-to-fortress access
 - Foundation for later dungeon/progression access

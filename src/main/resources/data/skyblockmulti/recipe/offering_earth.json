@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:diamond_hoe",
+    "minecraft:diamond_shovel",
+    "minecraft:hay_block",
+    "minecraft:pumpkin",
+    "minecraft:melon"
+  ],
+  "result": {
+    "id": "minecraft:echo_shard",
+    "count": 1,
+    "components": {
+      "minecraft:custom_name": {"translate": "skyblockmulti.offering.earth", "color": "gold", "italic": false},
+      "minecraft:custom_data": {"skyblockmulti": {"offering": "earth"}}
+    }
+  }
+}

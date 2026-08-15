@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -45,11 +46,19 @@ public final class NexusFoundation implements ModInitializer {
 
     public static final int END_EYES_0 = 0;
     public static final int END_EYES_25 = 25;
+    public static final int END_EYES_50 = 50;
     public static final int END_EYES_75 = 75;
     public static final int DEFAULT_END_EYES = END_EYES_0;
 
     private static final String CONFIG_FILE = "skyblockmulti_nexus.json";
     private static final String WORLD_STATE_FILE = "skyblockmulti_nexus.properties";
+
+    private static final List<BlockPos> RENEWABLE_LAVA_SOURCES = List.of(
+            new BlockPos(0, 15, -66),
+            new BlockPos(66, 15, 0),
+            new BlockPos(0, 15, 66),
+            new BlockPos(-66, 15, 0)
+    );
 
     private static Path configPath;
 
@@ -171,6 +180,10 @@ public final class NexusFoundation implements ModInitializer {
             BlockPos hitPos = hitResult.getBlockPos();
             BlockPos adjacentPos = hitPos.relative(hitResult.getDirection());
 
+            if (stack.is(Items.BUCKET) && isRenewableLavaSource(level, hitPos)) {
+                return InteractionResult.PASS;
+            }
+
             if (isProtectedNexusPosition(level, hitPos)
                     || isProtectedNexusPosition(level, adjacentPos)) {
                 return InteractionResult.FAIL;
@@ -178,6 +191,49 @@ public final class NexusFoundation implements ModInitializer {
 
             return InteractionResult.PASS;
         });
+
+        // Fluid pickup is handled through item use rather than block use in
+        // current mappings. Keep filled buckets blocked throughout the Nexus,
+        // and permit an empty bucket only while standing at a designated well.
+        UseItemCallback.EVENT.register((player, level, hand) -> {
+            if (!(player instanceof ServerPlayer serverPlayer)) {
+                return InteractionResult.PASS;
+            }
+
+            if (hasBuilderBypass(serverPlayer)) {
+                return InteractionResult.PASS;
+            }
+
+            ItemStack stack = player.getItemInHand(hand);
+            if (!(stack.getItem() instanceof BucketItem)) {
+                return InteractionResult.PASS;
+            }
+
+            if (!isProtectedNexusPosition(level, player.blockPosition())) {
+                return InteractionResult.PASS;
+            }
+
+            if (stack.is(Items.BUCKET)
+                    && isNearRenewableLavaSource(level, player.blockPosition())) {
+                return InteractionResult.PASS;
+            }
+
+            return InteractionResult.FAIL;
+        });
+    }
+
+    private static boolean isRenewableLavaSource(Level level, BlockPos pos) {
+        return level.dimension().equals(Level.OVERWORLD)
+                && RENEWABLE_LAVA_SOURCES.contains(pos);
+    }
+
+    private static boolean isNearRenewableLavaSource(Level level, BlockPos pos) {
+        if (!level.dimension().equals(Level.OVERWORLD)) {
+            return false;
+        }
+
+        return RENEWABLE_LAVA_SOURCES.stream()
+                .anyMatch(source -> source.distSqr(pos) <= 36.0D);
     }
 
     private static boolean isPotentiallyDestructiveUse(ItemStack stack) {
@@ -236,7 +292,8 @@ public final class NexusFoundation implements ModInitializer {
     public static int getNextEndPortalEyesPercent(int current) {
         return switch (normalizeEndEyes(current)) {
             case END_EYES_0 -> END_EYES_25;
-            case END_EYES_25 -> END_EYES_75;
+            case END_EYES_25 -> END_EYES_50;
+            case END_EYES_50 -> END_EYES_75;
             default -> END_EYES_0;
         };
     }
@@ -273,8 +330,11 @@ public final class NexusFoundation implements ModInitializer {
         if (value <= 12) {
             return END_EYES_0;
         }
-        if (value <= 50) {
+        if (value <= 37) {
             return END_EYES_25;
+        }
+        if (value <= 62) {
+            return END_EYES_50;
         }
         return END_EYES_75;
     }
@@ -345,6 +405,7 @@ public final class NexusFoundation implements ModInitializer {
         int percent = loadConfiguredEndEyes();
         int eyes = switch (percent) {
             case END_EYES_25 -> 3;
+            case END_EYES_50 -> 6;
             case END_EYES_75 -> 9;
             default -> 0;
         };
@@ -354,7 +415,7 @@ public final class NexusFoundation implements ModInitializer {
             setPortalFrame(level, frame, false);
         }
 
-        // Luego elegir exactamente 0, 3 o 9 posiciones al azar.
+        // Luego elegir exactamente 0, 3, 6 o 9 posiciones al azar.
         List<PortalFrame> shuffled = new ArrayList<>(PORTAL_FRAMES);
         Collections.shuffle(shuffled, new Random());
 

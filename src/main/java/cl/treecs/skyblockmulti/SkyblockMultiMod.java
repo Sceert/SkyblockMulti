@@ -177,6 +177,7 @@ public final class SkyblockMultiMod implements ModInitializer {
     public void onInitialize() {
         configPath = FabricLoader.getInstance().getConfigDir().resolve("skyblockmulti.json");
         ensureConfigExists();
+        NexusCreativeTab.register();
         OpenPacCompat.initialize();
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {

@@ -1,7 +1,7 @@
 # Respaldo de inicialización.
 execute in minecraft:overworld unless entity @e[type=minecraft:marker,tag=skyblock_system_v1,limit=1] run function skyblock:bootstrap
-# Garantizar The Ascension Nexus sin reconstruirlo después de su marker persistente.
-execute in minecraft:overworld unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v1,limit=1] run function skyblock:hub/build
+# Garantizar The Ascension Nexus sin sobrescribir diseños v1-v20 persistentes.
+execute in minecraft:overworld unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v1,limit=1] unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v2,limit=1] unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v3,limit=1] unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v4,limit=1] unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v5,limit=1] unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v6,limit=1] unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v7,limit=1] unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v8,limit=1] unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v9,limit=1] unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v10,limit=1] unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v11,limit=1] unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v12,limit=1] unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v13,limit=1] unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v14,limit=1] unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v15,limit=1] unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v16,limit=1] unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v17,limit=1] unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v18,limit=1] unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v19,limit=1] unless entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v20,limit=1] run function skyblock:hub/build
 # Preparar las 8/16/24 anclas del anillo después de que sus chunks estén cargados.
 execute unless entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] if score #slotgen sb3_const matches 1.. run scoreboard players remove #slotgen sb3_const 1
 execute unless entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit=1] if score #slotgen sb3_const matches 0 run function skyblock:slots/generate_all
@@ -14,6 +14,14 @@ execute as @a[scores={sb3_state=2},tag=!skyblock_respawn_v2] run function skyblo
 # Restauración robusta después de morir.
 execute as @a[scores={sb3_state=2}] unless score @s sb_deaths = @s sb_last_deaths run function skyblock:player/death_detected
 execute as @a[tag=skyblock_respawn_pending,scores={sb3_state=2,sb_since_death=1..}] run function skyblock:player/respawn_decide
+
+# Progresión global de la fortaleza y fuentes renovables controladas (v15+).
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v15,limit=1] run function skyblock:nexus/tick
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v16,limit=1] run function skyblock:nexus/tick
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v17,limit=1] run function skyblock:nexus/tick
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v18,limit=1] run function skyblock:nexus/tick
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v19,limit=1] run function skyblock:nexus/tick
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v20,limit=1] run function skyblock:nexus/tick
 
 # Mantener estado de selección SIN inmovilizar al jugador.
 execute as @a[scores={sb3_state=1}] run function skyblock:player/freeze_selection

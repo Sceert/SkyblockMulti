@@ -1,5 +1,6 @@
 package cl.treecs.skyblockmulti.client;
 
+import cl.treecs.skyblockmulti.NexusFoundation;
 import cl.treecs.skyblockmulti.SkyblockMultiMod;
 import cl.treecs.skyblockmulti.SkyblockMultiMod.BonusChestMode;
 import cl.treecs.skyblockmulti.SkyblockMultiMod.TreeOption;
@@ -19,12 +20,15 @@ public final class SkyblockMultiConfigScreen extends Screen {
     private Button radiusButton;
     private Button bonusChestModeButton;
     private Button partyLeaveDifficultyButton;
+    private Button endPortalEyesButton;
 
     private int islandCapacity;
     private int islandRadius;
     private BonusChestMode bonusChestMode;
     private BonusChestMode partyLeaveDifficultyMode;
+    private int endPortalEyesPercent;
     private final boolean geometryLocked;
+    private final boolean endPortalConfigurationLocked;
     private final boolean openPacAvailable;
 
     private Component status = Component.empty();
@@ -42,7 +46,9 @@ public final class SkyblockMultiConfigScreen extends Screen {
         );
         this.bonusChestMode = SkyblockMultiMod.getConfiguredBonusChestMode();
         this.partyLeaveDifficultyMode = SkyblockMultiMod.getConfiguredPartyLeaveDifficultyMode();
+        this.endPortalEyesPercent = NexusFoundation.getConfiguredEndPortalEyesPercent();
         this.geometryLocked = SkyblockMultiMod.isWorldGeometryLocked();
+        this.endPortalConfigurationLocked = NexusFoundation.isEndPortalConfigurationLocked();
         this.openPacAvailable = SkyblockMultiMod.isOpenPacInstalled();
     }
 
@@ -81,16 +87,22 @@ public final class SkyblockMultiConfigScreen extends Screen {
                         .bounds(centerX - 155, 233, 310, 20).build()
         );
 
+        this.endPortalEyesButton = this.addRenderableWidget(
+                Button.builder(endPortalEyesLabel(), button -> cycleEndPortalEyes())
+                        .bounds(centerX - 155, 258, 310, 20).build()
+        );
+        this.endPortalEyesButton.active = !endPortalConfigurationLocked;
+
         int footerY;
         if (openPacAvailable) {
             this.partyLeaveDifficultyButton = this.addRenderableWidget(
                     Button.builder(partyLeaveDifficultyLabel(), button -> cyclePartyLeaveDifficulty())
-                            .bounds(centerX - 155, 258, 310, 20).build()
+                            .bounds(centerX - 155, 283, 310, 20).build()
             );
-            footerY = 284;
+            footerY = 309;
         } else {
             this.partyLeaveDifficultyButton = null;
-            footerY = 258;
+            footerY = 284;
         }
 
         this.addRenderableWidget(Button.builder(Component.translatable("skyblockmulti.config.reset"), button -> resetDefaults())
@@ -174,6 +186,24 @@ public final class SkyblockMultiConfigScreen extends Screen {
         );
     }
 
+    private void cycleEndPortalEyes() {
+        if (endPortalConfigurationLocked) return;
+        this.endPortalEyesPercent = NexusFoundation.getNextEndPortalEyesPercent(
+                this.endPortalEyesPercent
+        );
+        this.endPortalEyesButton.setMessage(endPortalEyesLabel());
+        clearStatus();
+    }
+
+    private Component endPortalEyesLabel() {
+        return Component.translatable(
+                endPortalConfigurationLocked
+                        ? "skyblockmulti.config.end_portal.eyes.locked_button"
+                        : "skyblockmulti.config.end_portal.eyes.button",
+                this.endPortalEyesPercent
+        );
+    }
+
     private void cyclePartyLeaveDifficulty() {
         if (!openPacAvailable) return;
         this.partyLeaveDifficultyMode = this.partyLeaveDifficultyMode.next();
@@ -207,9 +237,15 @@ public final class SkyblockMultiConfigScreen extends Screen {
 
         this.bonusChestMode = BonusChestMode.BEGINNER;
         this.partyLeaveDifficultyMode = BonusChestMode.BEGINNER;
+        if (!endPortalConfigurationLocked) {
+            this.endPortalEyesPercent = NexusFoundation.DEFAULT_END_EYES;
+        }
         if (this.bonusChestModeButton != null) this.bonusChestModeButton.setMessage(bonusChestModeLabel());
         if (this.partyLeaveDifficultyButton != null) {
             this.partyLeaveDifficultyButton.setMessage(partyLeaveDifficultyLabel());
+        }
+        if (this.endPortalEyesButton != null) {
+            this.endPortalEyesButton.setMessage(endPortalEyesLabel());
         }
         setStatus("skyblockmulti.config.status.defaults", 0xFFFFFF55);
     }
@@ -231,13 +267,17 @@ public final class SkyblockMultiConfigScreen extends Screen {
         int normalizedCapacity = SkyblockMultiMod.normalizeCapacity(this.islandCapacity);
         int normalizedRadius = SkyblockMultiMod.normalizeRadius(this.islandRadius, normalizedCapacity);
 
-        if (SkyblockMultiMod.saveConfiguration(
+        boolean generalSaved = SkyblockMultiMod.saveConfiguration(
                 normalizedRadius,
                 normalizedCapacity,
                 treeStates,
                 bonusChestMode,
                 partyLeaveDifficultyMode
-        )) {
+        );
+        boolean portalSaved = endPortalConfigurationLocked
+                || NexusFoundation.saveConfiguredEndPortalEyesPercent(endPortalEyesPercent);
+
+        if (generalSaved && portalSaved) {
             this.islandCapacity = normalizedCapacity;
             this.islandRadius = normalizedRadius;
             refreshGeometryLabels();
@@ -341,23 +381,14 @@ public final class SkyblockMultiConfigScreen extends Screen {
                 Component.translatable("skyblockmulti.config.allowed_trees", enabledTreeCount(), TreeOption.values().length),
                 centerX, 129, enabledTreeCount() > 0 ? 0xFFDDDDDD : 0xFFFF5555);
 
-        int bonusNoteY = openPacAvailable ? 309 : 283;
-        int multiSaplingsY = openPacAvailable ? 339 : 298;
-        int statusY = openPacAvailable ? 354 : 313;
-
-        graphics.centeredText(this.font, Component.translatable("skyblockmulti.config.bonus_chest.note"),
-                centerX, bonusNoteY, 0xFFAAAAAA);
-
-        if (openPacAvailable) {
-            graphics.centeredText(this.font, Component.translatable("skyblockmulti.config.party_leave.mode.note"),
-                    centerX, 324, 0xFF55FFFF);
-        }
-
-        graphics.centeredText(this.font, Component.translatable("skyblockmulti.config.multi_saplings"),
-                centerX, multiSaplingsY, 0xFFFFAA00);
-
         if (this.statusVisible) {
-            graphics.centeredText(this.font, this.status, centerX, statusY, this.statusColor);
+            graphics.centeredText(
+                    this.font,
+                    this.status,
+                    centerX,
+                    openPacAvailable ? 334 : 309,
+                    this.statusColor
+            );
         }
     }
 

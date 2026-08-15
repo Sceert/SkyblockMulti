@@ -5,6 +5,8 @@ out/
 .idea/
 *.iml
 *.class
+__pycache__/
+*.py[cod]
 .DS_Store
 Thumbs.db
 src/main/java/cl/treecs/skyblockmulti/SkyblockMultiMod.java.before_openpac_reservations

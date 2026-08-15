@@ -21,6 +21,7 @@ scoreboard objectives add sb_home trigger
 scoreboard objectives add sb_hub trigger
 scoreboard objectives add sb_info trigger
 scoreboard objectives add sb_adv_timer dummy
+scoreboard objectives add sb_nexus dummy
 scoreboard objectives add sb_choice_time dummy
 scoreboard objectives add sb_mobkills minecraft.custom:minecraft.mob_kills
 scoreboard objectives add sb_k_zombie minecraft.killed:minecraft.zombie

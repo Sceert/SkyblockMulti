@@ -9,7 +9,7 @@ Configurable multiplayer Skyblock for **Minecraft Java 26.2** on **Fabric**, foc
 
 SkyblockMulti is currently in beta development.
 
-`v0.1.1-beta` closes the multiplayer/OpenPAC foundation phase. Development of `0.2.0-beta` begins the world-foundation phase: the HUB, protected introductory refuge, fortress/End progression, and broader world design.
+`v0.1.1-beta` closed the multiplayer/OpenPAC foundation phase. `0.2.0-beta` introduces the world-foundation phase: the protected Ascension Nexus, its Last Refuge HUB, fortress, offerings and End-access progression.
 
 ## Requirements
 
@@ -47,6 +47,10 @@ OpenPAC integration has been tested with **Open Parties and Claims 0.29.3**.
 - Secret End advancement for preserving the original lore book
 - Optional OpenPAC party integration
 - English and Spanish client localization
+- The protected **Ascension Nexus**, with a custom glass-dome HUB and fortress
+- Eight world-global armor/offering seals that unlock the End portal chamber
+- Renewable fortress lava wells using a craftable Lava Catalyst
+- A dedicated creative inventory tab for the mod's recipes and progression items
 
 ## Multiplayer and OpenPAC
 
@@ -162,24 +166,21 @@ The custom advancement tree is designed both as progression tracking and as a gu
 
 ## 0.2.0-beta — World Foundation
 
-The `0.2.0-beta` development phase is focused on world identity and progression.
+The `0.2.0-beta` phase establishes the mod's central world identity and its first shared progression system:
 
-The following items are **planned/in development and should not be considered implemented until their corresponding commits are completed**:
-
-- The **Last Refuge**, a protected glass-dome introductory HUB
-- A walkable natural environment inside the dome
-- Mod-level HUB protection against destructive player/environment interactions
-- A transparent central observation floor
-- A protected fortress beneath the refuge
-- A stronghold-inspired End portal room
+- The **Last Refuge**, a walkable glass-dome introductory HUB inside the Ascension Nexus
+- Native central protection for blocks, fluids and explosions, independent of optional OpenPAC integration
+- A transparent vertical connection to the protected fortress below
+- A deepslate, stronghold-inspired End portal chamber
 - Configurable initial End Portal Eyes:
   - `0%` = 0/12 eyes
   - `25%` = 3/12 eyes
+  - `50%` = 6/12 eyes
   - `75%` = 9/12 eyes
   - never 100%
-- No direct passage from the introductory dome to the fortress
-- Future access to the fortress through lateral progression/dungeon content
-- Expanded world lore and exploration progression
+- Eight permanent world-global seals: leather, gold, iron and diamond armor plus Earth, Forest, Forge and War offerings
+- Craftable offering items, clue lecterns, colored beacon signals and a four-way portal reveal
+- Renewable lava wells supplied through a craftable catalyst
 
 ## Configuration
 
