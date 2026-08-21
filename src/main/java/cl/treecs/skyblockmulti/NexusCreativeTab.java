@@ -22,11 +22,11 @@ public final class NexusCreativeTab {
                 .title(Component.translatable("itemGroup.skyblockmulti"))
                 .icon(NexusCreativeTab::earthOffering)
                 .displayItems((parameters, output) -> {
-                    output.accept(lavaCatalyst());
-                    output.accept(offering("earth"));
-                    output.accept(offering("trees"));
-                    output.accept(offering("metals"));
-                    output.accept(offering("war"));
+                    output.accept(createLavaCatalyst());
+                    output.accept(createOffering("earth"));
+                    output.accept(createOffering("trees"));
+                    output.accept(createOffering("metals"));
+                    output.accept(createOffering("war"));
                 })
                 .build();
 
@@ -38,10 +38,10 @@ public final class NexusCreativeTab {
     }
 
     private static ItemStack earthOffering() {
-        return offering("earth");
+        return createOffering("earth");
     }
 
-    private static ItemStack offering(String type) {
+    public static ItemStack createOffering(String type) {
         ItemStack stack = new ItemStack(Items.ECHO_SHARD);
         stack.set(DataComponents.CUSTOM_NAME,
                 Component.translatable("skyblockmulti.offering." + type).withStyle(style -> style.withItalic(false)));
@@ -54,7 +54,7 @@ public final class NexusCreativeTab {
         return stack;
     }
 
-    private static ItemStack lavaCatalyst() {
+    public static ItemStack createLavaCatalyst() {
         ItemStack stack = new ItemStack(Items.FIRE_CHARGE);
         stack.set(DataComponents.CUSTOM_NAME,
                 Component.translatable("skyblockmulti.lava_catalyst").withStyle(style -> style.withItalic(false)));

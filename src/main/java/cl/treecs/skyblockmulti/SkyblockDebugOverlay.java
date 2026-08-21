@@ -46,7 +46,7 @@ public final class SkyblockDebugOverlay implements ModInitializer {
                 )
         );
 
-        System.out.println("[SkyblockMulti] Debug snapshot disponible con /skyblockmulti debug");
+        System.out.println("[Skyblock Multi] Debug snapshot disponible con /skyblockmulti debug");
     }
 
     private static void showDebugSnapshot(MinecraftServer server, ServerPlayer player) {
@@ -89,7 +89,7 @@ public final class SkyblockDebugOverlay implements ModInitializer {
             );
         } catch (Exception e) {
             System.err.println(
-                    "[SkyblockMulti] No fue posible mostrar el debug snapshot para "
+                    "[Skyblock Multi] No fue posible mostrar el debug snapshot para "
                             + playerName + ": " + e
             );
         }

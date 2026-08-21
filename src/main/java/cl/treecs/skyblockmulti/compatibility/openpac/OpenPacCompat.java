@@ -51,9 +51,9 @@ public final class OpenPacCompat {
 
     public static void initialize() {
         if (isInstalled()) {
-            System.out.println("[SkyblockMulti] OpenPAC detectado; integración opcional disponible.");
+            System.out.println("[Skyblock Multi] OpenPAC detectado; integración opcional disponible.");
         } else {
-            System.out.println("[SkyblockMulti] OpenPAC no instalado; integración desactivada.");
+            System.out.println("[Skyblock Multi] OpenPAC no instalado; integración desactivada.");
         }
     }
 
@@ -124,12 +124,12 @@ public final class OpenPacCompat {
 
             if (initializeIslandReservationsThisSession) {
                 System.out.println(
-                        "[SkyblockMulti] OpenPAC: inicialización territorial activada. "
+                        "[Skyblock Multi] OpenPAC: inicialización territorial activada. "
                                 + "Las reservas 5x5 de futuras islas se crearán una única vez."
                 );
             } else {
                 System.out.println(
-                        "[SkyblockMulti] OpenPAC: "
+                        "[Skyblock Multi] OpenPAC: "
                                 + ASCENSION_NEXUS_CANONICAL_NAME
                                 + " ya existe o no pudo inicializarse. "
                                 + "No se recrearán reservas de futuras islas en este arranque."
@@ -213,7 +213,7 @@ public final class OpenPacCompat {
 
         if (nexusSubConfig == null) {
             System.err.println(
-                    "[SkyblockMulti] OpenPAC: no fue posible crear el sub-claim "
+                    "[Skyblock Multi] OpenPAC: no fue posible crear el sub-claim "
                             + ASCENSION_NEXUS_SUBCLAIM_ID
                             + " para "
                             + ASCENSION_NEXUS_CANONICAL_NAME
@@ -255,7 +255,7 @@ public final class OpenPacCompat {
                         && !SERVER_CLAIM_UUID.equals(existing.getPlayerId())) {
 
                     System.err.println(
-                            "[SkyblockMulti] OpenPAC: no fue posible reservar completamente "
+                            "[Skyblock Multi] OpenPAC: no fue posible reservar completamente "
                                     + ASCENSION_NEXUS_CANONICAL_NAME
                                     + ". El chunk "
                                     + x + "," + z
@@ -306,7 +306,7 @@ public final class OpenPacCompat {
         }
 
         System.out.println(
-                "[SkyblockMulti] OpenPAC: "
+                "[Skyblock Multi] OpenPAC: "
                         + ASCENSION_NEXUS_CANONICAL_NAME
                         + " reservado permanentemente como Server Claim circular. "
                         + "Radio=" + radius
@@ -366,7 +366,7 @@ public final class OpenPacCompat {
                         && !SERVER_CLAIM_UUID.equals(existing.getPlayerId())) {
 
                     System.out.println(
-                            "[SkyblockMulti] OpenPAC: reserva 5x5 omitida en "
+                            "[Skyblock Multi] OpenPAC: reserva 5x5 omitida en "
                                     + blockX + "," + blockZ
                                     + " porque el chunk "
                                     + x + "," + z
@@ -397,7 +397,7 @@ public final class OpenPacCompat {
         }
 
         System.out.println(
-                "[SkyblockMulti] OpenPAC: slot reservado como Server Claim 5x5 en chunks "
+                "[Skyblock Multi] OpenPAC: slot reservado como Server Claim 5x5 en chunks "
                         + left + "," + top
                         + " -> "
                         + right + "," + bottom
@@ -460,7 +460,7 @@ public final class OpenPacCompat {
                         && !playerUuid.equals(existing.getPlayerId())) {
 
                     System.err.println(
-                            "[SkyblockMulti] OpenPAC: NO se asignó el claim 3x3 de "
+                            "[Skyblock Multi] OpenPAC: NO se asignó el claim 3x3 de "
                                     + player.getGameProfile().name()
                                     + ". El chunk "
                                     + x + "," + z
@@ -513,7 +513,7 @@ public final class OpenPacCompat {
         }
 
         System.out.println(
-                "[SkyblockMulti] OpenPAC: reserva 5x5 transferida a "
+                "[Skyblock Multi] OpenPAC: reserva 5x5 transferida a "
                         + player.getGameProfile().name()
                         + ". Claim personal 3x3: "
                         + playerLeft + "," + playerTop
@@ -571,7 +571,7 @@ public final class OpenPacCompat {
                 );
 
         System.out.println(
-                "[SkyblockMulti] OpenPAC: claim inicial 3x3 solicitado para "
+                "[Skyblock Multi] OpenPAC: claim inicial 3x3 solicitado para "
                         + player.getGameProfile().name()
                         + " en chunks "
                         + left + "," + top

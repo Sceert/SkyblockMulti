@@ -13,6 +13,20 @@ def command_set(x, y, z, block):
     return f"execute in minecraft:overworld run setblock {x} {y} {z} minecraft:{block}"
 
 
+def nexus_hint_book(hint):
+    """Return the block-entity NBT for a localized Nexus clue book."""
+    return (
+        "{Book:{id:'minecraft:written_book',count:1,components:{"
+        "'minecraft:written_book_content':{"
+        "title:{raw:'Whispers of the Eight Seals'},"
+        "author:'The Ascension Nexus',generation:0,resolved:true,"
+        f"pages:[{{raw:{{translate:'skyblockmulti.nexus.hint.{hint}'}}}}]"
+        "},"
+        f"'minecraft:custom_data':{{skyblockmulti_nexus_hint:'{hint}'}}"
+        "}},Page:0}"
+    )
+
+
 def disk(lines, y, radius, block, inner=-1):
     for z in range(-radius, radius + 1):
         outer_x = int(sqrt(max(0, radius * radius - z * z)))
@@ -408,16 +422,17 @@ def fortress():
 
     # The four cardinal requirements are displayed on real armor stands.
     cardinal_stands = [
-        (0,-25,"leather"),(25,0,"gold"),(0,25,"iron"),(-25,0,"diamond"),
+        (0,-25,"leather",180.0),(25,0,"gold",-90.0),
+        (0,25,"iron",0.0),(-25,0,"diamond",90.0),
     ]
-    for x, z, seal in cardinal_stands:
+    for x, z, seal, yaw in cardinal_stands:
         lines.append(command_fill(x - 1, 15, z - 1, x + 1, 15, z + 1, "chiseled_stone_bricks"))
         lines.append(command_set(x, 16, z, "air"))
         lines.append(
             f'execute in minecraft:overworld run summon minecraft:armor_stand '
             f'{x + 0.5} 16 {z + 0.5} '
             f'{{Tags:["skyblock_nexus_seal_{seal}"],NoGravity:1b,Invulnerable:1b,'
-            f'PersistenceRequired:1b,ShowArms:1b}}'
+            f'PersistenceRequired:1b,ShowArms:1b,Rotation:[{yaw}f,0.0f]}}'
         )
 
     # The four intercardinal chests accept only their crafted Offering item.
@@ -431,20 +446,20 @@ def fortress():
     # Eight readable clue books. Their pages use translation components, so
     # every client receives the hint in its own configured language.
     hints = [
-        (3,-25,"west","leather"), (25,3,"north","gold"),
-        (-3,25,"east","iron"), (-25,-3,"south","diamond"),
-        (15,-18,"west","earth"), (15,18,"west","trees"),
-        (-15,18,"east","metals"), (-15,-18,"east","war"),
+        # Cardinal lecterns sit one block lower and directly outward from
+        # their armor stand, facing the same cardinal direction.
+        (0,15,-26,"north","leather"), (26,15,0,"east","gold"),
+        (0,15,26,"south","iron"), (-26,15,0,"west","diamond"),
+        # Intercardinal clues remain beside their crafted-offering chests.
+        (15,16,-18,"west","earth"), (15,16,18,"west","trees"),
+        (-15,16,18,"east","metals"), (-15,16,-18,"east","war"),
     ]
-    for x, z, facing, hint in hints:
-        lines.append(command_set(x, 15, z, "chiseled_stone_bricks"))
-        lines.append(command_set(x, 16, z, f"lectern[facing={facing},has_book=true,powered=false]"))
+    for x, y, z, facing, hint in hints:
+        lines.append(command_set(x, y - 1, z, "chiseled_stone_bricks"))
+        lines.append(command_set(x, y, z, f"lectern[facing={facing},has_book=true,powered=false]"))
         lines.append(
-            f'''execute in minecraft:overworld run item replace block {x} 16 {z} container.0 with '''
-            + '''minecraft:written_book[minecraft:written_book_content={title:"Pista del Nexo",'''
-            + '''author:"El Nexo del Ascenso",generation:0,resolved:1b,pages:[{raw:'''
-            + f'''\'{{"translate":"skyblockmulti.nexus.hint.{hint}"}}\''''
-            + '''}]}]'''
+            f'''execute in minecraft:overworld run data merge block {x} {y} {z} '''
+            + nexus_hint_book(hint)
         )
 
     # Re-open the four inner corridor mouths after their structural end walls

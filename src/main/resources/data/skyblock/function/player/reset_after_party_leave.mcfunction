@@ -78,5 +78,5 @@ tag @s remove skyblock_menu_shown_v1
 execute in minecraft:overworld run teleport @s 0.5 101 0.5
 execute in minecraft:overworld run spawnpoint @s 0 101 0
 function skyblock:player/give_lore_book
-tellraw @s [{"text":"[SkyblockMulti] ","color":"aqua","bold":true},{"translate":"skyblockmulti.party.reset_no_personal_island","color":"yellow"}]
+tellraw @s [{"text":"[Skyblock Multi] ","color":"aqua","bold":true},{"translate":"skyblockmulti.party.reset_no_personal_island","color":"yellow"}]
 function skyblock:player/freeze_selection

@@ -1,15 +1,15 @@
-# SkyblockMulti
+# Skyblock Multi
 
 Configurable multiplayer Skyblock for **Minecraft Java 26.2** on **Fabric**, focused on multiplayer-safe island allocation, player-selectable difficulty, custom progression, optional party integration, and a growing world/lore layer.
 
 > **Latest published checkpoint:** `v0.1.1-beta`  
-> **Current development:** `0.2.0-beta` on `feature/world-foundation`
+> **Current development:** `0.2.1-beta` on `feature/world-foundation`
 
 ## Status
 
-SkyblockMulti is currently in beta development.
+Skyblock Multi is currently in beta development.
 
-`v0.1.1-beta` closed the multiplayer/OpenPAC foundation phase. `0.2.0-beta` introduces the world-foundation phase: the protected Ascension Nexus, its Last Refuge HUB, fortress, offerings and End-access progression.
+`v0.1.1-beta` closed the multiplayer/OpenPAC foundation phase. `0.2.1-beta` is the current world-foundation revision: the protected Ascension Nexus, its Last Refuge HUB, fortress, offerings and End-access progression. It prepares the project for the final review of the beta 0.2 milestone.
 
 ## Requirements
 
@@ -19,8 +19,10 @@ SkyblockMulti is currently in beta development.
 - Java **25**
 - Mod Menu — optional, recommended for in-game configuration
 - Open Parties and Claims — optional, for shared-party island integration
+- Just Enough Items (JEI) — optional, for browsing Skyblock Multi recipes and custom offering variants
 
 OpenPAC integration has been tested with **Open Parties and Claims 0.29.3**.
+JEI integration has been tested with **JEI 30.24.0.165 for Fabric/Minecraft 26.2**.
 
 ## Main features
 
@@ -54,7 +56,7 @@ OpenPAC integration has been tested with **Open Parties and Claims 0.29.3**.
 
 ## Multiplayer and OpenPAC
 
-SkyblockMulti can run without Open Parties and Claims.
+Skyblock Multi can run without Open Parties and Claims.
 
 When OpenPAC is installed:
 
@@ -143,7 +145,7 @@ When OpenPAC is installed, a separate minimum difficulty can be configured for p
 
 New players receive the **Chronicle of the Last Refuge**, an initial written book that introduces the world and its background.
 
-The book is intentionally worth preserving: reaching the End while still carrying the original SkyblockMulti lore book unlocks a secret advancement.
+The book is intentionally worth preserving: reaching the End while still carrying the original Skyblock Multi lore book unlocks a secret advancement.
 
 The custom advancement tree is designed both as progression tracking and as a guide for Skyblock gameplay.
 
@@ -164,9 +166,9 @@ The custom advancement tree is designed both as progression tracking and as a gu
 - Vanilla End generation remains enabled
 - Central island, dragon fight, gateways, outer islands, End Cities and ships remain part of progression
 
-## 0.2.0-beta — World Foundation
+## 0.2.x-beta — World Foundation
 
-The `0.2.0-beta` phase establishes the mod's central world identity and its first shared progression system:
+The `0.2.x-beta` milestone establishes the mod's central world identity and its first shared progression system. The current revision is `0.2.1-beta`:
 
 - The **Last Refuge**, a walkable glass-dome introductory HUB inside the Ascension Nexus
 - Native central protection for blocks, fluids and explosions, independent of optional OpenPAC integration
@@ -184,7 +186,7 @@ The `0.2.0-beta` phase establishes the mod's central world identity and its firs
 
 ## Configuration
 
-SkyblockMulti stores its configuration in:
+Skyblock Multi stores its configuration in:
 
 ```text
 config/skyblockmulti.json
@@ -202,7 +204,7 @@ Capacity and radius become locked per world after the first island is assigned.
 
 ## Localization
 
-SkyblockMulti includes localized UI files for:
+Skyblock Multi includes localized UI files for:
 
 English:
 - `en_us`
@@ -228,17 +230,17 @@ Each client can display translated menus in its own language on the same multipl
 1. Install Minecraft Java 26.2.
 2. Install Fabric Loader 0.19.3 or newer.
 3. Install Fabric API.
-4. Place the SkyblockMulti `.jar` in the Minecraft `mods` folder.
+4. Place the Skyblock Multi `.jar` in the Minecraft `mods` folder.
 5. Optionally install Mod Menu.
 6. Optionally install Open Parties and Claims for party integration.
-7. Create a world using the SkyblockMulti world preset.
+7. Create a world using the Skyblock Multi world preset.
 
-For multiplayer, installing SkyblockMulti on both server/host and clients is recommended so players receive the intended translated UI.
+For multiplayer, installing Skyblock Multi on both server/host and clients is recommended so players receive the intended translated UI.
 
 ## Development branches
 
 - `main` — published/checkpoint code
-- `feature/world-foundation` — current `0.2.0-beta` development
+- `feature/world-foundation` — current `0.2.1-beta` development
 - older feature branches may remain temporarily for historical/reference purposes
 
 ## License

@@ -34,9 +34,3 @@ execute if score #tree_azalea sb3_cfg matches 1 unless score #tree_flowering_aza
 execute if score #tree_azalea sb3_cfg matches 1 if score #tree_flowering_azalea sb3_cfg matches 1 run tellraw @s {"text":"","font":"minecraft:uniform","extra":[{"translate":"skyblockmulti.menu.tree.azalea","color":"dark_aqua","click_event":{"action":"run_command","command":"trigger sb_tree set 10"},"hover_event":{"action":"show_text","value":{"translate":"skyblockmulti.menu.tree.azalea.hover"}}},{"translate":"skyblockmulti.menu.tree.azalea.pad","strikethrough":false},{"translate":"skyblockmulti.menu.tree.flowering_azalea","color":"dark_purple","click_event":{"action":"run_command","command":"trigger sb_tree set 11"},"hover_event":{"action":"show_text","value":{"translate":"skyblockmulti.menu.tree.flowering_azalea.hover"}}},{"translate":"skyblockmulti.menu.tree.flowering_azalea.pad","strikethrough":false}]}
 tellraw @s {"text":""}
 execute if score #enabled_count sb3_cfg matches 1.. run function skyblock:player/menu/tree/random
-tellraw @s {"text":""}
-execute unless score #openpac sb3_cfg matches 1 run tellraw @s {"translate":"skyblockmulti.menu.capacity.solo","with":[{"score":{"name":"#capacity","objective":"sb3_cfg"}}],"color":"gray"}
-execute if score #openpac sb3_cfg matches 1 run tellraw @s {"translate":"skyblockmulti.menu.capacity.team","with":[{"score":{"name":"#capacity","objective":"sb3_cfg"}}],"color":"gray"}
-execute if score #openpac sb3_cfg matches 1 run tellraw @s {"translate":"skyblockmulti.menu.openpac_share","color":"dark_aqua"}
-tellraw @s {"translate":"skyblockmulti.menu.footer","color":"gray","italic":true}
-tellraw @s {"translate":"skyblockmulti.menu.random_note","color":"dark_gray","italic":true}

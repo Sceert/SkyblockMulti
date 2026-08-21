@@ -40,4 +40,4 @@ $execute if score #claim sb3_const matches 1 run skyblockmulti openpac_claim $(x
 execute if score #claim sb3_const matches 1 run function skyblock:player/unlock_selection
 $execute if score #claim sb3_const matches 1 in minecraft:overworld positioned $(x) 67 $(z) run kill @e[type=minecraft:text_display,tag=skyblock_island_label,distance=..2]
 execute if score #claim sb3_const matches 1 run advancement grant @s only skyblockmulti:progress/first_island
-execute if score #claim sb3_const matches 1 run tellraw @s [{"text":"[SkyblockMulti] ","color":"aqua","bold":true},{"translate":"skyblockmulti.island.created","color":"green"}]
+execute if score #claim sb3_const matches 1 run tellraw @s [{"text":"[Skyblock Multi] ","color":"aqua","bold":true},{"translate":"skyblockmulti.island.created","color":"green"}]

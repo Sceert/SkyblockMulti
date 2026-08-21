@@ -17,10 +17,10 @@ public final class VersionJoinMessage implements ModInitializer {
                     .orElse("unknown");
 
             handler.player.sendSystemMessage(
-                    Component.literal("[SkyblockMulti] ")
+                    Component.literal("[Skyblock Multi] ")
                             .withStyle(ChatFormatting.AQUA)
                             .append(
-                                    Component.literal("SkyblockMulti " + version)
+                                    Component.literal("Skyblock Multi " + version)
                                             .withStyle(ChatFormatting.GRAY)
                             )
             );

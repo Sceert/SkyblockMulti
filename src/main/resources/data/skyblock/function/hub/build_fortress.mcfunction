@@ -5102,16 +5102,16 @@ execute in minecraft:overworld run setblock -69 16 0 minecraft:oxidized_copper_c
 execute in minecraft:overworld run setblock -69 17 0 minecraft:copper_bulb[lit=true,powered=true]
 execute in minecraft:overworld run fill -1 15 -26 1 15 -24 minecraft:chiseled_stone_bricks
 execute in minecraft:overworld run setblock 0 16 -25 minecraft:air
-execute in minecraft:overworld run summon minecraft:armor_stand 0.5 16 -24.5 {Tags:["skyblock_nexus_seal_leather"],NoGravity:1b,Invulnerable:1b,PersistenceRequired:1b,ShowArms:1b}
+execute in minecraft:overworld run summon minecraft:armor_stand 0.5 16 -24.5 {Tags:["skyblock_nexus_seal_leather"],NoGravity:1b,Invulnerable:1b,PersistenceRequired:1b,ShowArms:1b,Rotation:[180.0f,0.0f]}
 execute in minecraft:overworld run fill 24 15 -1 26 15 1 minecraft:chiseled_stone_bricks
 execute in minecraft:overworld run setblock 25 16 0 minecraft:air
-execute in minecraft:overworld run summon minecraft:armor_stand 25.5 16 0.5 {Tags:["skyblock_nexus_seal_gold"],NoGravity:1b,Invulnerable:1b,PersistenceRequired:1b,ShowArms:1b}
+execute in minecraft:overworld run summon minecraft:armor_stand 25.5 16 0.5 {Tags:["skyblock_nexus_seal_gold"],NoGravity:1b,Invulnerable:1b,PersistenceRequired:1b,ShowArms:1b,Rotation:[-90.0f,0.0f]}
 execute in minecraft:overworld run fill -1 15 24 1 15 26 minecraft:chiseled_stone_bricks
 execute in minecraft:overworld run setblock 0 16 25 minecraft:air
-execute in minecraft:overworld run summon minecraft:armor_stand 0.5 16 25.5 {Tags:["skyblock_nexus_seal_iron"],NoGravity:1b,Invulnerable:1b,PersistenceRequired:1b,ShowArms:1b}
+execute in minecraft:overworld run summon minecraft:armor_stand 0.5 16 25.5 {Tags:["skyblock_nexus_seal_iron"],NoGravity:1b,Invulnerable:1b,PersistenceRequired:1b,ShowArms:1b,Rotation:[0.0f,0.0f]}
 execute in minecraft:overworld run fill -26 15 -1 -24 15 1 minecraft:chiseled_stone_bricks
 execute in minecraft:overworld run setblock -25 16 0 minecraft:air
-execute in minecraft:overworld run summon minecraft:armor_stand -24.5 16 0.5 {Tags:["skyblock_nexus_seal_diamond"],NoGravity:1b,Invulnerable:1b,PersistenceRequired:1b,ShowArms:1b}
+execute in minecraft:overworld run summon minecraft:armor_stand -24.5 16 0.5 {Tags:["skyblock_nexus_seal_diamond"],NoGravity:1b,Invulnerable:1b,PersistenceRequired:1b,ShowArms:1b,Rotation:[90.0f,0.0f]}
 execute in minecraft:overworld run fill 17 15 -19 19 15 -17 minecraft:chiseled_stone_bricks
 execute in minecraft:overworld run setblock 18 16 -18 minecraft:oxidized_copper_chest[facing=north,type=single,waterlogged=false]
 execute in minecraft:overworld run fill 17 15 17 19 15 19 minecraft:chiseled_stone_bricks
@@ -5120,30 +5120,30 @@ execute in minecraft:overworld run fill -19 15 17 -17 15 19 minecraft:chiseled_s
 execute in minecraft:overworld run setblock -18 16 18 minecraft:oxidized_copper_chest[facing=south,type=single,waterlogged=false]
 execute in minecraft:overworld run fill -19 15 -19 -17 15 -17 minecraft:chiseled_stone_bricks
 execute in minecraft:overworld run setblock -18 16 -18 minecraft:oxidized_copper_chest[facing=north,type=single,waterlogged=false]
-execute in minecraft:overworld run setblock 3 15 -25 minecraft:chiseled_stone_bricks
-execute in minecraft:overworld run setblock 3 16 -25 minecraft:lectern[facing=west,has_book=true,powered=false]
-execute in minecraft:overworld run item replace block 3 16 -25 container.0 with minecraft:written_book[minecraft:written_book_content={title:"Pista del Nexo",author:"El Nexo del Ascenso",generation:0,resolved:1b,pages:[{raw:'{"translate":"skyblockmulti.nexus.hint.leather"}'}]}]
-execute in minecraft:overworld run setblock 25 15 3 minecraft:chiseled_stone_bricks
-execute in minecraft:overworld run setblock 25 16 3 minecraft:lectern[facing=north,has_book=true,powered=false]
-execute in minecraft:overworld run item replace block 25 16 3 container.0 with minecraft:written_book[minecraft:written_book_content={title:"Pista del Nexo",author:"El Nexo del Ascenso",generation:0,resolved:1b,pages:[{raw:'{"translate":"skyblockmulti.nexus.hint.gold"}'}]}]
-execute in minecraft:overworld run setblock -3 15 25 minecraft:chiseled_stone_bricks
-execute in minecraft:overworld run setblock -3 16 25 minecraft:lectern[facing=east,has_book=true,powered=false]
-execute in minecraft:overworld run item replace block -3 16 25 container.0 with minecraft:written_book[minecraft:written_book_content={title:"Pista del Nexo",author:"El Nexo del Ascenso",generation:0,resolved:1b,pages:[{raw:'{"translate":"skyblockmulti.nexus.hint.iron"}'}]}]
-execute in minecraft:overworld run setblock -25 15 -3 minecraft:chiseled_stone_bricks
-execute in minecraft:overworld run setblock -25 16 -3 minecraft:lectern[facing=south,has_book=true,powered=false]
-execute in minecraft:overworld run item replace block -25 16 -3 container.0 with minecraft:written_book[minecraft:written_book_content={title:"Pista del Nexo",author:"El Nexo del Ascenso",generation:0,resolved:1b,pages:[{raw:'{"translate":"skyblockmulti.nexus.hint.diamond"}'}]}]
+execute in minecraft:overworld run setblock 0 14 -26 minecraft:chiseled_stone_bricks
+execute in minecraft:overworld run setblock 0 15 -26 minecraft:lectern[facing=north,has_book=true,powered=false]
+execute in minecraft:overworld run data merge block 0 15 -26 {Book:{id:'minecraft:written_book',count:1,components:{'minecraft:written_book_content':{title:{raw:'Whispers of the Eight Seals'},author:'The Ascension Nexus',generation:0,resolved:true,pages:[{raw:{translate:'skyblockmulti.nexus.hint.leather'}}]},'minecraft:custom_data':{skyblockmulti_nexus_hint:'leather'}}},Page:0}
+execute in minecraft:overworld run setblock 26 14 0 minecraft:chiseled_stone_bricks
+execute in minecraft:overworld run setblock 26 15 0 minecraft:lectern[facing=east,has_book=true,powered=false]
+execute in minecraft:overworld run data merge block 26 15 0 {Book:{id:'minecraft:written_book',count:1,components:{'minecraft:written_book_content':{title:{raw:'Whispers of the Eight Seals'},author:'The Ascension Nexus',generation:0,resolved:true,pages:[{raw:{translate:'skyblockmulti.nexus.hint.gold'}}]},'minecraft:custom_data':{skyblockmulti_nexus_hint:'gold'}}},Page:0}
+execute in minecraft:overworld run setblock 0 14 26 minecraft:chiseled_stone_bricks
+execute in minecraft:overworld run setblock 0 15 26 minecraft:lectern[facing=south,has_book=true,powered=false]
+execute in minecraft:overworld run data merge block 0 15 26 {Book:{id:'minecraft:written_book',count:1,components:{'minecraft:written_book_content':{title:{raw:'Whispers of the Eight Seals'},author:'The Ascension Nexus',generation:0,resolved:true,pages:[{raw:{translate:'skyblockmulti.nexus.hint.iron'}}]},'minecraft:custom_data':{skyblockmulti_nexus_hint:'iron'}}},Page:0}
+execute in minecraft:overworld run setblock -26 14 0 minecraft:chiseled_stone_bricks
+execute in minecraft:overworld run setblock -26 15 0 minecraft:lectern[facing=west,has_book=true,powered=false]
+execute in minecraft:overworld run data merge block -26 15 0 {Book:{id:'minecraft:written_book',count:1,components:{'minecraft:written_book_content':{title:{raw:'Whispers of the Eight Seals'},author:'The Ascension Nexus',generation:0,resolved:true,pages:[{raw:{translate:'skyblockmulti.nexus.hint.diamond'}}]},'minecraft:custom_data':{skyblockmulti_nexus_hint:'diamond'}}},Page:0}
 execute in minecraft:overworld run setblock 15 15 -18 minecraft:chiseled_stone_bricks
 execute in minecraft:overworld run setblock 15 16 -18 minecraft:lectern[facing=west,has_book=true,powered=false]
-execute in minecraft:overworld run item replace block 15 16 -18 container.0 with minecraft:written_book[minecraft:written_book_content={title:"Pista del Nexo",author:"El Nexo del Ascenso",generation:0,resolved:1b,pages:[{raw:'{"translate":"skyblockmulti.nexus.hint.earth"}'}]}]
+execute in minecraft:overworld run data merge block 15 16 -18 {Book:{id:'minecraft:written_book',count:1,components:{'minecraft:written_book_content':{title:{raw:'Whispers of the Eight Seals'},author:'The Ascension Nexus',generation:0,resolved:true,pages:[{raw:{translate:'skyblockmulti.nexus.hint.earth'}}]},'minecraft:custom_data':{skyblockmulti_nexus_hint:'earth'}}},Page:0}
 execute in minecraft:overworld run setblock 15 15 18 minecraft:chiseled_stone_bricks
 execute in minecraft:overworld run setblock 15 16 18 minecraft:lectern[facing=west,has_book=true,powered=false]
-execute in minecraft:overworld run item replace block 15 16 18 container.0 with minecraft:written_book[minecraft:written_book_content={title:"Pista del Nexo",author:"El Nexo del Ascenso",generation:0,resolved:1b,pages:[{raw:'{"translate":"skyblockmulti.nexus.hint.trees"}'}]}]
+execute in minecraft:overworld run data merge block 15 16 18 {Book:{id:'minecraft:written_book',count:1,components:{'minecraft:written_book_content':{title:{raw:'Whispers of the Eight Seals'},author:'The Ascension Nexus',generation:0,resolved:true,pages:[{raw:{translate:'skyblockmulti.nexus.hint.trees'}}]},'minecraft:custom_data':{skyblockmulti_nexus_hint:'trees'}}},Page:0}
 execute in minecraft:overworld run setblock -15 15 18 minecraft:chiseled_stone_bricks
 execute in minecraft:overworld run setblock -15 16 18 minecraft:lectern[facing=east,has_book=true,powered=false]
-execute in minecraft:overworld run item replace block -15 16 18 container.0 with minecraft:written_book[minecraft:written_book_content={title:"Pista del Nexo",author:"El Nexo del Ascenso",generation:0,resolved:1b,pages:[{raw:'{"translate":"skyblockmulti.nexus.hint.metals"}'}]}]
+execute in minecraft:overworld run data merge block -15 16 18 {Book:{id:'minecraft:written_book',count:1,components:{'minecraft:written_book_content':{title:{raw:'Whispers of the Eight Seals'},author:'The Ascension Nexus',generation:0,resolved:true,pages:[{raw:{translate:'skyblockmulti.nexus.hint.metals'}}]},'minecraft:custom_data':{skyblockmulti_nexus_hint:'metals'}}},Page:0}
 execute in minecraft:overworld run setblock -15 15 -18 minecraft:chiseled_stone_bricks
 execute in minecraft:overworld run setblock -15 16 -18 minecraft:lectern[facing=east,has_book=true,powered=false]
-execute in minecraft:overworld run item replace block -15 16 -18 container.0 with minecraft:written_book[minecraft:written_book_content={title:"Pista del Nexo",author:"El Nexo del Ascenso",generation:0,resolved:1b,pages:[{raw:'{"translate":"skyblockmulti.nexus.hint.war"}'}]}]
+execute in minecraft:overworld run data merge block -15 16 -18 {Book:{id:'minecraft:written_book',count:1,components:{'minecraft:written_book_content':{title:{raw:'Whispers of the Eight Seals'},author:'The Ascension Nexus',generation:0,resolved:true,pages:[{raw:{translate:'skyblockmulti.nexus.hint.war'}}]},'minecraft:custom_data':{skyblockmulti_nexus_hint:'war'}}},Page:0}
 execute in minecraft:overworld run fill -3 15 -36 3 21 -32 minecraft:air
 execute in minecraft:overworld run fill -3 15 32 3 21 36 minecraft:air
 execute in minecraft:overworld run fill 32 15 -3 36 21 3 minecraft:air

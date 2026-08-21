@@ -43,6 +43,7 @@ import java.util.Random;
 public final class NexusFoundation implements ModInitializer {
 
     private static final int NEXUS_RADIUS_CHUNKS = 15;
+    private static final BlockPos END_PORTAL_LOCATOR_TARGET = new BlockPos(0, 6, 0);
 
     public static final int END_EYES_0 = 0;
     public static final int END_EYES_25 = 25;
@@ -67,6 +68,22 @@ public final class NexusFoundation implements ModInitializer {
     private static volatile int activeWorldEndEyes = -1;
 
     private static int portalInitializationDelayTicks = -1;
+
+    public static BlockPos getEndPortalLocatorTarget(ServerLevel level) {
+        if (!level.dimension().equals(Level.OVERWORLD)) {
+            return null;
+        }
+
+        // La presencia de los doce marcos confirma la estructura funcional,
+        // sin depender de la versión visual concreta de la fortaleza.
+        for (PortalFrame frame : PORTAL_FRAMES) {
+            if (!level.getBlockState(frame.pos()).is(Blocks.END_PORTAL_FRAME)) {
+                return null;
+            }
+        }
+
+        return END_PORTAL_LOCATOR_TARGET;
+    }
 
     private record PortalFrame(BlockPos pos, Direction facing) {}
 
@@ -105,7 +122,7 @@ public final class NexusFoundation implements ModInitializer {
                 portalInitializationDelayTicks = -1;
 
                 System.out.println(
-                        "[SkyblockMulti] Nexus: configuración del Portal del End restaurada: "
+                        "[Skyblock Multi] Nexus: configuración del Portal del End restaurada: "
                                 + activeWorldEndEyes + "%."
                 );
             } else {
@@ -143,7 +160,7 @@ public final class NexusFoundation implements ModInitializer {
         });
 
         System.out.println(
-                "[SkyblockMulti] Nexus Foundation inicializado. Protección nativa del núcleo activa."
+                "[Skyblock Multi] Nexus Foundation inicializado. Protección nativa del núcleo activa."
         );
     }
 
@@ -319,7 +336,7 @@ public final class NexusFoundation implements ModInitializer {
             return true;
         } catch (IOException e) {
             System.err.println(
-                    "[SkyblockMulti] Nexus: no se pudo guardar la configuración: "
+                    "[Skyblock Multi] Nexus: no se pudo guardar la configuración: "
                             + e.getMessage()
             );
             return false;
@@ -351,7 +368,7 @@ public final class NexusFoundation implements ModInitializer {
             }
         } catch (IOException e) {
             System.err.println(
-                    "[SkyblockMulti] Nexus: no se pudo crear "
+                    "[Skyblock Multi] Nexus: no se pudo crear "
                             + CONFIG_FILE + ": " + e.getMessage()
             );
         }
@@ -384,7 +401,7 @@ public final class NexusFoundation implements ModInitializer {
             }
         } catch (Exception e) {
             System.err.println(
-                    "[SkyblockMulti] Nexus: configuración inválida; se usará 0%: "
+                    "[Skyblock Multi] Nexus: configuración inválida; se usará 0%: "
                             + e.getMessage()
             );
         }
@@ -436,12 +453,12 @@ public final class NexusFoundation implements ModInitializer {
             try (var writer = Files.newBufferedWriter(statePath, StandardCharsets.UTF_8)) {
                 properties.store(
                         writer,
-                        "SkyblockMulti - The Ascension Nexus world state"
+                        "Skyblock Multi - The Ascension Nexus world state"
                 );
             }
         } catch (IOException e) {
             System.err.println(
-                    "[SkyblockMulti] Nexus: el portal fue configurado, pero no se pudo "
+                    "[Skyblock Multi] Nexus: el portal fue configurado, pero no se pudo "
                             + "guardar su estado persistente: " + e.getMessage()
             );
             return false;
@@ -451,7 +468,7 @@ public final class NexusFoundation implements ModInitializer {
         endPortalConfigurationLocked = true;
 
         System.out.println(
-                "[SkyblockMulti] Nexus: Portal del End inicializado con "
+                "[Skyblock Multi] Nexus: Portal del End inicializado con "
                         + percent + "% (" + eyes + "/12 ojos). "
                         + "La configuración estructural queda bloqueada para este mundo."
         );
@@ -494,7 +511,7 @@ public final class NexusFoundation implements ModInitializer {
             );
         } catch (Exception e) {
             System.err.println(
-                    "[SkyblockMulti] Nexus: no se pudo leer el estado del mundo: "
+                    "[Skyblock Multi] Nexus: no se pudo leer el estado del mundo: "
                             + e.getMessage()
             );
             return DEFAULT_END_EYES;

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "skyblockmulti",
   "version": "${version}",
-  "name": "SkyblockMulti",
+  "name": "Skyblock Multi",
   "description": "Configurable multiplayer Skyblock for Minecraft 26.2 with island allocation, difficulty selection, progression, custom recipes and optional Mod Menu support.",
   "authors": [
     "Treecs"
@@ -15,7 +15,12 @@
       "cl.treecs.skyblockmulti.SkyblockMultiMod",
       "cl.treecs.skyblockmulti.SkyblockDebugOverlay",
       "cl.treecs.skyblockmulti.NexusFoundation",
-      "cl.treecs.skyblockmulti.VersionJoinMessage"
+      "cl.treecs.skyblockmulti.VersionJoinMessage",
+      "cl.treecs.skyblockmulti.RequiredClientMod",
+      "cl.treecs.skyblockmulti.PlayerReconnectHandler"
+    ],
+    "client": [
+      "cl.treecs.skyblockmulti.client.RequiredClientModClient"
     ],
     "modmenu": [
       "cl.treecs.skyblockmulti.client.SkyblockMultiModMenu"
@@ -31,7 +36,8 @@
   },
   "suggests": {
     "modmenu": "*",
-    "openpartiesandclaims": "*"
+    "openpartiesandclaims": "*",
+    "jei": "*"
   },
   "custom": {
     "modmenu": {

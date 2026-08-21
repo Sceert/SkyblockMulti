@@ -1,6 +1,41 @@
 # Changelog
 
-All notable SkyblockMulti milestones are documented here.
+All notable Skyblock Multi milestones are documented here.
+
+## [0.2.1-beta] — 2026-08-16
+
+Ascension Nexus visual and progression revision.
+
+### Added
+
+- Optional JEI integration for discovering the four offerings and renewable lava catalyst recipes
+- Narrative clue books for all four armor trials and four crafted offerings
+- Cardinal armor displays that preserve completed equipment on Steve mannequins
+- Open-topped transparent glass-pane reliquaries around completed armor guardians
+- A fortress decoration guide with protected functional coordinates and a WorldEdit schematic workflow
+
+### Changed
+
+- Unified the public project name as Skyblock Multi across the mod metadata, documentation, translations and build artifacts
+- Refined the imported Last Refuge dome, its lighting, wooden ribs, observation tube and central landscaping
+- Expanded the lower fortress with eight dungeon approaches, renewable lava wells and a stronger End portal chamber
+- Repositioned cardinal clue lecterns in front of their armor stands and aligned both with their outward direction
+- Reworked clue writing to provide discoverable hints without directly listing exact offering recipes
+- Prepared fortress generation so future hand-built decoration can remain separate from progression logic
+- Simplified the first-join menu by removing redundant capacity, tree-renewability, random-selection and OpenPAC notices
+
+### Fixed
+
+- Corrected written-book data for Minecraft 26.2 lecterns
+- Corrected visible line breaks in Spanish clue books
+- Corrected cardinal armor-stand orientation
+- Prevented completed armor sets from being dropped or duplicated during their guardian transformation
+
+### Maintenance
+
+- Removed temporary world-repair functions used during the development iteration
+- Removed redundant per-tick visual maintenance and unused localization entries
+- Verified datapack loading and the complete armor-seal transformation in a Minecraft 26.2 development server
 
 ## [0.2.0-beta] — 2026-08-15
 
@@ -17,7 +52,7 @@ World Foundation beta.
 - Permanent progression state, colored beacon signals and four-way portal-chamber access after completing all seals
 - Renewable fortress lava wells powered by a craftable Lava Catalyst
 - In-world clues for the armor trials, offerings and lava wells
-- Dedicated creative inventory tab for SkyblockMulti recipes and progression items
+- Dedicated creative inventory tab for Skyblock Multi recipes and progression items
 - Imported custom HUB/dome structures and reproducible conversion/generation tools
 - New English and Spanish text for every supported locale
 

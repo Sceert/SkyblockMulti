@@ -15,7 +15,8 @@
     "count": 1,
     "components": {
       "minecraft:custom_name": {"translate": "skyblockmulti.offering.war", "color": "red", "italic": false},
-      "minecraft:custom_data": {"skyblockmulti": {"offering": "war"}}
+      "minecraft:custom_data": {"skyblockmulti": {"offering": "war"}},
+      "minecraft:max_stack_size": 1
     }
   }
 }

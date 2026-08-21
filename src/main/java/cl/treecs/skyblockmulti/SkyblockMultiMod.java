@@ -252,24 +252,13 @@ public final class SkyblockMultiMod implements ModInitializer {
                 );
             }
 
-            // Mensaje informativo sobre integración con OpenPAC.
-            if (OpenPacCompat.isInstalled()) {
-                player.sendSystemMessage(
-                        Component.translatable("skyblockmulti.openpac.detected")
-                );
-            } else {
-                player.sendSystemMessage(
-                        Component.translatable("skyblockmulti.openpac.solo")
-                );
-            }
-
             if (!OpenPacCompat.isInstalled()) {
                 return;
             }
 
             if (!partyInfo.inParty()) {
                 System.out.println(
-                        "[SkyblockMulti] OpenPAC: "
+                        "[Skyblock Multi] OpenPAC: "
                                 + player.getGameProfile().name()
                                 + " no pertenece a una party."
                 );
@@ -278,7 +267,7 @@ public final class SkyblockMultiMod implements ModInitializer {
 
             if (partyInfo.owner()) {
                 System.out.println(
-                        "[SkyblockMulti] OpenPAC: "
+                        "[Skyblock Multi] OpenPAC: "
                                 + player.getGameProfile().name()
                                 + " es owner de la party "
                                 + partyInfo.partyId()
@@ -286,7 +275,7 @@ public final class SkyblockMultiMod implements ModInitializer {
                 );
             } else {
                 System.out.println(
-                        "[SkyblockMulti] OpenPAC: "
+                        "[Skyblock Multi] OpenPAC: "
                                 + player.getGameProfile().name()
                                 + " pertenece a la party "
                                 + partyInfo.partyId()
@@ -352,7 +341,7 @@ public final class SkyblockMultiMod implements ModInitializer {
                 .getModContainer(MOD_ID)
                 .map(container -> container.getMetadata().getVersion().getFriendlyString())
                 .orElse("unknown");
-        System.out.println("[SkyblockMulti] Mod " + modVersion + " inicializado. Configuración: " + configPath);
+        System.out.println("[Skyblock Multi] Mod " + modVersion + " inicializado. Configuración: " + configPath);
     }
 
     public static int getConfiguredRadius() {
@@ -464,7 +453,7 @@ public final class SkyblockMultiMod implements ModInitializer {
         if (worldGeometryLocked
                 && (normalizedCapacity != lockedCapacity || normalizedRadius != lockedRadius)) {
             System.err.println(
-                    "[SkyblockMulti] Radio/capacidad bloqueados: el mundo ya tiene una isla asignada."
+                    "[Skyblock Multi] Radio/capacidad bloqueados: el mundo ya tiene una isla asignada."
             );
             return false;
         }
@@ -482,7 +471,7 @@ public final class SkyblockMultiMod implements ModInitializer {
 
         try {
             writeConfig(radiusToWrite, capacityToWrite, trees, safeMode, safePartyLeaveMode);
-            System.out.println("[SkyblockMulti] Configuración guardada: radio_hub=" + normalizedRadius
+            System.out.println("[Skyblock Multi] Configuración guardada: radio_hub=" + normalizedRadius
                     + ", capacidad=" + normalizedCapacity
                     + ", árboles=" + countEnabled(trees)
                     + ", cofre=" + safeMode.configKey()
@@ -493,7 +482,7 @@ public final class SkyblockMultiMod implements ModInitializer {
             }
             return true;
         } catch (IOException e) {
-            System.err.println("[SkyblockMulti] No se pudo guardar la configuración: " + e.getMessage());
+            System.err.println("[Skyblock Multi] No se pudo guardar la configuración: " + e.getMessage());
             return false;
         }
     }
@@ -605,7 +594,7 @@ public final class SkyblockMultiMod implements ModInitializer {
                 );
             }
         } catch (IOException e) {
-            System.err.println("[SkyblockMulti] No se pudo crear el archivo de configuración: " + e.getMessage());
+            System.err.println("[Skyblock Multi] No se pudo crear el archivo de configuración: " + e.getMessage());
         }
     }
 
@@ -692,7 +681,7 @@ public final class SkyblockMultiMod implements ModInitializer {
                 }
             }
         } catch (Exception e) {
-            System.err.println("[SkyblockMulti] Configuración inválida; se usarán valores seguros: " + e.getMessage());
+            System.err.println("[Skyblock Multi] Configuración inválida; se usarán valores seguros: " + e.getMessage());
         }
 
         return new ConfigData(
@@ -776,7 +765,7 @@ public final class SkyblockMultiMod implements ModInitializer {
                 wasMemberOfAnotherPlayer && !isMemberOfAnotherPlayer;
 
         System.out.println(
-                "[SkyblockMulti] OpenPAC: cambio de party detectado para "
+                "[Skyblock Multi] OpenPAC: cambio de party detectado para "
                         + playerName
                         + "."
         );
@@ -844,12 +833,12 @@ public final class SkyblockMultiMod implements ModInitializer {
             );
 
             System.out.println(
-                    "[SkyblockMulti] OpenPAC: retorno tras salir de party procesado para "
+                    "[Skyblock Multi] OpenPAC: retorno tras salir de party procesado para "
                             + playerName + "."
             );
         } catch (Exception e) {
             System.err.println(
-                    "[SkyblockMulti] No fue posible devolver a "
+                    "[Skyblock Multi] No fue posible devolver a "
                             + playerName
                             + " tras salir de la party: "
                             + e
@@ -885,7 +874,7 @@ public final class SkyblockMultiMod implements ModInitializer {
             }
         } catch (Exception e) {
             System.err.println(
-                    "[SkyblockMulti] No fue posible reconciliar las islas activas online: " + e
+                    "[Skyblock Multi] No fue posible reconciliar las islas activas online: " + e
             );
         }
     }
@@ -910,12 +899,12 @@ public final class SkyblockMultiMod implements ModInitializer {
                             + " at @s run spawnpoint @s ~ ~ ~"
             );
             System.out.println(
-                    "[SkyblockMulti] OpenPAC: punto de reaparición actualizado para "
+                    "[Skyblock Multi] OpenPAC: punto de reaparición actualizado para "
                             + playerName + " tras cambio de party."
             );
         } catch (Exception e) {
             System.err.println(
-                    "[SkyblockMulti] No fue posible actualizar el punto de reaparición de "
+                    "[Skyblock Multi] No fue posible actualizar el punto de reaparición de "
                             + playerName + " tras cambio de party: " + e
             );
         }
@@ -1037,7 +1026,7 @@ public final class SkyblockMultiMod implements ModInitializer {
             );
 
             System.out.println(
-                    "[SkyblockMulti] OpenPAC: reconciliación de isla activa solicitada para "
+                    "[Skyblock Multi] OpenPAC: reconciliación de isla activa solicitada para "
                             + playerName
                             + " usando la isla de "
                             + ownerName
@@ -1055,7 +1044,7 @@ public final class SkyblockMultiMod implements ModInitializer {
             }
         } catch (Exception e) {
             System.err.println(
-                    "[SkyblockMulti] No fue posible reconciliar la isla activa de "
+                    "[Skyblock Multi] No fue posible reconciliar la isla activa de "
                             + playerName
                             + ": "
                             + e
@@ -1098,7 +1087,7 @@ public final class SkyblockMultiMod implements ModInitializer {
             }
 
             System.out.println(
-                    "[SkyblockMulti] OpenPAC: reservas de slots procesadas. "
+                    "[Skyblock Multi] OpenPAC: reservas de slots procesadas. "
                             + "Server Claims 5x5 activos/confirmados="
                             + reserved
                             + ", omitidos="
@@ -1107,7 +1096,7 @@ public final class SkyblockMultiMod implements ModInitializer {
             );
         } catch (Exception e) {
             System.err.println(
-                    "[SkyblockMulti] OpenPAC: no fue posible reservar los slots libres: "
+                    "[Skyblock Multi] OpenPAC: no fue posible reservar los slots libres: "
                             + e
             );
             e.printStackTrace(System.err);
@@ -1168,7 +1157,7 @@ public final class SkyblockMultiMod implements ModInitializer {
             }
             worldGeometryLocked = true;
         } catch (Exception e) {
-            System.err.println("[SkyblockMulti] No fue posible persistir el bloqueo de geometría: " + e);
+            System.err.println("[Skyblock Multi] No fue posible persistir el bloqueo de geometría: " + e);
         }
     }
 
@@ -1228,7 +1217,7 @@ public final class SkyblockMultiMod implements ModInitializer {
                     executor.run("scoreboard players set #world_capacity sb3_cfg " + storedCapacity);
                     executor.run("scoreboard players set #world_radius sb3_const " + storedRadius);
                     System.out.println(
-                            "[SkyblockMulti] Geometría circular existente migrada a bloqueo persistente."
+                            "[Skyblock Multi] Geometría circular existente migrada a bloqueo persistente."
                     );
                 }
             }
@@ -1298,7 +1287,7 @@ public final class SkyblockMultiMod implements ModInitializer {
             executor.run("tag @a[scores={sb3_state=1}] remove skyblock_menu_shown_v1");
             executor.run("execute in minecraft:overworld if biome 0 64 0 minecraft:the_void run function skyblock:slots/forceload");
             executor.run("execute in minecraft:overworld if biome 0 64 0 minecraft:the_void run scoreboard players set #slotgen sb3_const 60");
-            System.out.println("[SkyblockMulti] Configuración aplicada: radio_hub=" + radius
+            System.out.println("[Skyblock Multi] Configuración aplicada: radio_hub=" + radius
                     + ", capacidad=" + capacity
                     + (capacity == 24 ? ", radio_interior=" + getInnerRadius(radius, capacity) : "")
                     + ", separación_aprox=" + getApproxNeighborDistance(radius, capacity)
@@ -1307,7 +1296,7 @@ public final class SkyblockMultiMod implements ModInitializer {
                     + ", cofre=" + config.bonusChestMode().configKey()
                     + ", salida_party=" + config.partyLeaveDifficultyMode().configKey());
         } catch (Exception e) {
-            System.err.println("[SkyblockMulti] No fue posible aplicar la configuración al servidor: " + e);
+            System.err.println("[Skyblock Multi] No fue posible aplicar la configuración al servidor: " + e);
             e.printStackTrace(System.err);
         }
     }
