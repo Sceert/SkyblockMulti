@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "DDD",
+    "DWD",
+    "DDD"
+  ],
+  "key": {
+    "D": "minecraft:dirt",
+    "W": "minecraft:water_bucket"
+  },
+  "result": {
+    "id": "minecraft:clay",
+    "count": 9
+  }
+}

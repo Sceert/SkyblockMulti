@@ -23,6 +23,12 @@ public final class NexusCreativeTab {
                 .icon(NexusCreativeTab::earthOffering)
                 .displayItems((parameters, output) -> {
                     output.accept(createLavaCatalyst());
+                    output.accept(new ItemStack(NexusItems.INFERNAL_CORE));
+                    output.accept(new ItemStack(NexusItems.INFERNAL_CORE_2));
+                    output.accept(new ItemStack(NexusItems.INFERNAL_CORE_3));
+                    output.accept(new ItemStack(NexusItems.INFERNAL_CORE_4));
+                    output.accept(new ItemStack(NexusItems.INFERNAL_CORE_5));
+                    output.accept(new ItemStack(NexusItems.INFERNAL_CORE_6));
                     output.accept(createOffering("earth"));
                     output.accept(createOffering("trees"));
                     output.accept(createOffering("metals"));
@@ -42,7 +48,7 @@ public final class NexusCreativeTab {
     }
 
     public static ItemStack createOffering(String type) {
-        ItemStack stack = new ItemStack(Items.ECHO_SHARD);
+        ItemStack stack = new ItemStack(NexusItems.offering(type));
         stack.set(DataComponents.CUSTOM_NAME,
                 Component.translatable("skyblockmulti.offering." + type).withStyle(style -> style.withItalic(false)));
         CompoundTag root = new CompoundTag();
@@ -55,7 +61,7 @@ public final class NexusCreativeTab {
     }
 
     public static ItemStack createLavaCatalyst() {
-        ItemStack stack = new ItemStack(Items.FIRE_CHARGE);
+        ItemStack stack = new ItemStack(NexusItems.LAVA_CATALYST);
         stack.set(DataComponents.CUSTOM_NAME,
                 Component.translatable("skyblockmulti.lava_catalyst").withStyle(style -> style.withItalic(false)));
         CompoundTag root = new CompoundTag();

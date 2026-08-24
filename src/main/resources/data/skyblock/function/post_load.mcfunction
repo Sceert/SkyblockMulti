@@ -29,7 +29,40 @@ execute unless entity @e[type=minecraft:marker,tag=skyblock_slots_ready_v2,limit
 # The Ascension Nexus: spawn principal.
 execute in minecraft:overworld run setworldspawn 0 161 0
 execute in minecraft:overworld run gamerule respawn_radius 0
+
+# Coliseo Infernal v6: schematic actualizado expresamente por el autor.
+execute unless score #arena_version sb_infernal matches 6 unless score #arena_build_pending sb_infernal matches 1 run function skyblock:infernal_trial/build
 function skyblock:hub/build
+
+# Detectar una sola vez el estado estructural persistente; no reconstruye ni modifica bloques.
+scoreboard players set #nexus_built sb3_const 0
+scoreboard players set #nexus_functional sb3_const 0
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v1,limit=1] run scoreboard players set #nexus_built sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v2,limit=1] run scoreboard players set #nexus_built sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v3,limit=1] run scoreboard players set #nexus_built sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v4,limit=1] run scoreboard players set #nexus_built sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v5,limit=1] run scoreboard players set #nexus_built sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v6,limit=1] run scoreboard players set #nexus_built sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v7,limit=1] run scoreboard players set #nexus_built sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v8,limit=1] run scoreboard players set #nexus_built sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v9,limit=1] run scoreboard players set #nexus_built sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v10,limit=1] run scoreboard players set #nexus_built sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v11,limit=1] run scoreboard players set #nexus_built sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v12,limit=1] run scoreboard players set #nexus_built sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v13,limit=1] run scoreboard players set #nexus_built sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v14,limit=1] run scoreboard players set #nexus_built sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v15,limit=1] run scoreboard players set #nexus_built sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v16,limit=1] run scoreboard players set #nexus_built sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v17,limit=1] run scoreboard players set #nexus_built sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v18,limit=1] run scoreboard players set #nexus_built sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v19,limit=1] run scoreboard players set #nexus_built sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v20,limit=1] run scoreboard players set #nexus_built sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v15,limit=1] run scoreboard players set #nexus_functional sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v16,limit=1] run scoreboard players set #nexus_functional sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v17,limit=1] run scoreboard players set #nexus_functional sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v18,limit=1] run scoreboard players set #nexus_functional sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v19,limit=1] run scoreboard players set #nexus_functional sb3_const 1
+execute in minecraft:overworld if entity @e[type=minecraft:marker,tag=skyblock_nexus_built_v20,limit=1] run scoreboard players set #nexus_functional sb3_const 1
 
 # Marcador técnico reposicionado al nivel del nuevo HUB.
 execute in minecraft:overworld unless entity @e[type=minecraft:marker,tag=skyblock_system_v1,limit=1] positioned 0 160 0 run summon minecraft:marker ~ ~ ~ {Tags:["skyblock_system_v1"]}

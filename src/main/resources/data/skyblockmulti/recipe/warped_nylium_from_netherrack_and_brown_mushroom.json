@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "NNN",
+    "NMN",
+    "NNN"
+  ],
+  "key": {
+    "N": "minecraft:netherrack",
+    "M": "minecraft:brown_mushroom"
+  },
+  "result": {
+    "id": "minecraft:warped_nylium",
+    "count": 9
+  }
+}

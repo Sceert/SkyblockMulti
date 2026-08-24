@@ -1,4 +1,4 @@
-data remove block 18 16 18 Items[{id:"minecraft:echo_shard",components:{"minecraft:custom_data":{skyblockmulti:{offering:"trees"}}}}]
+data remove block 18 16 18 Items[{id:"skyblockmulti:offering_trees"}]
 setblock 18 16 18 minecraft:waxed_copper_grate
 scoreboard players set #seal_trees sb_nexus 1
 particle minecraft:happy_villager 18.5 17 18.5 0.8 1.0 0.8 0.1 40 force

@@ -8,11 +8,10 @@
     "minecraft:gold_ingot"
   ],
   "result": {
-    "id": "minecraft:echo_shard",
+    "id": "skyblockmulti:offering_metals",
     "count": 1,
     "components": {
       "minecraft:custom_name": {"translate": "skyblockmulti.offering.metals", "color": "aqua", "italic": false},
-      "minecraft:custom_data": {"skyblockmulti": {"offering": "metals"}},
       "minecraft:max_stack_size": 1
     }
   }

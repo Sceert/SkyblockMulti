@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "SSS",
+    "SCS",
+    "SSS"
+  ],
+  "key": {
+    "S": "minecraft:stone",
+    "C": "minecraft:coal"
+  },
+  "result": {
+    "id": "minecraft:deepslate",
+    "count": 9
+  }
+}

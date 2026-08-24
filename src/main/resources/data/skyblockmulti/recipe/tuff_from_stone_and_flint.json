@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "SSS",
+    "SFS",
+    "SSS"
+  ],
+  "key": {
+    "S": "minecraft:stone",
+    "F": "minecraft:flint"
+  },
+  "result": {
+    "id": "minecraft:tuff",
+    "count": 9
+  }
+}

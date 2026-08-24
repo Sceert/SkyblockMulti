@@ -1,4 +1,4 @@
-data remove block -18 16 -18 Items[{id:"minecraft:echo_shard",components:{"minecraft:custom_data":{skyblockmulti:{offering:"war"}}}}]
+data remove block -18 16 -18 Items[{id:"skyblockmulti:offering_war"}]
 setblock -18 16 -18 minecraft:waxed_copper_grate
 scoreboard players set #seal_war sb_nexus 1
 particle minecraft:happy_villager -17.5 17 -17.5 0.8 1.0 0.8 0.1 40 force

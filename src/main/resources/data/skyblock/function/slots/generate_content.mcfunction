@@ -29,5 +29,4 @@ execute if score #capacity sb3_cfg matches 24 run function skyblock:slots/create
 execute if score #anchors sb3_const = #capacity sb3_cfg in minecraft:overworld positioned 0 100 0 run summon minecraft:marker ~ ~ ~ {Tags:["skyblock_slots_ready_v2"]}
 execute if score #anchors sb3_const = #capacity sb3_cfg run function skyblock:slots/sync_occupancy
 execute if score #anchors sb3_const = #capacity sb3_cfg run function skyblock:slots/remove_forceload
-execute if score #anchors sb3_const = #capacity sb3_cfg run tellraw @a [{"text":"[Skyblock Multi] ","color":"aqua","bold":true},{"translate":"skyblockmulti.system.anchors_ready","with":[{"score":{"name":"#capacity","objective":"sb3_cfg"}},{"score":{"name":"#distance","objective":"sb3_const"}}],"color":"green"}]
 execute unless score #anchors sb3_const = #capacity sb3_cfg run scoreboard players set #slotgen sb3_const 40

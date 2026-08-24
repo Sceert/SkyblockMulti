@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "GGG",
+    "GDG",
+    "GGG"
+  ],
+  "key": {
+    "G": "minecraft:glowstone",
+    "D": "minecraft:orange_dye"
+  },
+  "result": {
+    "id": "minecraft:ochre_froglight",
+    "count": 9
+  }
+}

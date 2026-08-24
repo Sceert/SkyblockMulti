@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "DDD",
+    "DBD",
+    "DDD"
+  ],
+  "key": {
+    "D": "minecraft:diorite",
+    "B": "minecraft:bone_meal"
+  },
+  "result": {
+    "id": "minecraft:calcite",
+    "count": 9
+  }
+}

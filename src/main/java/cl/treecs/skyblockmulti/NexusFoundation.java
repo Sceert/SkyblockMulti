@@ -170,7 +170,7 @@ public final class NexusFoundation implements ModInitializer {
                 return true;
             }
 
-            if (!isProtectedNexusPosition(level, pos)) {
+            if (!isProtectedStructurePosition(level, pos)) {
                 return true;
             }
 
@@ -201,8 +201,8 @@ public final class NexusFoundation implements ModInitializer {
                 return InteractionResult.PASS;
             }
 
-            if (isProtectedNexusPosition(level, hitPos)
-                    || isProtectedNexusPosition(level, adjacentPos)) {
+            if (isProtectedStructurePosition(level, hitPos)
+                    || isProtectedStructurePosition(level, adjacentPos)) {
                 return InteractionResult.FAIL;
             }
 
@@ -226,7 +226,7 @@ public final class NexusFoundation implements ModInitializer {
                 return InteractionResult.PASS;
             }
 
-            if (!isProtectedNexusPosition(level, player.blockPosition())) {
+            if (!isProtectedStructurePosition(level, player.blockPosition())) {
                 return InteractionResult.PASS;
             }
 
@@ -281,6 +281,28 @@ public final class NexusFoundation implements ModInitializer {
 
         return chunkX * chunkX + chunkZ * chunkZ
                 <= NEXUS_RADIUS_CHUNKS * NEXUS_RADIUS_CHUNKS;
+    }
+
+    public static boolean isProtectedStructurePosition(Level level, BlockPos pos) {
+        return isProtectedNexusPosition(level, pos)
+                || isProtectedInfernalRitualPosition(level, pos);
+    }
+
+    /**
+     * Protege únicamente el pedestal donde se entrega el Núcleo Infernal.
+     * El resto del coliseo permanece destructible y editable.
+     */
+    public static boolean isProtectedInfernalRitualPosition(Level level, BlockPos pos) {
+        if (!level.dimension().equals(Level.NETHER)) {
+            return false;
+        }
+
+        boolean altar = Math.abs(pos.getX()) <= 3
+                && Math.abs(pos.getZ()) <= 3
+                && pos.getY() >= 60
+                && pos.getY() <= 68;
+        boolean reliquary = pos.getX() == 0 && pos.getY() == 64 && pos.getZ() == 5;
+        return altar || reliquary;
     }
 
     /**

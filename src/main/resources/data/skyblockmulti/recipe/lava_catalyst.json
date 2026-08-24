@@ -12,11 +12,10 @@
     "H": "minecraft:charcoal"
   },
   "result": {
-    "id": "minecraft:fire_charge",
+    "id": "skyblockmulti:lava_catalyst",
     "count": 1,
     "components": {
       "minecraft:custom_name": {"translate": "skyblockmulti.lava_catalyst", "color": "gold", "italic": false},
-      "minecraft:custom_data": {"skyblockmulti": {"lava_catalyst": true}},
       "minecraft:max_stack_size": 1
     }
   }

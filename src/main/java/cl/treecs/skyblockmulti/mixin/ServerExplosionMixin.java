@@ -24,7 +24,7 @@ public abstract class ServerExplosionMixin {
         // bloques. Filtrarla mantiene daño, sonido y partículas sin permitir
         // destrucción ni fuego de explosión dentro del Nexus.
         explodedPositions.removeIf(
-                pos -> NexusFoundation.isProtectedNexusPosition(level, pos)
+                pos -> NexusFoundation.isProtectedStructurePosition(level, pos)
         );
     }
 }

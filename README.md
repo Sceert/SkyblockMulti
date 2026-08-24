@@ -3,13 +3,13 @@
 Configurable multiplayer Skyblock for **Minecraft Java 26.2** on **Fabric**, focused on multiplayer-safe island allocation, player-selectable difficulty, custom progression, optional party integration, and a growing world/lore layer.
 
 > **Latest published checkpoint:** `v0.1.1-beta`  
-> **Current development:** `0.2.1-beta` on `feature/world-foundation`
+> **Current development:** `0.2.2-beta` on `feature/world-foundation`
 
 ## Status
 
 Skyblock Multi is currently in beta development.
 
-`v0.1.1-beta` closed the multiplayer/OpenPAC foundation phase. `0.2.1-beta` is the current world-foundation revision: the protected Ascension Nexus, its Last Refuge HUB, fortress, offerings and End-access progression. It prepares the project for the final review of the beta 0.2 milestone.
+`v0.1.1-beta` closed the multiplayer/OpenPAC foundation phase. `0.2.2-beta` expands the current world-foundation revision with the protected Ascension Nexus, its Last Refuge HUB, fortress progression and the first shared Nether combat activity. The remaining beta 0.2 work is focused on the final fortress revision and polish.
 
 ## Requirements
 
@@ -160,6 +160,12 @@ The custom advancement tree is designed both as progression tracking and as a gu
 ### Nether
 
 - Void-based Skyblock progression
+- A central **Infernal Coliseum** generated once in new worlds
+- Six craftable Infernal Cores with secret advanced trial tiers
+- Difficulty- and participant-aware combat encounters
+- Two-phase trials at tiers VII–X, including a final champion at tier X
+- Raid-style enemy tracking, abandonment recovery and temporary spawn control
+- Personal rewards with renewable Nether resources and controlled Ancient Debris progression
 
 ### End
 
@@ -168,7 +174,7 @@ The custom advancement tree is designed both as progression tracking and as a gu
 
 ## 0.2.x-beta — World Foundation
 
-The `0.2.x-beta` milestone establishes the mod's central world identity and its first shared progression system. The current revision is `0.2.1-beta`:
+The `0.2.x-beta` milestone establishes the mod's central world identity and its first shared progression systems. The current revision is `0.2.2-beta`:
 
 - The **Last Refuge**, a walkable glass-dome introductory HUB inside the Ascension Nexus
 - Native central protection for blocks, fluids and explosions, independent of optional OpenPAC integration
@@ -183,6 +189,11 @@ The `0.2.x-beta` milestone establishes the mod's central world identity and its 
 - Eight permanent world-global seals: leather, gold, iron and diamond armor plus Earth, Forest, Forge and War offerings
 - Craftable offering items, clue lecterns, colored beacon signals and a four-way portal reveal
 - Renewable lava wells supplied through a craftable catalyst
+- The **Infernal Coliseum**, a protected ritual arena in the void Nether
+- Six visible trial tiers and secret tiers VII–X selected from the highest catalyst
+- Progressive waves distributed throughout the arena galleries
+- Multiplayer scaling, difficulty-aware rewards and personal reward recovery
+- Renewable Nether progression resources, with Ancient Debris controlled by trial tier and difficulty
 
 ## Configuration
 
@@ -240,7 +251,7 @@ For multiplayer, installing Skyblock Multi on both server/host and clients is re
 ## Development branches
 
 - `main` — published/checkpoint code
-- `feature/world-foundation` — current `0.2.1-beta` development
+- `feature/world-foundation` — current `0.2.2-beta` development
 - older feature branches may remain temporarily for historical/reference purposes
 
 ## License

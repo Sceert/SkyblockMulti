@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "GGG",
+    "GDG",
+    "GGG"
+  ],
+  "key": {
+    "G": "minecraft:glowstone",
+    "D": "minecraft:lime_dye"
+  },
+  "result": {
+    "id": "minecraft:verdant_froglight",
+    "count": 9
+  }
+}

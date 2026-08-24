@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "MSM",
+    "SPS",
+    "MSM"
+  ],
+  "key": {
+    "M": "minecraft:red_mushroom",
+    "S": "minecraft:soul_sand",
+    "P": "minecraft:blaze_powder"
+  },
+  "result": {
+    "id": "minecraft:nether_wart",
+    "count": 9
+  }
+}

@@ -9,11 +9,10 @@
     "#minecraft:saplings"
   ],
   "result": {
-    "id": "minecraft:echo_shard",
+    "id": "skyblockmulti:offering_trees",
     "count": 1,
     "components": {
       "minecraft:custom_name": {"translate": "skyblockmulti.offering.trees", "color": "dark_green", "italic": false},
-      "minecraft:custom_data": {"skyblockmulti": {"offering": "trees"}},
       "minecraft:max_stack_size": 1
     }
   }
