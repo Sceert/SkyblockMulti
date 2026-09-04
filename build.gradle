@@ -58,6 +58,7 @@ processResources {
 
 tasks.withType(JavaCompile).configureEach {
     options.release = 25
+    options.compilerArgs += ['-Xlint:deprecation']
 }
 
 java {
@@ -65,3 +66,30 @@ java {
     targetCompatibility = JavaVersion.VERSION_25
     withSourcesJar()
 }
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.archives_base_name}" }
+    }
+}
+
+tasks.register('verifyTreeConfig', JavaExec) {
+    group = 'verification'
+    description = 'Verifies stable tree IDs and legacy configuration migration.'
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'cl.treecs.skyblockmulti.tree.TreeConfigVerification'
+}
+
+tasks.register('verifyInfernalDataApi', JavaExec) {
+    group = 'verification'
+    description = 'Verifies Infernal Trial datapack schema parsing and safety limits.'
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'cl.treecs.skyblockmulti.infernal.InfernalDataApiVerification'
+}
+
+// Las verificaciones actuales son ejecutables Java sin dependencia de JUnit.
+test.failOnNoDiscoveredTests = false
+check.dependsOn verifyTreeConfig
+check.dependsOn verifyInfernalDataApi

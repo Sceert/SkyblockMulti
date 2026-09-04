@@ -7,7 +7,7 @@
   "authors": [
     "Treecs"
   ],
-  "license": "All Rights Reserved",
+  "license": "MIT",
   "environment": "*",
   "icon": "assets/skyblockmulti/icon.png",
   "entrypoints": {

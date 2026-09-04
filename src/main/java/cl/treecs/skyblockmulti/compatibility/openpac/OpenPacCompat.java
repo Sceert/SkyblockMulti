@@ -28,10 +28,11 @@ public final class OpenPacCompat {
     private static final int RESERVED_RADIUS_CHUNKS = 2;
     private static final int PLAYER_RADIUS_CHUNKS = 1;
 
-    // The Ascension Nexus: círculo de radio 15 chunks, centrado en 0,0.
-    // OpenPAC protege toda la columna vertical de cada chunk reclamado, por lo que
-    // cubre HUB, futura dungeon y fortaleza/Portal del End bajo el HUB.
-    private static final int ASCENSION_NEXUS_RADIUS_CHUNKS = 15;
+    // OpenPAC es una capa secundaria centrada en el domo. Se incluyen todos
+    // los chunks que intersectan su círculo físico de radio 45, no un círculo
+    // calculado a partir de índices de chunks.
+    private static final int ASCENSION_NEXUS_DOME_RADIUS_BLOCKS = 45;
+    private static final int LEGACY_NEXUS_SCAN_RADIUS_CHUNKS = 6;
 
     /*
      * El Server Claim central del Nexus se usa además como marca persistente.
@@ -54,6 +55,17 @@ public final class OpenPacCompat {
             System.out.println("[Skyblock Multi] OpenPAC detectado; integración opcional disponible.");
         } else {
             System.out.println("[Skyblock Multi] OpenPAC no instalado; integración desactivada.");
+        }
+    }
+
+    /**
+     * Prepara inmediatamente el claim central al iniciar el mundo. La decisión
+     * de crear reservas de islas queda almacenada para que su procesamiento
+     * pueda seguir esperando a que el datapack restaure los slots usados.
+     */
+    public static void prepareWorldClaims(MinecraftServer server) {
+        if (isInstalled() && server != null) {
+            shouldInitializeWorldClaims(server);
         }
     }
 
@@ -110,6 +122,11 @@ public final class OpenPacCompat {
 
             initializeIslandReservationsThisSession = !nexusAlreadyPresent;
 
+            if (nexusAlreadyPresent) {
+                configureExistingNexusInteractions(server);
+                reserveAscensionNexus(server);
+            }
+
             if (initializeIslandReservationsThisSession) {
                 boolean nexusCreated = reserveAscensionNexus(server);
 
@@ -140,6 +157,42 @@ public final class OpenPacCompat {
         return initializeIslandReservationsThisSession;
     }
 
+    /**
+     * Keeps the non-destructive interaction policy in sync for an existing
+     * Nexus claim without touching claims, structures or world progression.
+     */
+    private static void configureExistingNexusInteractions(MinecraftServer server) {
+        IPlayerConfigAPI serverClaimsConfig = OpenPACServerAPI
+                .get(server)
+                .getPlayerConfigManager()
+                .getServerClaimConfig();
+        IPlayerConfigAPI nexusSubConfig =
+                serverClaimsConfig.getSubConfig(ASCENSION_NEXUS_SUBCLAIM_ID);
+        if (nexusSubConfig == null) {
+            System.err.println(
+                    "[Skyblock Multi] OpenPAC: el claim del Nexo existe, pero no se encontró su subconfiguración."
+            );
+            return;
+        }
+        IPlayerConfigAPI.SetResult blockResult = nexusSubConfig.tryToSet(
+                PlayerConfigOptions.CLAIM_EXCEPTION_BLOCKS_BY_PLAYERS,
+                "E"
+        );
+        IPlayerConfigAPI.SetResult itemResult = nexusSubConfig.tryToSet(
+                PlayerConfigOptions.CLAIM_EXCEPTION_ITEM_USE,
+                "E"
+        );
+        IPlayerConfigAPI.SetResult entityResult = nexusSubConfig.tryToSet(
+                PlayerConfigOptions.CLAIM_EXCEPTION_ENTITIES_BY_PLAYERS,
+                "E"
+        );
+        System.out.println(
+                "[Skyblock Multi] OpenPAC: interacciones del Nexo sincronizadas. "
+                        + "bloques=" + blockResult + ", items=" + itemResult
+                        + ", entidades=" + entityResult + "."
+        );
+    }
+
     private static boolean isAscensionNexusClaimPresent(MinecraftServer server) {
 
         if (!isInstalled() || server == null) {
@@ -163,12 +216,9 @@ public final class OpenPacCompat {
     /**
      * Server Claim permanente para la zona central.
      *
-     * Tamaño actual:
-     * círculo discreto de radio 15 chunks (709 chunks reclamados).
-     * Diámetro máximo: 31 chunks ≈ 496 bloques.
-     *
-     * Al ser un claim por chunk de OpenPAC, protege toda la columna vertical:
-     * HUB superior + futura dungeon + fortaleza y sala del Portal del End.
+     * Incluye exactamente los chunks que intersectan el círculo físico del
+     * domo de radio 45. OpenPAC protege toda la columna de esos chunks, pero
+     * la fortaleza exterior depende únicamente de la protección nativa.
      *
      * Este claim nunca se transforma en player claim.
      */
@@ -232,20 +282,40 @@ public final class OpenPacCompat {
                 ASCENSION_NEXUS_CLAIM_COLOR
         );
 
+        /*
+         * OpenPAC normally treats opening containers and trapdoors as a
+         * protected block interaction. Let it delegate player interactions
+         * inside the Nexus to SkyblockMulti's native protection instead:
+         * native protection still denies breaking, placing and destructive
+         * item use, while allowing the intended doors, lecterns and chests.
+         */
+        IPlayerConfigAPI.SetResult interactionResult = nexusSubConfig.tryToSet(
+                PlayerConfigOptions.CLAIM_EXCEPTION_BLOCKS_BY_PLAYERS,
+                "E"
+        );
+        IPlayerConfigAPI.SetResult itemUseResult = nexusSubConfig.tryToSet(
+                PlayerConfigOptions.CLAIM_EXCEPTION_ITEM_USE,
+                "E"
+        );
+        IPlayerConfigAPI.SetResult entityInteractionResult = nexusSubConfig.tryToSet(
+                PlayerConfigOptions.CLAIM_EXCEPTION_ENTITIES_BY_PLAYERS,
+                "E"
+        );
+
         int nexusSubConfigIndex = nexusSubConfig.getSubIndex();
 
-        int radius = ASCENSION_NEXUS_RADIUS_CHUNKS;
-        int radiusSquared = radius * radius;
+        int minChunk = Math.floorDiv(-ASCENSION_NEXUS_DOME_RADIUS_BLOCKS, 16);
+        int maxChunk = Math.floorDiv(ASCENSION_NEXUS_DOME_RADIUS_BLOCKS, 16);
 
         /*
          * Primer pase: seguridad.
          * Se revisan únicamente los chunks que forman el círculo.
          * Nunca se pisa un claim de jugador.
          */
-        for (int x = -radius; x <= radius; x++) {
-            for (int z = -radius; z <= radius; z++) {
+        for (int x = minChunk; x <= maxChunk; x++) {
+            for (int z = minChunk; z <= maxChunk; z++) {
 
-                if (x * x + z * z > radiusSquared) {
+                if (!chunkIntersectsNexusDome(x, z)) {
                     continue;
                 }
 
@@ -272,14 +342,13 @@ public final class OpenPacCompat {
         int claimedChunks = 0;
 
         /*
-         * Segundo pase: círculo discreto de chunks.
-         * Los bordes quedan escalonados, como corresponde a la cuadrícula
-         * de chunks, pero en el mapa se percibe claramente circular.
+         * Segundo pase: reclamar cada chunk que contenga al menos un bloque
+         * dentro del círculo físico del domo.
          */
-        for (int x = -radius; x <= radius; x++) {
-            for (int z = -radius; z <= radius; z++) {
+        for (int x = minChunk; x <= maxChunk; x++) {
+            for (int z = minChunk; z <= maxChunk; z++) {
 
-                if (x * x + z * z > radiusSquared) {
+                if (!chunkIntersectsNexusDome(x, z)) {
                     continue;
                 }
 
@@ -305,20 +374,62 @@ public final class OpenPacCompat {
             }
         }
 
+        int removedLegacyChunks = 0;
+        for (int x = -LEGACY_NEXUS_SCAN_RADIUS_CHUNKS;
+             x <= LEGACY_NEXUS_SCAN_RADIUS_CHUNKS; x++) {
+            for (int z = -LEGACY_NEXUS_SCAN_RADIUS_CHUNKS;
+                 z <= LEGACY_NEXUS_SCAN_RADIUS_CHUNKS; z++) {
+                if (chunkIntersectsNexusDome(x, z)) {
+                    continue;
+                }
+
+                IPlayerChunkClaimAPI existing = claims.get(overworld, x, z);
+                if (existing != null
+                        && SERVER_CLAIM_UUID.equals(existing.getPlayerId())
+                        && existing.getSubConfigIndex() == nexusSubConfigIndex) {
+                    claims.unclaim(overworld, x, z);
+                    removedLegacyChunks++;
+                }
+            }
+        }
+
         System.out.println(
                 "[Skyblock Multi] OpenPAC: "
                         + ASCENSION_NEXUS_CANONICAL_NAME
-                        + " reservado permanentemente como Server Claim circular. "
-                        + "Radio=" + radius
-                        + " chunks, chunks reclamados=" + claimedChunks
+                        + " reservado permanentemente alrededor del domo. "
+                        + "Radio=" + ASCENSION_NEXUS_DOME_RADIUS_BLOCKS
+                        + " bloques, chunks reclamados=" + claimedChunks
+                        + ", chunks heredados retirados=" + removedLegacyChunks
                         + ", sub-claim=" + ASCENSION_NEXUS_SUBCLAIM_ID
                         + ", nombre_resultado=" + nameResult
                         + ", color_nexus_resultado=" + nexusColorResult
+                        + ", interacciones_resultado=" + interactionResult
+                        + ", uso_items_resultado=" + itemUseResult
+                        + ", entidades_resultado=" + entityInteractionResult
                         + ", color_reservas_resultado=" + serverColorResult
                         + "."
         );
 
         return true;
+    }
+
+    private static boolean chunkIntersectsNexusDome(int chunkX, int chunkZ) {
+        int closestX = closestCoordinateToOrigin(chunkX);
+        int closestZ = closestCoordinateToOrigin(chunkZ);
+        int radius = ASCENSION_NEXUS_DOME_RADIUS_BLOCKS;
+        return closestX * closestX + closestZ * closestZ <= radius * radius;
+    }
+
+    private static int closestCoordinateToOrigin(int chunkCoordinate) {
+        int min = chunkCoordinate * 16;
+        int max = min + 15;
+        if (min > 0) {
+            return min;
+        }
+        if (max < 0) {
+            return -max;
+        }
+        return 0;
     }
 
     /**

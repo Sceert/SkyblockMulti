@@ -1,3 +1,6 @@
 {
-  "parent": "minecraft:item/fire_charge"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "skyblockmulti:item/lava_catalyst"
+  }
 }

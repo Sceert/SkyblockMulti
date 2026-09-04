@@ -8,7 +8,7 @@ from convert_sponge_schem import Tag, read_nbt, write_nbt
 
 ROOT = Path(__file__).resolve().parents[1]
 STRUCTURE = ROOT / "src/main/resources/data/skyblockmulti/structure/nexus_hub_v13.nbt"
-POWER_FUNCTION = ROOT / "src/main/resources/data/skyblock/function/hub/power_copper_ring.mcfunction"
+POWER_FUNCTION = ROOT / "src/main/resources/data/skyblockmulti/function/hub/power_copper_ring.mcfunction"
 
 
 def main() -> None:

@@ -44,7 +44,10 @@ public final class NexusCreativeTab {
     }
 
     private static ItemStack earthOffering() {
-        return createOffering("earth");
+        ItemStack stack = createOffering("earth");
+        stack.set(DataComponents.ITEM_MODEL,
+                Identifier.fromNamespaceAndPath(SkyblockMultiMod.MOD_ID, "creative_tab_icon"));
+        return stack;
     }
 
     public static ItemStack createOffering(String type) {

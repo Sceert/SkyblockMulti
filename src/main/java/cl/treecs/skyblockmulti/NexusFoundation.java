@@ -12,6 +12,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
@@ -19,7 +20,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ButtonBlock;
+import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.EndPortalFrameBlock;
+import net.minecraft.world.level.block.LeverBlock;
+import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.LevelResource;
 
@@ -42,7 +47,17 @@ import java.util.Random;
  */
 public final class NexusFoundation implements ModInitializer {
 
-    private static final int NEXUS_RADIUS_CHUNKS = 15;
+    /*
+     * Logical protection volumes are intentionally independent from the
+     * current block palette. Block-precise radii let players build an access
+     * route right up to the lower fortress without inheriting a stepped
+     * chunk-wide exclusion zone.
+     */
+    private static final int DOME_PROTECTION_MIN_Y = 150;
+    private static final int DOME_PROTECTION_RADIUS_BLOCKS = 45;
+    private static final int OBSERVATION_CORE_MIN_Y = 41;
+    private static final int OBSERVATION_CORE_RADIUS_BLOCKS = 12;
+    private static final int FORTRESS_PROTECTION_RADIUS_BLOCKS = 74;
     private static final BlockPos END_PORTAL_LOCATOR_TARGET = new BlockPos(0, 6, 0);
 
     public static final int END_EYES_0 = 0;
@@ -54,11 +69,11 @@ public final class NexusFoundation implements ModInitializer {
     private static final String CONFIG_FILE = "skyblockmulti_nexus.json";
     private static final String WORLD_STATE_FILE = "skyblockmulti_nexus.properties";
 
-    private static final List<BlockPos> RENEWABLE_LAVA_SOURCES = List.of(
-            new BlockPos(0, 15, -66),
-            new BlockPos(66, 15, 0),
-            new BlockPos(0, 15, 66),
-            new BlockPos(-66, 15, 0)
+    private static final List<BlockPos> LAVA_EXCHANGE_CHESTS = List.of(
+            new BlockPos(0, 16, -62),
+            new BlockPos(62, 16, 0),
+            new BlockPos(0, 16, 62),
+            new BlockPos(-62, 16, 0)
     );
 
     private static Path configPath;
@@ -68,6 +83,7 @@ public final class NexusFoundation implements ModInitializer {
     private static volatile int activeWorldEndEyes = -1;
 
     private static int portalInitializationDelayTicks = -1;
+    private static int lavaExchangeDelayTicks;
 
     public static BlockPos getEndPortalLocatorTarget(ServerLevel level) {
         if (!level.dimension().equals(Level.OVERWORLD)) {
@@ -135,11 +151,14 @@ public final class NexusFoundation implements ModInitializer {
         });
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
-            if (portalInitializationDelayTicks < 0) {
-                return;
+            if (++lavaExchangeDelayTicks >= 10) {
+                lavaExchangeDelayTicks = 0;
+                processLavaExchanges(server);
             }
 
-            if (portalInitializationDelayTicks > 0) {
+            if (portalInitializationDelayTicks < 0) {
+                return;
+            } else if (portalInitializationDelayTicks > 0) {
                 portalInitializationDelayTicks--;
                 return;
             }
@@ -157,6 +176,7 @@ public final class NexusFoundation implements ModInitializer {
             activeWorldEndEyes = -1;
             endPortalConfigurationLocked = false;
             portalInitializationDelayTicks = -1;
+            lavaExchangeDelayTicks = 0;
         });
 
         System.out.println(
@@ -174,15 +194,17 @@ public final class NexusFoundation implements ModInitializer {
                 return true;
             }
 
+            // Apagar fuego existente es una acción segura y preventiva; no
+            // modifica ningún bloque estructural del Nexus.
+            if (state.is(Blocks.FIRE) || state.is(Blocks.SOUL_FIRE)) {
+                return true;
+            }
+
             return hasBuilderBypass(serverPlayer);
         });
 
         UseBlockCallback.EVENT.register((player, level, hand, hitResult) -> {
-            if (!(player instanceof ServerPlayer serverPlayer)) {
-                return InteractionResult.PASS;
-            }
-
-            if (hasBuilderBypass(serverPlayer)) {
+            if (player.isCreative()) {
                 return InteractionResult.PASS;
             }
 
@@ -197,7 +219,7 @@ public final class NexusFoundation implements ModInitializer {
             BlockPos hitPos = hitResult.getBlockPos();
             BlockPos adjacentPos = hitPos.relative(hitResult.getDirection());
 
-            if (stack.is(Items.BUCKET) && isRenewableLavaSource(level, hitPos)) {
+            if (!player.isSecondaryUseActive() && isSafeInteractable(level, hitPos)) {
                 return InteractionResult.PASS;
             }
 
@@ -209,15 +231,11 @@ public final class NexusFoundation implements ModInitializer {
             return InteractionResult.PASS;
         });
 
-        // Fluid pickup is handled through item use rather than block use in
-        // current mappings. Keep filled buckets blocked throughout the Nexus,
-        // and permit an empty bucket only while standing at a designated well.
+        // Buckets remain blocked throughout the protected Nexus. Renewable
+        // lava is obtained through the four catalyst exchange chests instead
+        // of modifying a protected fluid block directly.
         UseItemCallback.EVENT.register((player, level, hand) -> {
-            if (!(player instanceof ServerPlayer serverPlayer)) {
-                return InteractionResult.PASS;
-            }
-
-            if (hasBuilderBypass(serverPlayer)) {
+            if (player.isCreative()) {
                 return InteractionResult.PASS;
             }
 
@@ -230,27 +248,54 @@ public final class NexusFoundation implements ModInitializer {
                 return InteractionResult.PASS;
             }
 
-            if (stack.is(Items.BUCKET)
-                    && isNearRenewableLavaSource(level, player.blockPosition())) {
-                return InteractionResult.PASS;
-            }
-
             return InteractionResult.FAIL;
         });
     }
 
-    private static boolean isRenewableLavaSource(Level level, BlockPos pos) {
-        return level.dimension().equals(Level.OVERWORLD)
-                && RENEWABLE_LAVA_SOURCES.contains(pos);
+    private static boolean isSafeInteractable(Level level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        return state.getBlock() instanceof ButtonBlock
+                || state.getBlock() instanceof LeverBlock
+                || state.getBlock() instanceof DoorBlock
+                || state.getBlock() instanceof TrapDoorBlock
+                || level.getBlockEntity(pos) != null;
     }
 
-    private static boolean isNearRenewableLavaSource(Level level, BlockPos pos) {
-        if (!level.dimension().equals(Level.OVERWORLD)) {
-            return false;
+    private static void processLavaExchanges(MinecraftServer server) {
+        ServerLevel overworld = server.getLevel(Level.OVERWORLD);
+        if (overworld == null) {
+            return;
         }
 
-        return RENEWABLE_LAVA_SOURCES.stream()
-                .anyMatch(source -> source.distSqr(pos) <= 36.0D);
+        for (BlockPos chestPos : LAVA_EXCHANGE_CHESTS) {
+            if (!(overworld.getBlockEntity(chestPos) instanceof Container container)) {
+                continue;
+            }
+
+            int catalystSlot = findContainerSlot(container, NexusItems.LAVA_CATALYST);
+            int bucketSlot = findContainerSlot(container, Items.BUCKET);
+            if (catalystSlot < 0 || bucketSlot < 0) {
+                continue;
+            }
+
+            container.getItem(catalystSlot).shrink(1);
+            container.getItem(bucketSlot).shrink(1);
+
+            int outputSlot = container.getItem(catalystSlot).isEmpty()
+                    ? catalystSlot
+                    : bucketSlot;
+            container.setItem(outputSlot, new ItemStack(Items.LAVA_BUCKET));
+            container.setChanged();
+        }
+    }
+
+    private static int findContainerSlot(Container container, net.minecraft.world.item.Item item) {
+        for (int slot = 0; slot < container.getContainerSize(); slot++) {
+            if (container.getItem(slot).is(item)) {
+                return slot;
+            }
+        }
+        return -1;
     }
 
     private static boolean isPotentiallyDestructiveUse(ItemStack stack) {
@@ -276,11 +321,18 @@ public final class NexusFoundation implements ModInitializer {
             return false;
         }
 
-        int chunkX = Math.floorDiv(pos.getX(), 16);
-        int chunkZ = Math.floorDiv(pos.getZ(), 16);
+        int radius;
+        if (pos.getY() >= DOME_PROTECTION_MIN_Y) {
+            radius = DOME_PROTECTION_RADIUS_BLOCKS;
+        } else if (pos.getY() >= OBSERVATION_CORE_MIN_Y) {
+            radius = OBSERVATION_CORE_RADIUS_BLOCKS;
+        } else {
+            radius = FORTRESS_PROTECTION_RADIUS_BLOCKS;
+        }
 
-        return chunkX * chunkX + chunkZ * chunkZ
-                <= NEXUS_RADIUS_CHUNKS * NEXUS_RADIUS_CHUNKS;
+        long x = pos.getX();
+        long z = pos.getZ();
+        return x * x + z * z <= (long) radius * radius;
     }
 
     public static boolean isProtectedStructurePosition(Level level, BlockPos pos) {

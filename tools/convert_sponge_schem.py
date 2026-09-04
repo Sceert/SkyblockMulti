@@ -202,7 +202,7 @@ def block_entity_map(blocks: Tag) -> dict[tuple[int, int, int], Tag]:
     return result
 
 
-def convert(source: Path, target: Path) -> None:
+def convert(source: Path, target: Path, include_air: bool = False) -> None:
     root_name, root = read_nbt(source)
     # WorldEdit 7.4 writes an unnamed root with a nested Schematic compound;
     # older Sponge writers may name the root itself Schematic.
@@ -229,7 +229,9 @@ def convert(source: Path, target: Path) -> None:
     palette: list[Tag] = []
     palette_indexes: dict[str, int] = {}
     blocks: list[Tag] = []
-    skipped = {"minecraft:air", "minecraft:structure_void"}
+    skipped = {"minecraft:structure_void"}
+    if not include_air:
+        skipped.add("minecraft:air")
 
     for index, source_id in enumerate(source_ids):
         state = source_palette[source_id]
@@ -272,8 +274,13 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=Path)
     parser.add_argument("target", type=Path)
+    parser.add_argument(
+        "--include-air",
+        action="store_true",
+        help="Preserve air so the template exactly replaces the selected volume.",
+    )
     args = parser.parse_args()
-    convert(args.source, args.target)
+    convert(args.source, args.target, args.include_air)
 
 
 if __name__ == "__main__":

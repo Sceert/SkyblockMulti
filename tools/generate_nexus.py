@@ -2,7 +2,19 @@ from pathlib import Path
 from math import sqrt
 
 ROOT = Path(__file__).resolve().parents[1]
-FUNCTIONS = ROOT / "src/main/resources/data/skyblock/function/hub"
+FUNCTIONS = ROOT / "src/main/resources/data/skyblockmulti/function/hub"
+NEXUS_FUNCTIONS = ROOT / "src/main/resources/data/skyblockmulti/function/nexus"
+
+HINT_TITLES = {
+    "leather": "The First Warden",
+    "gold": "The Sunless King",
+    "iron": "The Steadfast Watch",
+    "diamond": "The Last Warden",
+    "earth": "The Harvester's Verse",
+    "trees": "The Forest's Promise",
+    "metals": "The Forge's Memory",
+    "war": "The Soldier's Lament",
+}
 
 
 def command_fill(x1, y1, z1, x2, y2, z2, block):
@@ -15,13 +27,15 @@ def command_set(x, y, z, block):
 
 def nexus_hint_book(hint):
     """Return the block-entity NBT for a localized Nexus clue book."""
+    title = HINT_TITLES[hint]
     return (
         "{Book:{id:'minecraft:written_book',count:1,components:{"
         "'minecraft:written_book_content':{"
-        "title:{raw:'Whispers of the Eight Seals'},"
-        "author:'The Ascension Nexus',generation:0,resolved:true,"
+        f"title:{{raw:\"{title}\"}},"
+        "author:'The Nexus Chronicler',generation:0,resolved:true,"
         f"pages:[{{raw:{{translate:'skyblockmulti.nexus.hint.{hint}'}}}}]"
         "},"
+        f"'minecraft:custom_name':{{translate:'skyblockmulti.nexus.hint_title.{hint}',color:'dark_aqua',italic:false}},"
         f"'minecraft:custom_data':{{skyblockmulti_nexus_hint:'{hint}'}}"
         "}},Page:0}"
     )
@@ -392,56 +406,38 @@ def fortress():
             lines.append(command_fill(x - 3, 15, z - 3, x + 3, 21, z + 3, "air"))
             lines.append(command_fill(x - 4, 22, z - 4, x + 4, 23, z + 4, "polished_blackstone_bricks"))
 
-    # Architectural dressing for all eight wings: pylons, bars, chains and
-    # controlled soul fire. No mob spawners are used.
+    # Structural pylons for all eight wings. Fragile hanging decorations are
+    # supplied only by the final schematic so they cannot break into items
+    # when that schematic replaces this prototype layer.
     room_centres = [(0,-62),(44,-44),(62,0),(44,44),(0,62),(-44,44),(-62,0),(-44,-44)]
     for x, z in room_centres:
         lines.append(command_fill(x - 1, 15, z - 1, x + 1, 18, z + 1, "chiseled_deepslate"))
-        lines.append(command_set(x, 19, z, "soul_lantern"))
         for dx, dz in [(-7,-7),(7,-7),(-7,7),(7,7)]:
             lines.append(command_fill(x + dx, 15, z + dz, x + dx, 20, z + dz, "polished_blackstone_brick_wall"))
-            lines.append(command_set(x + dx, 21, z + dz, "iron_chain[axis=y,waterlogged=false]"))
 
     # Four renewable lava wells. Each source is restored only when its nearby
     # donation chest receives one crafted Lava Catalyst.
     wells = [
-        (0,-66,0,-69,"south"),
-        (66,0,69,0,"west"),
-        (0,66,0,69,"north"),
-        (-66,0,-69,0,"east"),
+        (0,-66,0,-62,"north"),
+        (66,0,62,0,"east"),
+        (0,66,0,62,"south"),
+        (-66,0,-62,0,"west"),
     ]
     for x, z, chest_x, chest_z, facing in wells:
         lines.append(command_fill(x - 2, 14, z - 2, x + 2, 14, z + 2, "polished_blackstone_bricks"))
         lines.append(command_fill(x - 1, 15, z - 1, x + 1, 15, z + 1, "polished_blackstone"))
         lines.append(command_set(x, 15, z, "lava[level=0]"))
-        lines.append(command_set(
-            chest_x, 16, chest_z,
-            f"oxidized_copper_chest[facing={facing},type=single,waterlogged=false]"
-        ))
-        lines.append(command_set(chest_x, 17, chest_z, "copper_bulb[lit=true,powered=true]"))
 
     # The four cardinal requirements are displayed on real armor stands.
     cardinal_stands = [
         (0,-25,"leather",180.0),(25,0,"gold",-90.0),
         (0,25,"iron",0.0),(-25,0,"diamond",90.0),
     ]
-    for x, z, seal, yaw in cardinal_stands:
-        lines.append(command_fill(x - 1, 15, z - 1, x + 1, 15, z + 1, "chiseled_stone_bricks"))
-        lines.append(command_set(x, 16, z, "air"))
-        lines.append(
-            f'execute in minecraft:overworld run summon minecraft:armor_stand '
-            f'{x + 0.5} 16 {z + 0.5} '
-            f'{{Tags:["skyblock_nexus_seal_{seal}"],NoGravity:1b,Invulnerable:1b,'
-            f'PersistenceRequired:1b,ShowArms:1b,Rotation:[{yaw}f,0.0f]}}'
-        )
 
     # The four intercardinal chests accept only their crafted Offering item.
     receptacles = [
         (18,-18,"north"),(18,18,"south"),(-18,18,"south"),(-18,-18,"north"),
     ]
-    for x, z, facing in receptacles:
-        lines.append(command_fill(x - 1, 15, z - 1, x + 1, 15, z + 1, "chiseled_stone_bricks"))
-        lines.append(command_set(x, 16, z, f"oxidized_copper_chest[facing={facing},type=single,waterlogged=false]"))
 
     # Eight readable clue books. Their pages use translation components, so
     # every client receives the hint in its own configured language.
@@ -450,17 +446,10 @@ def fortress():
         # their armor stand, facing the same cardinal direction.
         (0,15,-26,"north","leather"), (26,15,0,"east","gold"),
         (0,15,26,"south","iron"), (-26,15,0,"west","diamond"),
-        # Intercardinal clues remain beside their crafted-offering chests.
-        (15,16,-18,"west","earth"), (15,16,18,"west","trees"),
-        (-15,16,18,"east","metals"), (-15,16,-18,"east","war"),
+        # Intercardinal clues sit one block lower beside their offering chests.
+        (15,15,-18,"west","earth"), (15,15,18,"west","trees"),
+        (-15,15,18,"east","metals"), (-15,15,-18,"east","war"),
     ]
-    for x, y, z, facing, hint in hints:
-        lines.append(command_set(x, y - 1, z, "chiseled_stone_bricks"))
-        lines.append(command_set(x, y, z, f"lectern[facing={facing},has_book=true,powered=false]"))
-        lines.append(
-            f'''execute in minecraft:overworld run data merge block {x} {y} {z} '''
-            + nexus_hint_book(hint)
-        )
 
     # Re-open the four inner corridor mouths after their structural end walls
     # have been generated. Width seven keeps the lava wings visibly accessible.
@@ -496,9 +485,6 @@ def fortress():
         command_fill(2, 6, -1, 2, 6, 1, "end_portal_frame[facing=west,eye=false]"),
         command_fill(-1, 6, -1, 1, 6, 1, "air"),
     ]
-    for x, z in [(7,7),(-7,7),(7,-7),(-7,-7)]:
-        lines.append(command_set(x, 5, z, "soul_lantern"))
-
     # Transparent sealed axis between the HUB and fortress. It is an
     # observation feature, never a traversable shaft.
     for y in range(36, 160):
@@ -507,8 +493,121 @@ def fortress():
     # Widely spaced luminous hoops create depth when looking down through the
     # oculus. Every centre stays open and no access route is introduced.
     for y in [148, 132, 116, 100, 84, 68, 52, 38]:
-        circle_shell(lines, y, 11, "sea_lantern", 1)
+        circle_shell(lines, y, 11, "pearlescent_froglight", 1)
+
+    # The player-authored fortress is the final visual layer for Y=0..40.
+    # It deliberately includes air, allowing manual removals and openings to
+    # replace the prototype while the functional entities created above and
+    # the observation cylinder above Y=40 remain managed by the mod.
+    lines.append(
+        "execute in minecraft:overworld run place template "
+        "skyblockmulti:nexus_fortress_v2 -74 0 -74"
+    )
+
+    # Small visual repairs found during the v2 fortress walk-through. Keeping
+    # these as post-template corrections avoids requiring a new schematic for
+    # three isolated authoring slips.
+    lines.append(command_set(-62, 19, 0, "soul_lantern"))
+    lines.append(command_set(-64, 23, 2, "polished_blackstone_bricks"))
+    lines.append(command_set(-66, 23, 4, "polished_blackstone_bricks"))
+
+    # Match the south lava-fall cornice to the deepslate-tile trim used by the
+    # other cardinal entrances without replacing the surrounding brick walls.
+    lines.append(command_fill(-4, 21, 34, -4, 22, 35, "deepslate_tiles"))
+    lines.append(command_fill(4, 21, 34, 4, 22, 35, "deepslate_tiles"))
+    lines.append(command_fill(-3, 22, 34, 3, 22, 34, "deepslate_tiles"))
+
+    # Portal chamber finish: the outer square becomes an outward-facing
+    # deepslate-tile stair frame. Remove the three obsolete decorative stair
+    # clusters and cover the visible blackstone/reinforced transition with a
+    # single deepslate-brick palette.
+    lines.append(command_fill(-6, 5, -6, 6, 5, -6, "deepslate_tile_stairs[facing=south,half=bottom,shape=straight,waterlogged=false]"))
+    lines.append(command_fill(-6, 5, 6, 6, 5, 6, "deepslate_tile_stairs[facing=north,half=bottom,shape=straight,waterlogged=false]"))
+    lines.append(command_fill(-6, 5, -5, -6, 5, 5, "deepslate_tile_stairs[facing=east,half=bottom,shape=straight,waterlogged=false]"))
+    lines.append(command_fill(6, 5, -5, 6, 5, 5, "deepslate_tile_stairs[facing=west,half=bottom,shape=straight,waterlogged=false]"))
+    lines.append(command_fill(-7, 5, -1, -7, 5, 1, "air"))
+    lines.append(command_fill(7, 5, -1, 7, 5, 1, "air"))
+    lines.append(command_fill(-1, 5, 7, 1, 5, 7, "air"))
+    lines.append(command_fill(-3, 5, -3, 3, 5, 3, "deepslate_bricks"))
+    lines.append(command_fill(-6, 4, -6, 6, 4, -6, "deepslate_bricks"))
+    lines.append(command_fill(-6, 4, 6, 6, 4, 6, "deepslate_bricks"))
+    lines.append(command_fill(-6, 4, -5, -6, 4, 5, "deepslate_bricks"))
+    lines.append(command_fill(6, 4, -5, 6, 4, 5, "deepslate_bricks"))
+
+    # The schematic still contains the former prototype stations at distance
+    # 69. Remove those copies, then restore the four functional catalyst
+    # chests at distance 62 on top of the player-authored architecture.
+    for old_x, old_z in [(0, -69), (69, 0), (0, 69), (-69, 0)]:
+        lines.append(
+            f"execute in minecraft:overworld if block {old_x} 16 {old_z} "
+            f"minecraft:oxidized_copper_chest run setblock {old_x} 16 {old_z} minecraft:air"
+        )
+        lines.append(
+            f"execute in minecraft:overworld if block {old_x} 17 {old_z} "
+            f"minecraft:copper_bulb run setblock {old_x} 17 {old_z} minecraft:air"
+        )
+    for _, _, chest_x, chest_z, facing in wells:
+        lines.append(command_set(
+            chest_x, 16, chest_z,
+            f"oxidized_copper_chest[facing={facing},type=single,waterlogged=false]"
+        ))
+        lines.append(
+            f'''execute in minecraft:overworld run data merge block {chest_x} 16 {chest_z} '''
+            '''{CustomName:{translate:"skyblockmulti.nexus.lava_well",color:"gold",italic:false}}'''
+        )
+
+    # Functional stations are applied only now, after the visual schematic,
+    # so no duplicate lecterns, books, receptacles or armor stands are made.
+    for x, z, seal, yaw in cardinal_stands:
+        lines.append(command_fill(x - 1, 15, z - 1, x + 1, 15, z + 1, "chiseled_deepslate"))
+        lines.append(command_set(x, 16, z, "air"))
+        lines.append(
+            f'execute in minecraft:overworld run summon minecraft:armor_stand '
+            f'{x + 0.5} 16 {z + 0.5} '
+            f'{{Tags:["skyblock_nexus_seal_{seal}"],NoGravity:1b,Invulnerable:1b,'
+            f'PersistenceRequired:1b,ShowArms:1b,Rotation:[{yaw}f,0.0f]}}'
+        )
+
+    for x, z, facing in receptacles:
+        lines.append(command_fill(x - 1, 15, z - 1, x + 1, 15, z + 1, "chiseled_deepslate"))
+        lines.append(command_set(x, 16, z, f"oxidized_copper_chest[facing={facing},type=single,waterlogged=false]"))
+
+    for x, y, z, facing, hint in hints:
+        # Remove only the obsolete raised intercardinal copy from the schematic.
+        if hint in {"earth", "trees", "metals", "war"}:
+            lines.append(
+                f"execute in minecraft:overworld if block {x} 16 {z} "
+                f"minecraft:lectern run setblock {x} 16 {z} minecraft:air"
+            )
+        lines.append(command_set(x, y - 1, z, "chiseled_deepslate"))
+        lines.append(command_set(x, y, z, f"lectern[facing={facing},has_book=true,powered=false]"))
+        lines.append(
+            f'''execute in minecraft:overworld run data merge block {x} {y} {z} '''
+            + nexus_hint_book(hint)
+        )
+
     write("build_fortress.mcfunction", lines)
+
+    # Keep the eight official volumes recoverable without duplicating any
+    # other block entity from the fortress schematic.
+    restore_lines = [
+        "# Restore an official clue volume after it is removed from its lectern."
+    ]
+    for x, y, z, facing, hint in hints:
+        restore_lines.append(
+            f"execute in minecraft:overworld if block {x} {y} {z} "
+            f"minecraft:lectern[has_book=false] run setblock {x} {y} {z} "
+            f"minecraft:lectern[facing={facing},has_book=true,powered=false]"
+        )
+        restore_lines.append(
+            f"execute in minecraft:overworld if block {x} {y} {z} "
+            f"minecraft:lectern[has_book=true] unless data block {x} {y} {z} Book "
+            f"run data merge block {x} {y} {z} {nexus_hint_book(hint)}"
+        )
+    NEXUS_FUNCTIONS.mkdir(parents=True, exist_ok=True)
+    (NEXUS_FUNCTIONS / "restore_hints.mcfunction").write_text(
+        "\n".join(restore_lines) + "\n", encoding="utf-8"
+    )
 
 
 if __name__ == "__main__":

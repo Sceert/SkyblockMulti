@@ -1,0 +1,25 @@
+# Elimina forceloads de las posiciones almacenadas actualmente.
+execute if data storage skyblockmulti:slots s01.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s01
+execute if data storage skyblockmulti:slots s02.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s02
+execute if data storage skyblockmulti:slots s03.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s03
+execute if data storage skyblockmulti:slots s04.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s04
+execute if data storage skyblockmulti:slots s05.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s05
+execute if data storage skyblockmulti:slots s06.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s06
+execute if data storage skyblockmulti:slots s07.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s07
+execute if data storage skyblockmulti:slots s08.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s08
+execute if data storage skyblockmulti:slots s09.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s09
+execute if data storage skyblockmulti:slots s10.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s10
+execute if data storage skyblockmulti:slots s11.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s11
+execute if data storage skyblockmulti:slots s12.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s12
+execute if data storage skyblockmulti:slots s13.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s13
+execute if data storage skyblockmulti:slots s14.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s14
+execute if data storage skyblockmulti:slots s15.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s15
+execute if data storage skyblockmulti:slots s16.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s16
+execute if data storage skyblockmulti:slots s17.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s17
+execute if data storage skyblockmulti:slots s18.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s18
+execute if data storage skyblockmulti:slots s19.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s19
+execute if data storage skyblockmulti:slots s20.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s20
+execute if data storage skyblockmulti:slots s21.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s21
+execute if data storage skyblockmulti:slots s22.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s22
+execute if data storage skyblockmulti:slots s23.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s23
+execute if data storage skyblockmulti:slots s24.x run function skyblockmulti:slots/remove_forceload_one with storage skyblockmulti:slots s24

@@ -1,3 +1,6 @@
 {
-  "parent": "minecraft:item/echo_shard"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "skyblockmulti:item/offering_trees"
+  }
 }

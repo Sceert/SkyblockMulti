@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.2-beta — Infernal Trials
+## 0.2.3-beta — Infernal Trials and Datapack API
 
 This beta checkpoint adds the first shared combat activity to Skyblock Multi while preserving the existing Ascension Nexus and island progression.
 
@@ -9,11 +9,14 @@ This beta checkpoint adds the first shared combat activity to Skyblock Multi whi
 - A persistent Infernal Coliseum in the void Nether.
 - Six craftable Infernal Cores and secret advanced tiers VII–X.
 - Progressive waves that scale with trial tier, selected island difficulty and nearby participants.
-- Two phases for tiers VII–X and a final champion encounter at tier X.
+- Two phases for tiers VII–IX, with a dedicated third champion phase at tier X.
 - Raid-style remaining-enemy display, start countdowns, cooldown feedback and arena lore.
 - Personal reward delivery with a reliquary fallback for returning participants.
 - Controlled Ancient Debris rewards, golden apple bonuses and renewable Nether materials.
 - Temporary natural-spawn suppression inside the coliseum during active trials.
+- A validated datapack API for custom Infernal Trials, phases, enemies, equipment,
+  scaling, timing, arena hooks and custom catalyst items.
+- Distinct 2D artifact sprites for the four Nexus offerings and six Infernal Cores.
 
 ### Improved
 
@@ -35,4 +38,5 @@ This beta checkpoint adds the first shared combat activity to Skyblock Multi whi
 
 ### Known beta scope
 
-- The Ascension Nexus fortress is still awaiting its final user-authored schematic and decorative review.
+- Additional Infernal Trial definitions and temporary arena transformations remain
+  extensibility features for datapack authors rather than built-in progression.

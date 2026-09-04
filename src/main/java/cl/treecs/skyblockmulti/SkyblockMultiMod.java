@@ -1,6 +1,14 @@
 package cl.treecs.skyblockmulti;
 
+import cl.treecs.skyblockmulti.tree.TreeCatalog;
+import cl.treecs.skyblockmulti.tree.TreeConfigCodec;
+import cl.treecs.skyblockmulti.tree.TreeDefinition;
+import cl.treecs.skyblockmulti.tree.TreeDefinitionReloadListener;
+import cl.treecs.skyblockmulti.tree.PlayerTreeSelectionState;
+import cl.treecs.skyblockmulti.infernal.InfernalDefinitionReloadListener;
+import cl.treecs.skyblockmulti.infernal.InfernalTrialRunner;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.MappingResolver;
 
@@ -12,6 +20,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -25,11 +34,17 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.world.scores.Objective;
+import net.minecraft.world.scores.ReadOnlyScoreInfo;
+import net.minecraft.world.scores.ScoreHolder;
+import net.minecraft.world.scores.Scoreboard;
 
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.PackType;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -77,6 +92,7 @@ public final class SkyblockMultiMod implements ModInitializer {
 	private static final Map<UUID, PartyState> OPENPAC_PARTY_STATES = new HashMap<>();
 	private static int openPacPartyCheckTicks = 0;
 	private static int openPacReservationDelayTicks = -1;
+	private static int geometryLockCheckTicks = 0;
 	private record PartyState(
         boolean inParty,
         UUID partyId,
@@ -92,42 +108,43 @@ public final class SkyblockMultiMod implements ModInitializer {
 }
 
     public enum TreeOption {
-        OAK("oak", "Roble", 1),
-        SPRUCE("spruce", "Abeto", 2),
-        BIRCH("birch", "Abedul", 3),
-        JUNGLE("jungle", "Jungla", 4),
-        ACACIA("acacia", "Acacia", 5),
-        CHERRY("cherry", "Cerezo", 6),
-        MANGROVE("mangrove", "Manglar", 7),
-        DARK_OAK("dark_oak", "Roble oscuro", 8),
-        PALE_OAK("pale_oak", "Roble pálido", 9),
-        AZALEA("azalea", "Azalea", 10),
-        FLOWERING_AZALEA("flowering_azalea", "Azalea florecida", 11);
+        OAK("minecraft:oak"),
+        SPRUCE("minecraft:spruce"),
+        BIRCH("minecraft:birch"),
+        JUNGLE("minecraft:jungle"),
+        ACACIA("minecraft:acacia"),
+        CHERRY("minecraft:cherry"),
+        MANGROVE("minecraft:mangrove"),
+        DARK_OAK("minecraft:dark_oak"),
+        PALE_OAK("minecraft:pale_oak"),
+        AZALEA("minecraft:azalea"),
+        FLOWERING_AZALEA("minecraft:flowering_azalea");
 
-        private final String configKey;
-        private final String displayName;
-        private final int triggerValue;
+        private final TreeDefinition definition;
 
-        TreeOption(String configKey, String displayName, int triggerValue) {
-            this.configKey = configKey;
-            this.displayName = displayName;
-            this.triggerValue = triggerValue;
+        TreeOption(String id) {
+            this.definition = TreeCatalog.find(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Árbol integrado desconocido: " + id));
+        }
+
+        public TreeDefinition definition() {
+            return definition;
+        }
+
+        public String id() {
+            return definition.id();
         }
 
         public String configKey() {
-            return configKey;
-        }
-
-        public String displayName() {
-            return displayName;
+            return definition.configKey();
         }
 
         public int triggerValue() {
-            return triggerValue;
+            return definition.legacyTriggerValue();
         }
 
         public String scoreHolder() {
-            return "#tree_" + configKey;
+            return definition.legacyScoreHolder();
         }
     }
 
@@ -177,9 +194,18 @@ public final class SkyblockMultiMod implements ModInitializer {
     public void onInitialize() {
         configPath = FabricLoader.getInstance().getConfigDir().resolve("skyblockmulti.json");
         ensureConfigExists();
+        ResourceLoader.get(PackType.SERVER_DATA).registerReloadListener(
+                Identifier.fromNamespaceAndPath(MOD_ID, "tree_options"),
+                new TreeDefinitionReloadListener()
+        );
+        ResourceLoader.get(PackType.SERVER_DATA).registerReloadListener(
+                Identifier.fromNamespaceAndPath(MOD_ID, "infernal_trials"),
+                new InfernalDefinitionReloadListener()
+        );
         NexusItems.initialize();
         NexusCreativeTab.register();
         InfernalTrialSpawnControl.register();
+        InfernalTrialRunner.register();
         OpenPacCompat.initialize();
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
@@ -197,8 +223,9 @@ public final class SkyblockMultiMod implements ModInitializer {
                                                                                 }
 
                                                                                 // La primera isla asignada fija y persiste la geometría de este mundo.
-                                                                                persistWorldGeometryLock(
-                                                                                        context.getSource().getServer()
+                                                                                recoverAndPersistWorldGeometryLock(
+                                                                                        context.getSource().getServer(),
+                                                                                        player
                                                                                 );
 
                                                                                 int x = IntegerArgumentType.getInteger(context, "x");
@@ -228,11 +255,8 @@ public final class SkyblockMultiMod implements ModInitializer {
             ServerPlayer player = handler.player;
 
             try {
-                String playerName = player.getGameProfile().name();
-                if (new ServerCommandExecutor(server).run(
-                        "execute if score " + playerName + " sb3_state matches 2"
-                ) > 0) {
-                    persistWorldGeometryLock(server);
+                if (scoreValue(server, player, "sb3_state") == 2) {
+                    recoverAndPersistWorldGeometryLock(server, player);
                 }
             } catch (Exception ignored) {
                 // En un mundo nuevo los objetivos pueden no estar listos durante los primeros instantes.
@@ -290,9 +314,27 @@ public final class SkyblockMultiMod implements ModInitializer {
 
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
             OPENPAC_PARTY_STATES.remove(handler.player.getUUID());
+            PlayerTreeSelectionState.clear(handler.player.getUUID());
         });
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
+            geometryLockCheckTicks++;
+            if (!worldGeometryLocked && geometryLockCheckTicks >= 20) {
+                geometryLockCheckTicks = 0;
+                for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+                    try {
+                        int state = scoreValue(server, player, "sb3_state");
+                        int slot = scoreValue(server, player, "sb3_slot");
+                        if (state == 2 && slot >= 1 && slot <= 24) {
+                            recoverAndPersistWorldGeometryLock(server, player);
+                            break;
+                        }
+                    } catch (Exception ignored) {
+                        // Los objetivos pueden no existir durante los primeros ticks de un mundo nuevo.
+                    }
+                }
+            }
+
             if (!OpenPacCompat.isInstalled()) {
                 return;
             }
@@ -324,7 +366,10 @@ public final class SkyblockMultiMod implements ModInitializer {
         // OpenPAC: esperamos unos segundos después de SERVER_STARTED.
         // applyConfiguration() reinicia temporalmente sb3_used y el datapack necesita
         // algunos ticks para volver a detectar islas existentes por su bedrock central.
-        ServerLifecycleEvents.SERVER_STARTED.register(server -> openPacReservationDelayTicks = 100);
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+            OpenPacCompat.prepareWorldClaims(server);
+            openPacReservationDelayTicks = 100;
+        });
 
         // El bloqueo es persistente DENTRO de cada mundo. Al cerrar el servidor integrado,
         // limpiamos solo el estado runtime para que Mod Menu vuelva a mostrar los valores
@@ -335,8 +380,10 @@ public final class SkyblockMultiMod implements ModInitializer {
             worldGeometryLocked = false;
             activeWorldRadius = -1;
             activeWorldCapacity = -1;
+            geometryLockCheckTicks = 0;
             openPacReservationDelayTicks = -1;
             OPENPAC_PARTY_STATES.clear();
+            PlayerTreeSelectionState.clearAll();
         });
 
         String modVersion = FabricLoader.getInstance()
@@ -359,7 +406,16 @@ public final class SkyblockMultiMod implements ModInitializer {
     }
 
     public static EnumMap<TreeOption, Boolean> getConfiguredTreeStates() {
-        return new EnumMap<>(loadConfig().trees());
+        EnumMap<TreeOption, Boolean> legacyStates = new EnumMap<>(TreeOption.class);
+        Map<String, Boolean> states = loadConfig().trees();
+        for (TreeOption tree : TreeOption.values()) {
+            legacyStates.put(tree, Boolean.TRUE.equals(states.get(tree.id())));
+        }
+        return legacyStates;
+    }
+
+    public static Map<String, Boolean> getConfiguredTreeStatesById() {
+        return new LinkedHashMap<>(loadConfig().trees());
     }
 
     public static int getPlayerCapacity(int ignoredDistance) {
@@ -391,7 +447,7 @@ public final class SkyblockMultiMod implements ModInitializer {
 
     public static boolean saveConfiguredRadius(int requestedRadius) {
         ConfigData current = loadConfig();
-        return saveConfiguration(
+        return saveConfigurationByTreeId(
                 requestedRadius,
                 current.capacity(),
                 current.trees(),
@@ -406,10 +462,10 @@ public final class SkyblockMultiMod implements ModInitializer {
 
     public static boolean saveConfiguration(int requestedRadius, Map<TreeOption, Boolean> requestedTrees) {
         ConfigData current = loadConfig();
-        return saveConfiguration(
+        return saveConfigurationByTreeId(
                 requestedRadius,
                 current.capacity(),
-                requestedTrees,
+                legacyTreeStatesToIds(requestedTrees),
                 current.bonusChestMode(),
                 current.partyLeaveDifficultyMode()
         );
@@ -418,10 +474,10 @@ public final class SkyblockMultiMod implements ModInitializer {
     public static boolean saveConfiguration(int requestedRadius, Map<TreeOption, Boolean> requestedTrees,
                                             BonusChestMode bonusChestMode) {
         ConfigData current = loadConfig();
-        return saveConfiguration(
+        return saveConfigurationByTreeId(
                 requestedRadius,
                 current.capacity(),
-                requestedTrees,
+                legacyTreeStatesToIds(requestedTrees),
                 bonusChestMode,
                 current.partyLeaveDifficultyMode()
         );
@@ -431,10 +487,10 @@ public final class SkyblockMultiMod implements ModInitializer {
                                             Map<TreeOption, Boolean> requestedTrees,
                                             BonusChestMode bonusChestMode) {
         ConfigData current = loadConfig();
-        return saveConfiguration(
+        return saveConfigurationByTreeId(
                 requestedRadius,
                 requestedCapacity,
-                requestedTrees,
+                legacyTreeStatesToIds(requestedTrees),
                 bonusChestMode,
                 current.partyLeaveDifficultyMode()
         );
@@ -444,6 +500,19 @@ public final class SkyblockMultiMod implements ModInitializer {
                                             Map<TreeOption, Boolean> requestedTrees,
                                             BonusChestMode bonusChestMode,
                                             BonusChestMode partyLeaveDifficultyMode) {
+        return saveConfigurationByTreeId(
+                requestedRadius,
+                requestedCapacity,
+                legacyTreeStatesToIds(requestedTrees),
+                bonusChestMode,
+                partyLeaveDifficultyMode
+        );
+    }
+
+    public static boolean saveConfigurationByTreeId(int requestedRadius, int requestedCapacity,
+                                                     Map<String, Boolean> requestedTrees,
+                                                     BonusChestMode bonusChestMode,
+                                                     BonusChestMode partyLeaveDifficultyMode) {
         ensureConfigReady();
         ConfigData current = loadConfig();
         int normalizedCapacity = normalizeCapacity(requestedCapacity);
@@ -460,7 +529,7 @@ public final class SkyblockMultiMod implements ModInitializer {
             return false;
         }
 
-        EnumMap<TreeOption, Boolean> trees = normalizeTrees(requestedTrees);
+        Map<String, Boolean> trees = normalizeTrees(requestedTrees);
         BonusChestMode safeMode = bonusChestMode == null ? BonusChestMode.BEGINNER : bonusChestMode;
         BonusChestMode safePartyLeaveMode = partyLeaveDifficultyMode == null
                 ? BonusChestMode.BEGINNER
@@ -600,7 +669,7 @@ public final class SkyblockMultiMod implements ModInitializer {
         }
     }
 
-    private static void writeConfig(int radius, int capacity, Map<TreeOption, Boolean> trees,
+    private static void writeConfig(int radius, int capacity, Map<String, Boolean> trees,
                                     BonusChestMode bonusChestMode,
                                     BonusChestMode partyLeaveDifficultyMode) throws IOException {
         StringBuilder json = new StringBuilder();
@@ -611,12 +680,12 @@ public final class SkyblockMultiMod implements ModInitializer {
         json.append("  \"partyLeaveDifficultyMode\": \"")
                 .append(partyLeaveDifficultyMode.configKey()).append("\",\n");
         json.append("  \"enabledTrees\": {\n");
-        TreeOption[] values = TreeOption.values();
-        for (int i = 0; i < values.length; i++) {
-            TreeOption tree = values[i];
-            json.append("    \"").append(tree.configKey()).append("\": ")
-                    .append(Boolean.TRUE.equals(trees.get(tree)));
-            if (i + 1 < values.length) json.append(',');
+        List<Map.Entry<String, Boolean>> values = List.copyOf(trees.entrySet());
+        for (int i = 0; i < values.size(); i++) {
+            Map.Entry<String, Boolean> tree = values.get(i);
+            json.append("    \"").append(tree.getKey()).append("\": ")
+                    .append(Boolean.TRUE.equals(tree.getValue()));
+            if (i + 1 < values.size()) json.append(',');
             json.append("\n");
         }
         json.append("  }\n");
@@ -628,7 +697,7 @@ public final class SkyblockMultiMod implements ModInitializer {
         ensureConfigReady();
         int radius = DEFAULT_RADIUS;
         int capacity = DEFAULT_CAPACITY;
-        EnumMap<TreeOption, Boolean> trees = defaultTrees();
+        Map<String, Boolean> trees = defaultTrees();
         BonusChestMode bonusChestMode = BonusChestMode.BEGINNER;
         BonusChestMode partyLeaveDifficultyMode = BonusChestMode.BEGINNER;
         try {
@@ -675,13 +744,7 @@ public final class SkyblockMultiMod implements ModInitializer {
                 partyLeaveDifficultyMode = BonusChestMode.fromConfig(partyLeaveMatcher.group(1));
             }
 
-            for (TreeOption tree : TreeOption.values()) {
-                Pattern pattern = Pattern.compile("\\\"" + Pattern.quote(tree.configKey()) + "\\\"\\s*:\\s*(true|false)", Pattern.CASE_INSENSITIVE);
-                Matcher treeMatcher = pattern.matcher(raw);
-                if (treeMatcher.find()) {
-                    trees.put(tree, Boolean.parseBoolean(treeMatcher.group(1)));
-                }
-            }
+            trees = TreeConfigCodec.readStates(raw);
         } catch (Exception e) {
             System.err.println("[Skyblock Multi] Configuración inválida; se usarán valores seguros: " + e.getMessage());
         }
@@ -695,29 +758,27 @@ public final class SkyblockMultiMod implements ModInitializer {
         );
     }
 
-    private static EnumMap<TreeOption, Boolean> defaultTrees() {
-        EnumMap<TreeOption, Boolean> trees = new EnumMap<>(TreeOption.class);
-        for (TreeOption tree : TreeOption.values()) trees.put(tree, true);
-        return trees;
+    private static Map<String, Boolean> defaultTrees() {
+        return TreeConfigCodec.defaultStates();
     }
 
-    private static EnumMap<TreeOption, Boolean> normalizeTrees(Map<TreeOption, Boolean> requested) {
-        EnumMap<TreeOption, Boolean> trees = new EnumMap<>(TreeOption.class);
-        for (TreeOption tree : TreeOption.values()) {
-            trees.put(tree, requested == null || !requested.containsKey(tree) || Boolean.TRUE.equals(requested.get(tree)));
-        }
-        if (countEnabled(trees) == 0) {
-            trees.put(TreeOption.OAK, true);
-        }
-        return trees;
+    private static Map<String, Boolean> normalizeTrees(Map<String, Boolean> requested) {
+        return TreeConfigCodec.normalize(requested);
     }
 
-    private static int countEnabled(Map<TreeOption, Boolean> trees) {
+    private static int countEnabled(Map<String, Boolean> trees) {
         int count = 0;
-        for (TreeOption tree : TreeOption.values()) {
-            if (Boolean.TRUE.equals(trees.get(tree))) count++;
+        for (TreeDefinition tree : TreeCatalog.builtIns()) {
+            if (Boolean.TRUE.equals(trees.get(tree.id()))) count++;
         }
         return count;
+    }
+
+    private static Map<String, Boolean> legacyTreeStatesToIds(Map<TreeOption, Boolean> requested) {
+        if (requested == null) return null;
+        Map<String, Boolean> trees = new LinkedHashMap<>();
+        requested.forEach((tree, enabled) -> trees.put(tree.id(), Boolean.TRUE.equals(enabled)));
+        return trees;
     }
 
     private static void checkOpenPacPartyChange(MinecraftServer server, ServerPlayer player) {
@@ -816,7 +877,7 @@ public final class SkyblockMultiMod implements ModInitializer {
             executor.run(
                     "execute if score " + playerName
                             + " sb3_slot matches 1..24 as " + playerName
-                            + " run function skyblock:player/home"
+                            + " run function skyblockmulti:player/home"
             );
             // HOME ya terminó de mover al jugador a OWN. Sobrescribimos aquí
             // cualquier cama que hubiese fijado mientras estaba en la isla de
@@ -831,7 +892,7 @@ public final class SkyblockMultiMod implements ModInitializer {
             executor.run(
                     "execute unless score " + playerName
                             + " sb3_slot matches 1..24 as " + playerName
-                            + " run function skyblock:player/reset_after_party_leave"
+                            + " run function skyblockmulti:player/reset_after_party_leave"
             );
 
             System.out.println(
@@ -1024,7 +1085,7 @@ public final class SkyblockMultiMod implements ModInitializer {
                     "execute unless score " + playerName
                             + " sb3_slot matches 1..24 if score " + ownerName
                             + " sb3_state matches 2 as " + playerName
-                            + " run function skyblock:player/unlock_selection"
+                            + " run function skyblockmulti:player/unlock_selection"
             );
 
             System.out.println(
@@ -1041,7 +1102,7 @@ public final class SkyblockMultiMod implements ModInitializer {
                 executor.run(
                         "execute if score " + ownerName
                                 + " sb3_state matches 2 as " + playerName
-                                + " run function skyblock:player/home"
+                                + " run function skyblockmulti:player/home"
                 );
             }
         } catch (Exception e) {
@@ -1151,8 +1212,16 @@ public final class SkyblockMultiMod implements ModInitializer {
             executor.run("scoreboard players operation #world_capacity sb3_cfg = #capacity sb3_cfg");
             executor.run("scoreboard players operation #world_radius sb3_const = #distance sb3_const");
 
-            int capacity = executor.run("scoreboard players get #capacity sb3_cfg");
-            int radius = executor.run("scoreboard players get #distance sb3_const");
+            int capacity = scoreValue(
+                    server,
+                    ScoreHolder.forNameOnly("#capacity"),
+                    "sb3_cfg"
+            );
+            int radius = scoreValue(
+                    server,
+                    ScoreHolder.forNameOnly("#distance"),
+                    "sb3_const"
+            );
             if (isExactCapacity(capacity) && isExactRadiusOption(radius, capacity)) {
                 activeWorldCapacity = capacity;
                 activeWorldRadius = radius;
@@ -1161,6 +1230,49 @@ public final class SkyblockMultiMod implements ModInitializer {
         } catch (Exception e) {
             System.err.println("[Skyblock Multi] No fue posible persistir el bloqueo de geometría: " + e);
         }
+    }
+
+    private static void recoverAndPersistWorldGeometryLock(
+            MinecraftServer server,
+            ServerPlayer player
+    ) {
+        if (!worldGeometryLocked) {
+            try {
+                ServerCommandExecutor executor = new ServerCommandExecutor(server);
+                int slot = scoreValue(server, player, "sb3_slot");
+                int x = scoreValue(server, player, "sb3_x");
+                int z = scoreValue(server, player, "sb3_z");
+                int capacity = scoreValue(server, ScoreHolder.forNameOnly("#capacity"), "sb3_cfg");
+
+                if (slot > 16) {
+                    capacity = 24;
+                } else if (slot > 8 && capacity < 16) {
+                    capacity = 16;
+                }
+
+                if (isExactCapacity(capacity) && slot >= 1 && slot <= capacity
+                        && (x != 0 || z != 0)) {
+                    double assignedRadius = Math.hypot(x, z);
+                    if (capacity == 24 && slot <= 8) {
+                        assignedRadius *= 2.0D;
+                    }
+                    int recoveredRadius = normalizeRadius((int) Math.round(assignedRadius), capacity);
+                    executor.run("scoreboard players set #capacity sb3_cfg " + capacity);
+                    executor.run("scoreboard players set #distance sb3_const " + recoveredRadius);
+                    System.out.println(
+                            "[Skyblock Multi] Geometría recuperada desde la isla asignada: radio_hub="
+                                    + recoveredRadius + ", capacidad=" + capacity + "."
+                    );
+                }
+            } catch (Exception e) {
+                System.err.println(
+                        "[Skyblock Multi] No fue posible recuperar la geometría desde la isla asignada: "
+                                + e.getMessage()
+                );
+            }
+        }
+
+        persistWorldGeometryLock(server);
     }
 
     private static boolean isExactCapacity(int capacity) {
@@ -1175,13 +1287,26 @@ public final class SkyblockMultiMod implements ModInitializer {
     }
 
     private static boolean anyIslandSlotUsed(ServerCommandExecutor executor) throws ReflectiveOperationException {
+        MinecraftServer server = (MinecraftServer) activeServer;
         for (int i = 1; i <= LEGACY_PLAYER_CAPACITY; i++) {
             String key = String.format(Locale.ROOT, "%02d", i);
-            if (executor.run("execute if score #" + key + " sb3_used matches 1") > 0) {
+            if (server != null && scoreValue(
+                    server,
+                    ScoreHolder.forNameOnly("#" + key),
+                    "sb3_used"
+            ) == 1) {
                 return true;
             }
         }
         return false;
+    }
+
+    private static int scoreValue(MinecraftServer server, ScoreHolder holder, String objectiveName) {
+        Scoreboard scoreboard = server.getScoreboard();
+        Objective objective = scoreboard.getObjective(objectiveName);
+        if (objective == null) return 0;
+        ReadOnlyScoreInfo score = scoreboard.getPlayerScoreInfo(holder, objective);
+        return score == null ? 0 : score.value();
     }
 
     private static void applyConfiguration(Object server) {
@@ -1195,21 +1320,41 @@ public final class SkyblockMultiMod implements ModInitializer {
             executor.run("scoreboard objectives add sb3_cfg dummy");
             executor.run("scoreboard objectives add sb3_used dummy");
 
-            boolean persistentLock =
-                    executor.run("execute if score #geometry_locked sb3_cfg matches 1") > 0;
+            MinecraftServer minecraftServer = (MinecraftServer) server;
+            boolean persistentLock = scoreValue(
+                    minecraftServer,
+                    ScoreHolder.forNameOnly("#geometry_locked"),
+                    "sb3_cfg"
+            ) == 1;
 
             int storedCapacity = persistentLock
-                    ? executor.run("scoreboard players get #world_capacity sb3_cfg")
+                    ? scoreValue(
+                            minecraftServer,
+                            ScoreHolder.forNameOnly("#world_capacity"),
+                            "sb3_cfg"
+                    )
                     : -1;
             int storedRadius = persistentLock
-                    ? executor.run("scoreboard players get #world_radius sb3_const")
+                    ? scoreValue(
+                            minecraftServer,
+                            ScoreHolder.forNameOnly("#world_radius"),
+                            "sb3_const"
+                    )
                     : -1;
 
             // Migración transparente desde la primera versión circular, que bloqueaba
             // solo durante la sesión. Los scores de ocupación/capacidad/radio sí persistían.
             if (!persistentLock && anyIslandSlotUsed(executor)) {
-                int previousCapacity = executor.run("scoreboard players get #capacity sb3_cfg");
-                int previousRadius = executor.run("scoreboard players get #distance sb3_const");
+                int previousCapacity = scoreValue(
+                        minecraftServer,
+                        ScoreHolder.forNameOnly("#capacity"),
+                        "sb3_cfg"
+                );
+                int previousRadius = scoreValue(
+                        minecraftServer,
+                        ScoreHolder.forNameOnly("#distance"),
+                        "sb3_const"
+                );
                 if (isExactCapacity(previousCapacity)
                         && isExactRadiusOption(previousRadius, previousCapacity)) {
                     storedCapacity = previousCapacity;
@@ -1241,13 +1386,13 @@ public final class SkyblockMultiMod implements ModInitializer {
             activeWorldRadius = radius;
 
             // Retirar tickets de la geometría anterior antes de reescribir los slots.
-            executor.run("execute in minecraft:overworld if biome 0 64 0 minecraft:the_void run function skyblock:slots/remove_forceload");
-            executor.run("execute in minecraft:overworld if biome 0 64 0 minecraft:the_void run function skyblock:slots/remove_free_anchors");
+            executor.run("execute in minecraft:overworld if biome 0 64 0 minecraft:the_void run function skyblockmulti:slots/remove_forceload");
+            executor.run("execute in minecraft:overworld if biome 0 64 0 minecraft:the_void run function skyblockmulti:slots/remove_free_anchors");
             executor.run("execute in minecraft:overworld run kill @e[type=minecraft:marker,tag=skyblock_slots_ready_v1]");
             executor.run("execute in minecraft:overworld run kill @e[type=minecraft:marker,tag=skyblock_slots_ready_v2]");
 
-            executor.run("data modify storage skyblock:config island_radius set value " + radius);
-            executor.run("data modify storage skyblock:config island_distance set value " + radius);
+            executor.run("data modify storage skyblockmulti:config island_radius set value " + radius);
+            executor.run("data modify storage skyblockmulti:config island_distance set value " + radius);
             executor.run("scoreboard players set #distance sb3_const " + radius);
             executor.run("scoreboard players set #layout_version sb3_const " + LAYOUT_VERSION);
             executor.run("scoreboard players set #capacity sb3_cfg " + capacity);
@@ -1266,14 +1411,14 @@ public final class SkyblockMultiMod implements ModInitializer {
 
             for (TreeOption tree : TreeOption.values()) {
                 executor.run("scoreboard players set " + tree.scoreHolder() + " sb3_cfg "
-                        + (Boolean.TRUE.equals(config.trees().get(tree)) ? 1 : 0));
+                        + (Boolean.TRUE.equals(config.trees().get(tree.id())) ? 1 : 0));
             }
 
             // Borrar definiciones de slots previas y reiniciar ocupación lógica.
             // Las islas construidas se vuelven a detectar por su bedrock central.
             for (int i = 1; i <= LEGACY_PLAYER_CAPACITY; i++) {
                 String key = String.format(Locale.ROOT, "%02d", i);
-                executor.run("data remove storage skyblock:slots s" + key);
+                executor.run("data remove storage skyblockmulti:slots s" + key);
                 executor.run("scoreboard players set #" + key + " sb3_used 0");
             }
 
@@ -1283,11 +1428,11 @@ public final class SkyblockMultiMod implements ModInitializer {
                 String snbt = String.format(Locale.ROOT,
                         "{x:%d,z:%d,slot:%d,key:\"%s\"}",
                         slot.x(), slot.z(), slot.index(), key);
-                executor.run("data modify storage skyblock:slots s" + key + " set value " + snbt);
+                executor.run("data modify storage skyblockmulti:slots s" + key + " set value " + snbt);
             }
 
             executor.run("tag @a[scores={sb3_state=1}] remove skyblock_menu_shown_v1");
-            executor.run("execute in minecraft:overworld if biome 0 64 0 minecraft:the_void run function skyblock:slots/forceload");
+            executor.run("execute in minecraft:overworld if biome 0 64 0 minecraft:the_void run function skyblockmulti:slots/forceload");
             executor.run("execute in minecraft:overworld if biome 0 64 0 minecraft:the_void run scoreboard players set #slotgen sb3_const 60");
             System.out.println("[Skyblock Multi] Configuración aplicada: radio_hub=" + radius
                     + ", capacidad=" + capacity
@@ -1344,7 +1489,7 @@ public final class SkyblockMultiMod implements ModInitializer {
         return (int) (Math.round(coordinate / 16.0D) * 16L);
     }
 
-    private record ConfigData(int radius, int capacity, EnumMap<TreeOption, Boolean> trees,
+    private record ConfigData(int radius, int capacity, Map<String, Boolean> trees,
                               BonusChestMode bonusChestMode,
                               BonusChestMode partyLeaveDifficultyMode) {}
     private record Slot(int index, int x, int z) {}

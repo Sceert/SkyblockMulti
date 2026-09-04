@@ -8,6 +8,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.ReadOnlyScoreInfo;
 import net.minecraft.world.scores.ScoreHolder;
+import cl.treecs.skyblockmulti.infernal.InfernalTrialRunner;
 
 /** Prevents unrelated natural mobs from entering the active Infernal Trial. */
 public final class InfernalTrialSpawnControl {
@@ -48,6 +49,7 @@ public final class InfernalTrialSpawnControl {
         }
         ReadOnlyScoreInfo lock = level.getScoreboard().getPlayerScoreInfo(
                 ScoreHolder.forNameOnly("#spawn_lock"), objective);
-        return lock == null || lock.value() == 0;
+        boolean builtInLock = lock != null && lock.value() != 0;
+        return !builtInLock && !InfernalTrialRunner.isSpawnLocked(level);
     }
 }
